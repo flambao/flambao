@@ -1,0 +1,1965 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head><script type="text/javascript" src="/___vscode_livepreview_injected_script"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flambao – Come con gente increíble</title>
+  <meta name="description" content="Flambao conecta personas a través de cenas compartidas en restaurantes. iOS y Android." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet" /><style>
+    :root {
+      --red:   #002d74;
+      --orange: #d0b787;
+      --dark:   #1d1d1b ;
+      --cream:  #F8F5F0;
+      --gray:   #6B6B6B;
+      --border: #E5DDD3;
+      --nav-h:  60px;
+      --inv-blue:   #002d74 ;
+      --inv-accent: #002d74 ;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; font-family: 'Gotham Book', serif; background: #fff; color: var(--dark); }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+      height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700; color: var(--dark);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer; flex-shrink: 0; user-select: none;
+    }
+    nav ul { list-style: none; display: flex; gap: 16px; align-items: center; }
+    nav ul li a {
+      font-family: 'Gotham Book', serif;
+      font-size: 12.5px; font-weight: 400; color: var(--gray);
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; white-space: nowrap; user-select: none;
+      transition: color 0.2s; padding-bottom: 2px;
+    }
+    nav ul li a:hover { color: var(--dark); }
+    nav ul li a.active { color: var(--dark); border-bottom: 1.5px solid var(--red); }
+    .nav-cta {
+      background: var(--red) !important; color: #fff !important;
+      padding: 7px 16px; border-radius: 2px;
+      font-weight: 600 !important; border-bottom: none !important;
+      transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: #a01130 !important; }
+     .nav-inv-link{color:var(--inv-blue)!important;font-weight:600!important}
+    .nav-inv-link:hover{color:var(--inv-accent)!important}
+    .nav-share-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: none; border: 1px solid var(--border); border-radius: 20px;
+      padding: 5px 13px; cursor: pointer; font-family: 'Gotham Book', serif;
+      font-size: 12px; font-weight: 600; color: var(--gray); letter-spacing: 0.04em;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .nav-share-btn:hover { border-color: var(--dark); color: var(--dark); }
+    .nav-share-btn svg { width: 13px; height: 13px; }
+    .nav-lang { position: relative; flex-shrink: 0; }
+    .nav-lang-btn {
+      display: flex; align-items: center; gap: 7px;
+      background: none; border: 1px solid var(--border); border-radius: 20px;
+      padding: 5px 12px; cursor: pointer; font-family: 'Gotham Book', serif;
+      font-size: 12px; font-weight: 600; color: var(--gray);
+      transition: all 0.2s;
+    }
+    .nav-lang-btn:hover { border-color: var(--dark); color: var(--dark); }
+    .nav-lang-btn svg { width: 13px; height: 13px; }
+    .lang-chevron { width: 10px !important; transition: transform 0.22s; }
+    .nav-lang.open .lang-chevron { transform: rotate(180deg); }
+    .nav-lang-dropdown {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      background: #fff; border: 1px solid var(--border); border-radius: 4px;
+      min-width: 130px; box-shadow: 0 8px 28px rgba(0,0,0,0.1); z-index: 500; overflow: hidden;
+    }
+
+    .nav-lang.open .nav-lang-dropdown { display: block; }
+    .lang-option {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 15px; font-family: 'Gotham Book', serif;
+      font-size: 14px; color: var(--gray); cursor: pointer;
+      transition: background 0.15s; border: none; background: none; width: 100%;
+    }
+    .lang-option:hover { background: var(--cream); color: var(--dark); }
+    .lang-option.active { color: var(--dark); font-weight: 600; }
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--dark); }
+    .nav-mobile {
+      display: none; position: fixed; top: var(--nav-h); left: 0; right: 0;
+      background: rgba(255,255,255,0.99); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border); z-index: 299;
+      padding: 12px 24px 20px; flex-direction: column;
+    }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile a {
+      font-size: 16px; color: var(--gray); letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: color 0.2s;
+    }
+    .nav-mobile a:hover { color: var(--dark); }
+    .nav-mobile .m-cta {
+      margin-top: 14px; background: var(--red); color: #fff !important;
+      text-align: center; padding: 13px 0; border-radius: 2px; border-bottom: none; font-weight: 600;
+    }
+
+    .screens { position: fixed; top: var(--nav-h); left: 0; right: 0; bottom: 0; }
+    .screen {
+      position: absolute; inset: 0;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .screen.active { opacity: 1; pointer-events: all; }
+
+    .quote-band {
+      background: var(--red); color: #fff;
+      text-align: center; padding: 18px 40px;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(16px, 2vw, 22px); font-style: italic; font-weight: 400;
+      letter-spacing: 0.02em; position: relative; overflow: hidden;
+    }
+    .quote-band::before, .quote-band::after {
+      content: '\201C'; position: absolute; font-size: 80px; opacity: 0.12;
+      font-family: 'Playfair Display', serif; line-height: 1; top: -8px;
+    }
+    .quote-band::before { left: 20px; }
+    .quote-band::after { right: 20px; content: '\201D'; }
+    .quote-band-dark { background: var(--dark); }
+    .quote-band-cream { background: var(--cream); color: var(--dark); }
+    .quote-band-cream::before, .quote-band-cream::after { color: var(--dark); }
+
+    .ticker-band {
+      background: var(--dark); overflow: hidden; padding: 12px 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .ticker-inner {
+      display: flex; gap: 0; white-space: nowrap;
+      animation: ticker 28s linear infinite;
+    }
+    .ticker-inner:hover { animation-play-state: paused; }
+    .ticker-item {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); padding: 0 32px; flex-shrink: 0;
+    }
+    .ticker-item span { color: var(--red); margin-right: 8px; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    #screen-home { background: #fff; }
+    .hero {
+      min-height: calc(100vh - var(--nav-h));
+      display: flex; align-items: center;
+      padding: 60px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -80px; right: -180px;
+      width: 650px; height: 650px;
+      background: radial-gradient(circle, rgba(192,20,60,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      max-width: 1180px; margin: 0 auto; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+      position: relative;
+    }
+    .hero-eyebrow {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--red); border: 1px solid rgba(192,20,60,0.25);
+      padding: 6px 16px; margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 5vw, 72px);
+      font-weight: 900; line-height: 1.0;
+      letter-spacing: -0.02em; color: var(--dark); margin-bottom: 26px;
+    }
+    .hero h1 em { font-style: italic; color: var(--red); }
+    .hero-sub { font-size: 19px; font-weight: 300; line-height: 1.8; color: var(--gray); margin-bottom: 40px; max-width: 460px; }
+    .hero-sub strong { color: var(--dark); font-weight: 600; }
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .btn-store {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 13px 24px; border-radius: 2px;
+      font-family: 'Gotham Book', serif; font-size: 16px; font-weight: 600;
+      text-decoration: none; letter-spacing: 0.04em; transition: all 0.25s;
+    }
+    .btn-dark { background: var(--dark); color: #fff; }
+    .btn-dark:hover { background: #333; }
+    .btn-outline { background: transparent; color: var(--dark); border: 1.5px solid var(--dark); }
+    .btn-outline:hover { background: var(--dark); color: #fff; }
+    .btn-store svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .gratis-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+      color: #2e7d4a; background: rgba(46,125,74,0.09); border: 1px solid rgba(46,125,74,0.22);
+      padding: 6px 13px; border-radius: 2px;
+    }
+    .gratis-pill::before { content: '\2713'; font-size: 10px; }
+    .hero-visual { position: relative; display: flex; justify-content: center; align-items: center; }
+    .hero-visual-glow { position: absolute; width: 360px; height: 360px; border-radius: 50%; background: radial-gradient(circle, rgba(192,20,60,0.07) 0%, transparent 70%); }
+
+    .reviews-section { padding: 90px 60px; background: var(--cream); border-top: 1px solid var(--border); }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: var(--red); display: block; margin-bottom: 14px; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3.5vw, 46px); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--dark); }
+    .section-title em { font-style: italic; color: var(--red); }
+    .section-sub { font-size: 18px; font-weight: 300; color: var(--gray); line-height: 1.7; max-width: 500px; margin: 14px auto 0; }
+    .rating-summary { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 48px; }
+    .rating-num { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; color: var(--dark); line-height: 1; }
+    .rating-details { display: flex; flex-direction: column; gap: 3px; }
+    .rating-stars { color: #F5A623; font-size: 22px; letter-spacing: 3px; }
+    .rating-count { font-size: 13px; font-weight: 300; color: var(--gray); }
+    .rating-divider { width: 1px; height: 48px; background: var(--border); }
+    .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; }
+    .review-card { background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 30px 26px; position: relative; transition: box-shadow 0.25s; }
+    .review-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.07); }
+    .review-quote { position: absolute; top: 20px; right: 22px; font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 900; color: rgba(192,20,60,0.06); line-height: 1; pointer-events: none; }
+    .review-stars { color: #F5A623; font-size: 14px; letter-spacing: 2px; margin-bottom: 14px; }
+    .review-text { font-size: 17px; font-weight: 300; color: var(--dark); line-height: 1.75; margin-bottom: 22px; font-style: italic; }
+    .review-author { display: flex; align-items: center; gap: 12px; }
+    .review-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #fff; }
+    .av-red { background: var(--red); } .av-dark { background: var(--dark); } .av-orange { background: var(--orange); }
+    .review-name { font-size: 14px; font-weight: 600; color: var(--dark); display: block; }
+    .review-meta { font-size: 12px; font-weight: 300; color: var(--gray); display: block; margin-top: 1px; }
+    .reviews-more { text-align: center; margin-top: 36px; font-size: 15px; font-weight: 300; color: var(--gray); }
+    .reviews-more strong { color: var(--dark); font-weight: 600; }
+
+    .sorteo-card-section { padding: 0 60px 0; background: var(--cream); }
+    .sorteo-card {
+      max-width: 1100px; margin: 0 auto; background: var(--dark);
+      border-radius: 8px; overflow: hidden; display: grid;
+      grid-template-columns: 1fr 1.1fr; box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      position: relative;
+    }
+    .sorteo-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 60% 50%, rgba(192,20,60,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .sorteo-card-left { padding: 48px 40px; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+    .sorteo-live-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 14px; border-radius: 2px; margin-bottom: 24px; width: fit-content; }
+    .sorteo-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: pulse-sorteo 1.4s infinite; }
+    @keyframes pulse-sorteo { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+    .sorteo-card-title { font-family: 'Playfair Display', serif; font-size: clamp(26px, 3vw, 40px); font-weight: 900; color: #fff; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 14px; }
+    .sorteo-card-title em { font-style: italic; color: var(--orange); }
+    .sorteo-card-sub { font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.6); line-height: 1.75; margin-bottom: 28px; max-width: 380px; }
+    .sorteo-card-sub strong { color: rgba(255,255,255,0.9); font-weight: 600; }
+    .sorteo-card-prize { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 14px 18px; margin-bottom: 28px; }
+    .sorteo-prize-icon { font-size: 28px; flex-shrink: 0; }
+    .sorteo-prize-label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4); display: block; margin-bottom: 3px; }
+    .sorteo-prize-text { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #fff; }
+    .sorteo-card-cta { display: inline-flex; align-items: center; gap: 10px; background: var(--red); color: #fff; padding: 14px 26px; border-radius: 2px; font-family: 'Gotham Book', serif; font-size: 17px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s, transform 0.15s; width: fit-content; }
+    .sorteo-card-cta:hover { background: #a01130; transform: translateY(-1px); }
+    .sorteo-card-cta svg { width: 16px; height: 16px; }
+    .sorteo-card-right { position: relative; overflow: hidden; min-height: 320px; }
+    .sorteo-card-right video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    .sorteo-card-right-overlay { position: absolute; inset: 0; background: linear-gradient(to right, var(--dark) 0%, transparent 30%); z-index: 1; pointer-events: none; }
+    .sorteo-card-right-bottom { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); z-index: 2; padding: 20px 24px; }
+    .sorteo-contador-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .sorteo-contador-sub { font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.55); margin-top: 2px; }
+  /* FLOATING BADGE INVERSORES */
+    .inv-float{position:fixed;bottom:28px;right:28px;z-index:400;display:flex;flex-direction:column;align-items:flex-end;gap:0;animation:float-in .6s cubic-bezier(.34,1.56,.64,1) 1.2s both}
+    @keyframes float-in{from{transform:translateY(120px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .inv-float.hidden{display:none}
+    .inv-float-close{background:rgba(13,31,78,.85);border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:11px;font-weight:700;margin-bottom:4px;margin-right:2px;transition:background .2s;backdrop-filter:blur(8px)}
+    .inv-float-close:hover{background:rgba(13,31,78,1);color:#fff}
+    .inv-float-card{background:var(--inv-blue);border:1px solid rgba(255,255,255,.2);border-radius:10px;overflow:hidden;width:240px;box-shadow:0 16px 48px rgba(0,0,0,.4);cursor:pointer;transition:transform .22s,box-shadow .22s}
+    .inv-float-card:hover{transform:translateY(-3px);box-shadow:0 24px 56px rgba(0,0,0,.5)}
+    .inv-float-top{background:linear-gradient(135deg,#0d1f4e 0%,#1a3a8f 100%);padding:16px 16px 12px;position:relative;overflow:hidden}
+    .inv-float-top::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.05)}
+    .inv-float-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:3px 10px;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#fff;margin-bottom:8px}
+    .inv-float-dot{width:5px;height:5px;border-radius:50%;background:#4ade80;animation:pulse-sorteo 1.4s infinite}
+    .inv-float-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;line-height:1.3}
+    .inv-float-sub{font-size:11px;font-weight:300;color:rgba(255,255,255,.65);margin-top:4px;line-height:1.4}
+    .inv-float-body{padding:12px 14px 14px;background:var(--inv-blue)}
+    .inv-float-stats{display:flex;gap:8px;margin-bottom:10px}
+    .inv-float-stat{flex:1;background:rgba(255,255,255,.08);border-radius:4px;padding:8px 6px;text-align:center}
+    .inv-float-stat-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:900;color:#fff;display:block}
+    .inv-float-stat-label{font-size:9px;font-weight:600;color:#6b7a8d;text-transform:uppercase;letter-spacing:.08em;display:block;margin-top:1px}
+    .inv-float-btn{width:100%;padding:9px 0;background:#fff;color:var(--inv-blue);border:none;border-radius:4px;cursor:pointer;font-family:'Gotham Book',serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:background .2s}
+    .inv-float-btn:hover{background:#e8edf8}
+
+    @keyframes float-in { from { transform: translateY(120px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .sorteo-float.hidden { display: none; }
+    .sorteo-float-close { background: rgba(28,28,28,0.85); border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 700; margin-bottom: 4px; margin-right: 2px; transition: background 0.2s; backdrop-filter: blur(8px); }
+    .sorteo-float-close:hover { background: rgba(192,20,60,0.85); color: #fff; }
+    .sorteo-float-card { background: var(--dark); border: 1px solid rgba(192,20,60,0.4); border-radius: 10px; overflow: hidden; width: 220px; box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(192,20,60,0.15); cursor: pointer; transition: transform 0.22s, box-shadow 0.22s; }
+    .sorteo-float-card:hover { transform: translateY(-3px); box-shadow: 0 24px 56px rgba(0,0,0,0.5), 0 0 0 1px rgba(192,20,60,0.3); }
+    .sorteo-float-video-wrap { position: relative; height: 120px; overflow: hidden; }
+    .sorteo-float-video-wrap video { width: 100%; height: 100%; object-fit: cover; object-position: top; pointer-events: none; }
+    .sorteo-float-video-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%); }
+    .sorteo-float-live { position: absolute; top: 8px; left: 8px; display: flex; align-items: center; gap: 5px; background: var(--red); color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+    .sorteo-float-live-dot { width: 5px; height: 5px; border-radius: 50%; background: #fff; animation: pulse-sorteo 1.4s infinite; }
+    .sorteo-float-body { padding: 12px 14px 14px; }
+    .sorteo-float-label { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); margin-bottom: 4px; display: block; }
+    .sorteo-float-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 8px; }
+    .sorteo-float-btn { width: 100%; padding: 8px 0; background: var(--red); color: #fff; border: none; border-radius: 2px; cursor: pointer; font-family: 'Gotham Book', serif; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transition: background 0.2s; }
+    .sorteo-float-btn:hover { background: #a01130; }
+
+    .susurros-section { padding: 90px 60px; background: var(--dark); }
+    .susurros-inner { max-width: 1100px; margin: 0 auto; }
+    .section-eyebrow-light { font-size: 11px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color:var(--dark); display: block; margin-bottom: 14px; }
+    .section-title-light { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3.5vw, 46px); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--dark); }
+    .section-title-light em { font-style: italic; color: var(--orange); }
+    .section-sub-light { font-size: 18px; font-weight: 300; color: var(--gray); line-height: 1.7; max-width: 540px; margin: 14px 0 0; }
+    .susurros-header-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 48px; gap: 24px; flex-wrap: wrap; }
+    .susurros-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .susurro-card { position: relative; border-radius: 6px; overflow: hidden; background: #2c2c2c; aspect-ratio: 3/4; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
+    .susurro-card:hover { transform: translateY(-6px); box-shadow: 0 24px 56px rgba(0,0,0,0.6); }
+    .susurro-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.25) 55%, transparent 100%); }
+    .susurro-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-58%); width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.35); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(6px); transition: all 0.22s; z-index: 3; }
+    .susurro-card:hover .susurro-play-btn { background: rgba(192,20,60,0.75); border-color: var(--red); }
+    .susurro-play-btn svg { width: 20px; height: 20px; fill: #fff; margin-left: 3px; }
+    .susurro-badge { position: absolute; top: 14px; left: 14px; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.08); padding: 4px 10px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.12); z-index: 3; }
+    .susurro-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 22px 18px 20px; z-index: 3; }
+    .susurro-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #fff; display: block; margin-bottom: 3px; }
+    .susurro-desc { font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.55); }
+    .susurros-coming { margin-top: 28px; text-align: center; font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; }
+    .susurro-progress-wrap { position: absolute; bottom: 0; left: 0; right: 0; padding: 0 14px 10px; z-index: 4; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .susurro-card.playing .susurro-progress-wrap { opacity: 1; pointer-events: all; }
+    .susurro-progress-bar-bg { width: 100%; height: 3px; background: rgba(255,255,255,0.25); border-radius: 2px; overflow: hidden; cursor: pointer; }
+    .susurro-progress-bar-fill { height: 100%; width: 0%; background: var(--red); border-radius: 2px; transition: width 0.25s linear; }
+    .susurro-time-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.55); letter-spacing: 0.06em; margin-top: 5px; text-align: right; display: block; }
+    .susurro-card video { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0; }
+    .susurro-card video ~ .susurro-overlay, .susurro-card video ~ .susurro-play-btn, .susurro-card video ~ .susurro-info, .susurro-card video ~ .susurro-badge { z-index:2; }
+
+    .mapa-section { padding: 90px 60px; background: #fff; border-top: 1px solid var(--border); }
+    .mapa-inner { max-width: 1100px; margin: 0 auto; }
+    .mapa-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 72px; align-items: center; }
+    .mapa-stats-row { display: flex; gap: 32px; margin-top: 36px; padding-top: 30px; border-top: 1px solid var(--border); }
+    .mapa-stat-num { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 900; color: var(--dark); display: block; line-height: 1; }
+    .mapa-stat-label { font-size: 12px; font-weight: 300; color: var(--gray); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 3px; display: block; }
+    .mapa-cities { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .mapa-city-tag { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray); background: var(--cream); border: 1px solid var(--border); padding: 5px 12px; border-radius: 2px; transition: all 0.2s; cursor: default; }
+    .mapa-city-tag:hover { background: var(--red); border-color: var(--red); color: #fff; }
+    .spain-map-wrap { background: var(--cream); border: 1px solid var(--border); border-radius: 6px; padding: 32px; }
+    .spain-map-wrap svg { width: 100%; height: auto; display: block; }
+
+    .faq-section { padding: 90px 60px; background: var(--cream); border-top: 1px solid var(--border); }
+    .faq-inner { max-width: 760px; margin: 0 auto; }
+    .faq-list { margin-top: 48px; }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-trigger { width: 100%; background: none; border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 22px 0; gap: 20px; text-align: left; }
+    .faq-q { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; color: var(--dark); line-height: 1.3; }
+    .faq-icon { width: 30px; height: 30px; flex-shrink: 0; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.25s; background: #fff; }
+    .faq-icon svg { width: 12px; height: 12px; transition: transform 0.3s; }
+    .faq-icon svg line { stroke: var(--gray); stroke-width: 1.5; stroke-linecap: round; }
+    .faq-item.open .faq-icon { background: var(--red); border-color: var(--red); }
+    .faq-item.open .faq-icon svg line { stroke: #fff; }
+    .faq-item.open .faq-icon .faq-vert { transform: scaleY(0); opacity: 0; }
+    .faq-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .faq-body-inner { padding: 0 0 24px; font-size: 17px; font-weight: 300; color: var(--gray); line-height: 1.8; }
+    .faq-body-inner strong { color: var(--dark); font-weight: 600; }
+    .faq-item.open .faq-body { max-height: 400px; }
+
+    #screen-como { background: #fff; }
+    .como-wrap { max-width: 1000px; margin: 0 auto; padding: 70px 60px; }
+    .screen-header { text-align: center; margin-bottom: 64px; }
+    .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--red); display: block; margin-bottom: 16px; }
+    .screen-title { font-family: 'Playfair Display', serif; font-size: clamp(30px, 4vw, 50px); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--dark); }
+    .screen-title em { font-style: italic; color: var(--red); }
+    .screen-sub { font-size: 18px; font-weight: 300; color: var(--gray); line-height: 1.7; max-width: 520px; margin: 16px auto 0; }
+    .steps { position: relative; display: flex; flex-direction: column; gap: 0; }
+    .step { position: relative; padding: 0 0 48px 0; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; padding-bottom: 0; }
+    .step-num-col { display: none; }
+    .step-body { padding: 0; }
+    .step-label { font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; display: inline-block; background: rgba(192,20,60,0.07); border: 1px solid rgba(192,20,60,0.2); padding: 5px 14px; border-radius: 2px; }
+    .step-title { font-family: 'Playfair Display', serif; font-size: clamp(22px, 2.8vw, 30px); font-weight: 700; color: var(--dark); line-height: 1.15; margin-bottom: 14px; margin-top: 4px; }
+    .step-desc { font-size: 17px; font-weight: 300; color: var(--gray); line-height: 1.75; }
+    .step-desc strong { color: var(--dark); font-weight: 600; }
+    .step-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+    .step-tag { font-size: 13px; font-weight: 600; color: var(--gray); background: var(--cream); border: 1px solid var(--border); padding: 4px 12px; border-radius: 2px; }
+    .step-img-col { display: none; }
+    .step-line { display: none; }
+
+    #screen-categorias { background: var(--cream); }
+    .cats-wrap { max-width: 1100px; margin: 0 auto; padding: 70px 60px; }
+    .cats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 56px; }
+    .cat-card { background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 36px 16px 28px; text-align: center; transition: all 0.28s; cursor: pointer; position: relative; overflow: hidden; }
+    .cat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--red); transform: scaleX(0); transition: transform 0.28s; }
+    .cat-card:hover::after, .cat-card.active-cat::after { transform: scaleX(1); }
+    .cat-card:hover, .cat-card.active-cat { background: var(--red); border-color: var(--red); transform: translateY(-4px); box-shadow: 0 16px 40px rgba(192,20,60,0.18); }
+    .cat-card:hover::after, .cat-card.active-cat::after { background: rgba(255,255,255,0.3); }
+    .cat-icon { font-size: 28px; display: block; margin-bottom: 12px; transition: transform 0.28s; }
+    .cat-card:hover .cat-icon, .cat-card.active-cat .cat-icon { transform: scale(1.15); }
+    .cat-name { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 600; color: var(--dark); line-height: 1.3; display: block; transition: color 0.28s; }
+    .cat-card:hover .cat-name, .cat-card.active-cat .cat-name { color: #fff; }
+    .cat-detail-panel { margin-top: 32px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); background: #fff; display: grid; grid-template-columns: 1fr 1fr; min-height: 260px; opacity: 0; transform: translateY(12px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
+    .cat-detail-panel.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+    .cat-detail-info { padding: 40px 36px; display: flex; flex-direction: column; justify-content: center; }
+    .cat-detail-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 12px; display: block; }
+    .cat-detail-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--dark); margin-bottom: 16px; line-height: 1.2; }
+    .cat-detail-desc { font-size: 16px; font-weight: 300; color: var(--gray); line-height: 1.8; }
+    .cat-detail-img { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--cream) 0%, #ede8e2 100%); }
+    .cat-detail-img-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--gray); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; padding: 20px; }
+    .cat-detail-img-placeholder .ph-icon { font-size: 48px; opacity: 0.5; }
+
+    /* ══ SAMANTHAS ══ */
+    #screen-samanthas { background: #fff; }
+    .samanthas-wrap { max-width: 1100px; margin: 0 auto; padding: 70px 60px; }
+    .samanthas-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 56px; }
+    .samanthas-content blockquote { font-family: 'Playfair Display', serif; font-size: clamp(22px, 2.5vw, 32px); font-style: italic; font-weight: 400; color: var(--dark); line-height: 1.4; margin: 24px 0; padding-left: 20px; border-left: 3px solid var(--red); }
+    .samanthas-content p { font-size: 17px; font-weight: 300; color: var(--gray); line-height: 1.8; margin-bottom: 16px; }
+    .samanthas-picks { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--border); }
+    .samanthas-picks-title { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 16px; display: block; }
+    .samanthas-pick-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sam-tag { font-size: 13px; font-weight: 600; color: var(--gray); background: var(--cream); border: 1px solid var(--border); padding: 6px 14px; border-radius: 2px; }
+
+    #screen-restaurantes { background: var(--cream); }
+    .rest-wrap { max-width: 1100px; margin: 0 auto; padding: 70px 60px; }
+    .rest-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 56px; }
+    .rest-benefits { display: flex; flex-direction: column; gap: 18px; margin: 28px 0; }
+    .rest-benefit { display: flex; align-items: flex-start; gap: 16px; padding: 18px 20px; background: #fff; border: 1px solid var(--border); border-radius: 4px; transition: box-shadow 0.2s; }
+    .rest-benefit:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+    .rest-benefit-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+    .rest-benefit-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--dark); display: block; margin-bottom: 4px; }
+    .rest-benefit-desc { font-size: 14px; font-weight: 300; color: var(--gray); line-height: 1.6; }
+    .btn-rest-contact { display: inline-flex; align-items: center; gap: 10px; background: var(--red); color: #fff; padding: 14px 28px; border-radius: 2px; border: none; cursor: pointer; font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; letter-spacing: 0.04em; transition: background 0.2s; text-decoration: none; }
+    .btn-rest-contact:hover { background: #a01130; }
+
+    /* PABBLOS */
+    #screen-pabblos{background:#fff}
+    .pabblos-wrap{max-width:1100px;margin:0 auto;padding:70px 60px}
+    .pabblos-header{display:flex;align-items:center;gap:16px;margin-bottom:48px}
+    .pabblos-logo-circle{width:56px;height:56px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#fff;flex-shrink:0}
+    .pabblos-name{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--dark)}
+    .pabblos-golden-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#c9a227,#f0c040);color:#fff;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:5px 12px;border-radius:2px}
+    .pabblos-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:64px;align-items:start}
+    .pabblos-photos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .pabblos-photo{border-radius:6px;overflow:hidden;aspect-ratio:4/5}
+    .pabblos-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+    .pabblos-photo:hover img{transform:scale(1.03)}
+    .pabblos-badges{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+    .pabblos-badge-item{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--dark)}
+    .pabblos-badge-item::before{content:'\2713';width:20px;height:20px;background:var(--red);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+    .pabblos-cta-btn{display:inline-flex;align-items:center;gap:10px;background:var(--dark);color:#fff;padding:16px 28px;border-radius:2px;border:none;cursor:pointer;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;letter-spacing:.04em;transition:background .2s;margin-top:24px;width:100%;justify-content:center}
+    .pabblos-cta-btn:hover{background:var(--red)}
+    .pabblos-sam-photo{border-radius:8px;overflow:hidden;aspect-ratio:3/4;position:relative}
+    .pabblos-sam-photo img{width:100%;height:100%;object-fit:cover;display:block}
+    .pabblos-sam-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,transparent 60%);padding:32px 24px 24px}
+    .pabblos-sam-quote{font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:#fff;line-height:1.5;margin-bottom:12px}
+    .pabblos-sam-name{font-size:13px;font-weight:700;color:var(--orange);letter-spacing:.12em;text-transform:uppercase}
+    .pabblos-cta-rest{background:var(--cream);border-top:1px solid var(--border);padding:56px 60px}
+    .pabblos-cta-rest-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap}
+    .pabblos-cta-rest p{font-size:20px;font-weight:300;color:var(--gray);line-height:1.7;max-width:600px}
+    .pabblos-cta-rest p strong{color:var(--dark);font-weight:600}
+    .btn-quiero-info{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;padding:16px 32px;border-radius:2px;border:none;cursor:pointer;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;letter-spacing:.04em;transition:all .2s;white-space:nowrap;text-decoration:none}
+    .btn-quiero-info:hover{background:#a01130;transform:translateY(-1px)}
+   
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal-box{background:#fff;border-radius:8px;padding:48px 44px;max-width:520px;width:90%;position:relative;transform:translateY(20px);transition:transform .3s;box-shadow:0 32px 80px rgba(0,0,0,.25)}
+    .modal-overlay.open .modal-box{transform:translateY(0)}
+    .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s}
+    .modal-close:hover{background:var(--cream)}
+    .modal-icon{font-size:40px;margin-bottom:20px;display:block}
+    .modal-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--dark);margin-bottom:14px;line-height:1.2}
+    .modal-body{font-size:17px;font-weight:300;color:var(--gray);line-height:1.8}
+    .modal-body strong{color:var(--dark);font-weight:600}
+    .modal-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(192,20,60,.08);border:1px solid rgba(192,20,60,.2);color:var(--red);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 14px;border-radius:2px;margin-top:20px}
+    /* REST FORM */
+    #screen-rest-form{background:var(--cream)}
+    .restform-wrap{max-width:760px;margin:0 auto;padding:70px 60px}
+    .restform-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:48px 44px}
+    .form-field{margin-bottom:20px}
+    .form-field label{display:block;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gray);margin-bottom:8px}
+    .form-field input,.form-field select,.form-field textarea{width:100%;padding:14px 16px;font-family:'Gotham Book',serif;font-size:17px;font-weight:300;color:var(--dark);background:#fff;border:1px solid var(--border);border-radius:2px;outline:none;transition:border-color .2s}
+    .form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--red)}
+    .form-field textarea{min-height:100px;resize:vertical}
+    .form-field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+    .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .btn-form-submit{width:100%;padding:18px;background:var(--red);color:#fff;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;transition:background .2s;margin-top:8px}
+    .btn-form-submit:hover{background:#a01130}
+    .restform-success{text-align:center;padding:48px 24px;display:none}
+    .restform-success.visible{display:block}
+    .restform-success-icon{font-size:56px;display:block;margin-bottom:20px}
+    .restform-success-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--dark);margin-bottom:14px}
+    .restform-success-msg{font-size:18px;font-weight:300;color:var(--gray);line-height:1.7}
+    /* INVERSORES */
+    #screen-inversores{background:#f0f4fb}
+    .inv-wrap{max-width:800px;margin:0 auto;padding:56px 40px}
+    .inv-logo-row{display:flex;align-items:center;gap:12px;margin-bottom:32px;justify-content:center}
+    .inv-logo-icon{width:44px;height:44px}
+    .inv-brand{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--inv-blue);letter-spacing:.06em;text-transform:uppercase}
+    .inv-main-title{font-family:'Playfair Display',serif;font-size:clamp(36px,5vw,64px);font-weight:900;color:var(--inv-blue);text-align:center;line-height:1.05;letter-spacing:-.02em;margin-bottom:16px}
+.inv-main-sub{font-size:16px;font-weight:300;color:#4a5568;text-align:center;line-height:1.7;margin-bottom:48px;max-width:560px;margin-left:auto;margin-right:auto} .inv-obj-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+   .inv-obj-card{background:#fff;border:1px solid #c8d8f0;border-radius:8px;padding:24px 20px;box-shadow:0 2px 8px rgba(0,45,116,.06)}
+.inv-obj-amount{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--inv-blue);line-height:1;display:block}
+.inv-obj-label{font-size:13px;font-weight:300;color:#4a5568;margin-top:4px;display:block}
+.inv-obj-sub{font-size:12px;font-weight:600;color:#6b7a8d;text-transform:uppercase;letter-spacing:.12em;margin-top:8px;display:block}
+.inv-progress-section{background:#fff;border:1px solid #c8d8f0;border-radius:8px;padding:20px 24px;margin-bottom:32px;box-shadow:0 2px 8px rgba(0,45,116,.06)}
+.inv-progress-target{font-size:12px;font-weight:600;color:#6b7a8d;text-transform:uppercase;letter-spacing:.12em}
+.inv-progress-pct{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--inv-blue)}
+.inv-progress-bar{height:8px;background:#dce8f7;border-radius:4px;overflow:hidden}
+.inv-progress-labels{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:#6b7a8d}
+.inv-main-title{font-family:'Playfair Display',serif;font-size:clamp(36px,5vw,64px);font-weight:900;color:var(--inv-blue);text-align:center;line-height:1.05;letter-spacing:-.02em;margin-bottom:16px}
+.inv-main-sub{font-size:16px;font-weight:300;color:#4a5568;text-align:center;line-height:1.7;margin-bottom:48px;max-width:640px;margin-left:auto;margin-right:auto}
+.inv-brand{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--inv-blue);letter-spacing:.06em;text-transform:uppercase}
+.inv-feature{background:#fff;border:1px solid #c8d8f0;border-radius:6px;padding:18px 16px;box-shadow:0 2px 8px rgba(0,45,116,.04)}
+.inv-feature-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--inv-blue);margin-bottom:6px}
+.inv-feature-desc{font-size:13px;font-weight:300;color:#4a5568;line-height:1.5}
+.inv-timeline-title{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#6b7a8d;margin-bottom:20px;display:block}
+.inv-tl-line{position:absolute;top:12px;left:20px;right:20px;height:2px;background:#c8d8f0}
+.inv-tl-dot{width:24px;height:24px;border-radius:50%;border:2px solid #c8d8f0;background:#f0f4fb;display:flex;align-items:center;justify-content:center}
+.inv-tl-label{font-size:11px;font-weight:300;color:#6b7a8d;text-align:center;max-width:90px;line-height:1.3}
+.inv-tl-label strong{display:block;color:var(--inv-blue);font-weight:600;font-size:12px;margin-bottom:2px}
+.inv-partners{background:#fff;border:1px solid #c8d8f0;border-radius:8px;padding:24px;margin-bottom:32px;box-shadow:0 2px 8px rgba(0,45,116,.04)}
+.inv-partners-label{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#6b7a8d;margin-bottom:16px;display:block}
+.inv-partner-item{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--inv-blue)} .inv-obj-icon{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px}
+      .inv-progress-fill{height:100%;width:25%;background:linear-gradient(to right,#4ade80,#22c55e);border-radius:4px}
+    .inv-progress-labels{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:#6b7a8d}
+    .inv-form-cta{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:20px 24px;margin-bottom:32px;display:flex;align-items:center;gap:20px}
+    .inv-form-cta-icon{width:44px;height:44px;border-radius:50%;background:var(--inv-accent);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .inv-form-cta-text{flex:1}
+    .inv-form-cta-text p{font-size:14px;font-weight:300;color:rgba(255,255,255,.6);line-height:1.5;margin-top:2px}
+    .inv-form-cta-text strong{font-size:16px;color:#fff;font-weight:600;display:block}
+    .inv-form-btn{background:#fff;color:var(--inv-blue);padding:12px 20px;border-radius:4px;border:none;cursor:pointer;font-family:'Gotham Book',serif;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;transition:background .2s;flex-shrink:0;text-decoration:none;display:inline-block}
+    .inv-form-btn:hover{background:#e8edf8}
+    .inv-countdown-section{background:var(--inv-accent);border-radius:8px;padding:28px 24px;margin-bottom:32px;text-align:center}
+    .inv-countdown-label{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:16px;display:block}
+    .inv-countdown-digits{display:flex;justify-content:center;gap:16px}
+    .inv-cd-block{text-align:center}
+    .inv-cd-num{font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:#fff;line-height:1;display:block;min-width:70px}
+    .inv-cd-unit{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45);display:block;margin-top:4px}
+    .inv-cd-sep{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:rgba(255,255,255,.3);line-height:1;align-self:flex-start;padding-top:4px}
+    .inv-features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:32px}
+.inv-feature{background:#fff;border:1px solid #c8d8f0;border-radius:6px;padding:18px 16px;box-shadow:0 2px 8px rgba(0,45,116,.04)}
+.inv-feature-icon{font-size:24px;margin-bottom:10px;display:block}
+.inv-feature-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--inv-blue);margin-bottom:6px}
+.inv-feature-desc{font-size:13px;font-weight:300;color:#4a5568;line-height:1.5}.inv-timeline{margin-bottom:32px}
+    .inv-tl-track{position:relative;padding:0 20px}
+     .inv-tl-fill{position:absolute;top:0;left:0;width:25%;height:100%;background:#4ade80;border-radius:1px}
+     .inv-timeline-title{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#6b7a8d;margin-bottom:20px;display:block}
+.inv-tl-line{position:absolute;top:12px;left:20px;right:20px;height:2px;background:#c8d8f0}
+    .inv-tl-dots{display:flex;justify-content:space-between;position:relative;z-index:1;margin-bottom:12px}
+   .inv-tl-dot{width:24px;height:24px;border-radius:50%;border:2px solid #c8d8f0;background:#f0f4fb;display:flex;align-items:center;justify-content:center} .inv-tl-dot.active{background:#4ade80;border-color:#4ade80}
+    .inv-tl-dot.current{background:#fff;border-color:#fff}
+    .inv-tl-dot.current::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--inv-blue)}
+    .inv-tl-dot.active::after{content:'\2713';font-size:11px;color:#fff;font-weight:700}
+    .inv-tl-labels{display:flex;justify-content:space-between}
+   .inv-tl-label{font-size:11px;font-weight:300;color:#6b7a8d;text-align:center;max-width:90px;line-height:1.3}
+.inv-tl-label strong{display:block;color:var(--inv-blue);font-weight:600;font-size:12px;margin-bottom:2px} .inv-partners{background:#fff;border:1px solid #c8d8f0;border-radius:8px;padding:24px;margin-bottom:32px;box-shadow:0 2px 8px rgba(0,45,116,.04)}
+.inv-partners-label{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#6b7a8d;margin-bottom:16px;display:block}
+.inv-partners-list{display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+.inv-partner-item{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--inv-blue)}.inv-bottom-cta{text-align:center;padding:32px 24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;margin-bottom:40px}
+    .inv-bottom-cta p{font-size:18px;font-weight:300;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+    .inv-bottom-cta strong{color:#fff;font-weight:600}
+ 
+   #screen-historia { background: #fff; }
+    .historia-wrap { max-width: 860px; margin: 0 auto; padding: 70px 60px; }
+    .historia-lede { font-family: 'Playfair Display', serif; font-size: clamp(20px, 2.5vw, 28px); font-style: italic; font-weight: 400; color: var(--dark); line-height: 1.55; margin: 36px 0 48px; padding: 32px 40px; background: var(--cream); border-left: 4px solid var(--red); border-radius: 0 4px 4px 0; }
+    .historia-body p { font-size: 18px; font-weight: 300; color: var(--gray); line-height: 1.9; margin-bottom: 22px; }
+    .historia-body p strong { color: var(--dark); font-weight: 600; }
+    .historia-body p em { font-style: italic; color: var(--dark); }
+    .historia-highlight { margin: 48px 0; padding: 40px 48px; background: var(--dark); border-radius: 4px; text-align: center; }
+    .historia-highlight p { font-family: 'Playfair Display', serif; font-size: clamp(18px, 2.2vw, 26px); font-style: italic; color: rgba(255,255,255,0.85); line-height: 1.5; font-weight: 400; margin: 0; }
+    .historia-highlight p em { color: var(--orange); font-style: normal; font-weight: 700; }
+    .fundadores-section { margin-top: 64px; padding-top: 48px; border-top: 1px solid var(--border); }
+    .fundadores-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+    .fundador-card { background: var(--cream); border: 1px solid var(--border); border-radius: 4px; padding: 28px 24px; }
+    .fundador-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--red); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 16px; }
+    .fundador-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--dark); display: block; margin-bottom: 4px; }
+    .fundador-role { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); display: block; margin-bottom: 10px; }
+    .fundador-bio { font-size: 14px; font-weight: 300; color: var(--gray); line-height: 1.7; }
+    .mision-vision { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 64px; padding-top: 48px; border-top: 1px solid var(--border); }
+    .mv-card { padding: 32px; border-radius: 4px; }
+    .mv-card-mision { background: var(--red); }
+    .mv-card-vision { background: var(--dark); }
+    .mv-label { font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.5); display: block; margin-bottom: 14px; }
+    .mv-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 14px; line-height: 1.2; }
+    .mv-text { font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.75); line-height: 1.7; }
+
+    #screen-contacto { background: #fff; }
+    .contacto-wrap { max-width: 1180px; margin: 0 auto; padding: 70px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: flex-start; }
+    .contacto-left h2 { font-family: 'Playfair Display', serif; font-size: clamp(30px, 3.5vw, 46px); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--dark); margin-bottom: 20px; }
+    .contacto-left h2 em { font-style: italic; color: var(--red); }
+    .contacto-left p { font-size: 18px; font-weight: 300; color: var(--gray); line-height: 1.8; margin-bottom: 32px; }
+    .c-info { display: flex; flex-direction: column; gap: 14px; }
+    .c-info-item { font-size: 16px; font-weight: 300; color: var(--gray); }
+    .c-info-item strong { color: var(--dark); font-weight: 600; display: block; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
+    .form-row { margin-bottom: 16px; }
+    .form-row input, .form-row textarea { width: 100%; padding: 15px 18px; font-family: 'Gotham Book', serif; font-size: 17px; font-weight: 300; color: var(--dark); background: #fff; border: 1px solid var(--border); border-radius: 2px; outline: none; transition: border-color 0.2s; }
+    .form-row input:focus, .form-row textarea:focus { border-color: var(--red); }
+    .form-row textarea { min-height: 120px; resize: vertical; }
+    .form-check { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; font-weight: 300; color: var(--gray); line-height: 1.6; margin-bottom: 22px; }
+    .form-check input[type="checkbox"] { margin-top: 3px; accent-color: var(--red); flex-shrink: 0; width: 15px; height: 15px; }
+    .form-check a { color: var(--red); text-decoration: none; }
+    .btn-submit { width: 100%; padding: 16px; background: var(--dark); color: #fff; font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; border: none; border-radius: 2px; cursor: pointer; transition: background 0.2s; }
+    .btn-submit:hover { background: var(--red); }
+    .footer-bar { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; grid-column: span 2; }
+    .footer-legal { display: flex; gap: 24px; flex-wrap: wrap; }
+    .footer-legal a { font-size: 13px; font-weight: 300; color: var(--gray); text-decoration: none; transition: color 0.2s; }
+    .footer-legal a:hover { color: var(--dark); }
+    .footer-copy { font-size: 13px; font-weight: 300; color: rgba(0,0,0,0.3); }
+
+    .site-footer { background: #111; color: #fff; padding: 64px 60px 0; flex-shrink: 0; }
+    .footer-top { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 56px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .footer-brand-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 0.06em; text-transform: uppercase; display: block; margin-bottom: 8px; }
+    .footer-brand-tagline { font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.4); margin-bottom: 28px; display: block; }
+    .footer-social { display: flex; gap: 14px; }
+    .footer-social-link { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .footer-social-link:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.07); }
+    .footer-social-link svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.65); }
+    .footer-col-title { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 20px; display: block; }
+    .footer-col-links { display: flex; flex-direction: column; }
+    .footer-col-links a { font-size: 16px; color: rgba(255,255,255,0.75); text-decoration: none; padding: 7px 0; transition: color 0.2s; cursor: pointer; border: none; background: none; font-family: 'Gotham Book', serif; text-align: left; }
+    .footer-col-links a:hover { color: #fff; }
+    .footer-bottom { padding: 24px 0 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+    .footer-legal-links { display: flex; flex-wrap: wrap; }
+    .footer-legal-links a { font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; padding-right: 20px; }
+    .footer-legal-links a:hover { color: rgba(255,255,255,0.7); }
+    .footer-copy-text { font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.25); }
+
+    #screen-media { background: #fff; }
+    .media-wrap { max-width: 1100px; margin: 0 auto; padding: 70px 60px; }
+    .media-prensa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+    .media-card { border-radius: 6px; overflow: hidden; position: relative; transition: transform 0.28s, box-shadow 0.28s; text-decoration: none; display: block; }
+    .media-card:hover { transform: translateY(-5px); box-shadow: 0 20px 48px rgba(0,0,0,0.5); }
+    .media-card-article { background:var(--cream); border: 1px solid rgba(255,255,255,0.08); padding: 28px 24px; }
+    .media-card-source { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); display: block; margin-bottom: 14px; }
+    .media-card-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700;color: var(--dark); line-height: 1.35; margin-bottom: 12px; }
+    .media-card-excerpt { font-size: 14px; font-weight: 300; color: var(--gray); line-height: 1.7; margin-bottom: 20px; }
+    .media-card-meta { font-size: 12px; font-weight: 300; color: var(--gray); display: flex; align-items: center; justify-content: space-between; }
+    .media-card-link-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange); display: flex; align-items: center; gap: 5px; }
+    .media-card-link-label svg { width: 12px; height: 12px; }
+    .media-card-podcast { background:  var(--cream); border: 1px solid rgba(192,20,60,0.25); padding: 28px 24px; }
+    .media-card-podcast-icon { width: 48px; height: 48px; border-radius: 10px; background: var(--red); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+    .media-card-podcast-icon svg { width: 24px; height: 24px; fill: #fff; }
+    .media-card-podcast-badge { display: inline-block; margin-bottom: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); background: rgba(192,20,60,0.12); padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(192,20,60,0.25); }
+    .media-card-podcast .media-card-title { font-size: 17px; }
+    .media-listen-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; background: var(--red); color: #fff; padding: 9px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transition: background 0.2s; }
+    .media-listen-btn:hover { background: #a01130; }
+    .media-listen-btn svg { width: 14px; height: 14px; fill: #fff; }
+    .media-susurros-section { margin-top: 72px; padding-top: 56px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .media-susurros-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; }
+    .media-logos-row { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; margin-top: 48px; padding: 28px 32px; background: var(--cream); border: 1px solid var(--border); border-radius: 6px; }
+    .media-logos-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dark); flex-shrink: 0; }
+    .media-logo-item { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: 0.04em; transition: color 0.2s; }
+    .media-logo-item:hover { color: rgba(255,255,255,0.7); }
+    .sorteo-activo-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; padding: 5px 12px; border-radius: 2px; margin-bottom: 10px; }
+    .sorteo-activo-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pulse-sorteo 1.4s infinite; }
+
+    .share-toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--dark); color: #fff; padding: 14px 24px; border-radius: 4px; font-size: 15px; font-weight: 400; letter-spacing: 0.02em; z-index: 999; transition: transform 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.3); white-space: nowrap; }
+    .share-toast.visible { transform: translateX(-50%) translateY(0); }
+
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+    .nav-dropdown > a::after { content: ''; display: inline-block; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform 0.22s; margin-left: 1px; }
+    .nav-dropdown:hover > a::after, .nav-dropdown.open > a::after { transform: rotate(-135deg) translateY(1px); }
+    .nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%); background: #fff; border: 1px solid var(--border); border-radius: 6px; min-width: 210px; box-shadow: 0 12px 40px rgba(0,0,0,0.12); z-index: 500; padding: 6px 0; }
+    .nav-dropdown-menu::before { content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 9px; height: 9px; background: #fff; border-left: 1px solid var(--border); border-top: 1px solid var(--border); }
+    .nav-dropdown.open .nav-dropdown-menu { display: block; }
+    .nav-dropdown-item { display: block; padding: 10px 20px; font-family: 'Gotham Book', serif; font-size: 14px; font-weight: 400; color: var(--gray); letter-spacing: 0.04em; cursor: pointer; transition: background 0.15s, color 0.15s; border: none; background: none; width: 100%; text-align: left; white-space: nowrap; }
+    .nav-dropdown-item:hover { background: var(--cream); color: var(--dark); }
+    .nav-dropdown-label { display: block; padding: 8px 20px 3px; font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.28); }
+    .nav-dropdown-divider { height: 1px; background: var(--border); margin: 5px 0; }
+
+    .step-mockup-real { width:160px; height:290px; border-radius:20px; overflow:hidden; border:1px solid var(--border); box-shadow:0 12px 40px rgba(0,0,0,0.14); flex-shrink:0; }
+    .step-mockup-real img { width:100%; height:100%; object-fit:cover; object-position:top center; display:block; }
+
+    @media (max-width: 1080px) { nav { padding: 0 20px; } nav ul { gap: 10px; } nav ul li a { font-size: 11.5px; } }
+    @media (max-width: 900px) {
+      nav ul { display: none; }
+      .nav-hamburger { display: flex; }
+      .hero { padding: 40px 24px 60px; min-height: auto; }
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+      .hero-visual { display: none; }
+      .media-prensa-grid { grid-template-columns: 1fr; }
+      .media-susurros-grid { grid-template-columns: 1fr 1fr; }
+      .media-wrap { padding: 48px 24px; }
+      .samanthas-wrap, .rest-wrap, .cats-wrap, .como-wrap, .historia-wrap { padding: 48px 24px; }
+      .reviews-grid { grid-template-columns: 1fr; }
+      .susurros-grid { grid-template-columns: 1fr 1fr; }
+      .mapa-layout { grid-template-columns: 1fr; gap: 40px; }
+      .cats-grid { grid-template-columns: repeat(2, 1fr); }
+      .cat-detail-panel { grid-template-columns: 1fr; }
+      .step { grid-template-columns: 50px 1fr; }
+      .step-body { padding: 0 0 40px 20px; }
+      .step-img-col { display: none; }
+      .samanthas-layout, .rest-layout, .mision-vision, .fundadores-grid { grid-template-columns: 1fr; }
+      .contacto-wrap { grid-template-columns: 1fr; gap: 40px; padding: 48px 24px; }
+      .footer-bar { grid-column: span 1; }
+      .site-footer { padding: 48px 24px 0; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .sorteo-card { grid-template-columns: 1fr; }
+      .sorteo-card-right { min-height: 220px; }
+      .sorteo-card-section { padding: 0 20px; }
+      .sorteo-float { bottom: 16px; right: 16px; }
+      .sorteo-float-card { width: 190px; }
+    }
+    @media (max-width: 520px) { .footer-top { grid-template-columns: 1fr; } }
+    @media (max-width:900px) {
+      .hero { padding:24px 20px 36px; }
+      .hero h1 { font-size:clamp(30px,8vw,50px); margin-bottom:14px; }
+      .hero-sub { font-size:15px; margin-bottom:24px; }
+      .reviews-section { padding:48px 20px; }
+      .reviews-grid .review-card:nth-child(n+4) { display:none; }
+      .susurros-section { padding:48px 20px; }
+      .susurros-grid { grid-template-columns:1fr 1fr; gap:10px; }
+      .susurro-card { aspect-ratio:2/3; }
+      .mapa-section { padding:48px 20px; }
+      .inv-float{bottom:16px;right:16px}.inv-float-card{width:200px}
+      .pabblos-layout{grid-template-columns:1fr}.pabblos-photos{grid-template-columns:1fr 1fr}.pabblos-wrap{padding:48px 24px}.pabblos-cta-rest{padding:40px 24px}.pabblos-cta-rest-inner{flex-direction:column}
+      .restform-wrap{padding:48px 24px}.restform-card{padding:32px 24px}.form-row-2{grid-template-columns:1fr}
+      .inv-wrap{padding:40px 24px}.inv-obj-grid,.inv-features-grid{grid-template-columns:1fr}.inv-countdown-digits{gap:8px}.inv-cd-num{font-size:36px;min-width:50px}.inv-form-cta{flex-direction:column;text-align:center}
+  
+      .faq-section { padding:48px 20px; }
+      .quote-band { padding:12px 20px; font-size:clamp(13px,3.5vw,17px); }
+    }
+  </style>
+</head>
+<body>
+  
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="showScreen('home')" style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+  <img src="https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png" style="height:36px;width:auto;mix-blend-mode:multiply;" alt="Flambao" />
+ </div>
+  <ul>
+    <li class="nav-dropdown">
+      <a id="nav-app">La App</a>
+      <div class="nav-dropdown-menu">
+        <span class="nav-dropdown-label">Descubre</span>
+        <button class="nav-dropdown-item" onclick="showScreen('como')">Cómo funciona</button>
+        <button class="nav-dropdown-item" onclick="showScreen('categorias')">Categorías</button>
+      </div>
+    </li>
+    <li><a id="nav-samanthas" onclick="showScreen('samanthas')">Samantha's Favourite</a></li>
+    <li><a id="nav-restaurantes" onclick="showScreen('restaurantes')">Restaurantes</a></li>
+    <li class="nav-dropdown">
+      <a id="nav-comunidad">Quiénes Somos</a>
+      <div class="nav-dropdown-menu">
+        <span class="nav-dropdown-label">Conoce Flambao</span>
+        <button class="nav-dropdown-item" onclick="showScreen('historia')">Nuestra historia</button>
+        <button class="nav-dropdown-item" onclick="showScreen('media')">Flambao Media</button>
+      </div>
+    </li>
+    <li><a id="nav-inversores" onclick="showScreen('inversores')" class="nav-inv-link">Inversores</a></li>
+    <li><a id="nav-contacto" onclick="showScreen('contacto')">Contacto</a></li>
+    <li><a onclick="showScreen('home')" class="nav-cta">Descargar App</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="nav-share-btn" onclick="shareWeb()" aria-label="Compartir">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Compartir
+    </button>
+    <div class="nav-lang" id="langSelector">
+      <button class="nav-lang-btn" onclick="toggleLang(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+        <span id="langLabel">ES</span>
+        <svg class="lang-chevron" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,3 5,7 8,3"/></svg>
+      </button>
+      <div class="nav-lang-dropdown">
+        <button class="lang-option active" onclick="setLang('es','ES')">🇪🇸 Español</button>
+        <button class="lang-option" onclick="setLang('en','EN')">🇬🇧 English</button>
+        <button class="lang-option" onclick="setLang('pt','PT')">🇵🇹 Português</button>
+      </div>
+    </div>
+    <button class="nav-hamburger" onclick="document.querySelector('.nav-mobile').classList.toggle('open')" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="nav-mobile">
+  <a style="font-size:9px;letter-spacing:0.2em;color:rgba(0,0,0,0.3);padding:10px 0 2px;border-bottom:none;pointer-events:none;">LA APP</a>
+  <a onclick="showScreen('como');closeMobile()">Cómo funciona</a>
+  <a onclick="showScreen('categorias');closeMobile()">Categorías</a>
+  <a onclick="showScreen('samanthas');closeMobile()">Samantha's Favourite</a>
+  <a onclick="showScreen('restaurantes');closeMobile()">Restaurantes</a>
+  <a style="font-size:9px;letter-spacing:0.2em;color:rgba(0,0,0,0.3);padding:10px 0 2px;border-bottom:none;pointer-events:none;">QUIÉNES SOMOS</a>
+  <a onclick="showScreen('historia');closeMobile()">Nuestra historia</a>
+  <a onclick="showScreen('media');closeMobile()">Flambao Media</a>
+  <a onclick="showScreen('inversores');closeMobile()" style="color:var(--inv-blue);font-weight:600;">Inversores</a>
+  <a onclick="showScreen('contacto');closeMobile()">Contacto</a>
+  <a onclick="showScreen('home');closeMobile()" class="m-cta">Descargar App</a>
+</div>
+
+<div class="share-toast" id="shareToast">✓ Enlace copiado al portapapeles</div>
+
+<!-- FLOATING BADGE INVERSORES -->
+<div class="inv-float" id="invFloat">
+  <button class="inv-float-close" onclick="document.getElementById('invFloat').classList.add('hidden')" title="Cerrar">✕</button>
+  <div class="inv-float-card" onclick="showScreen('inversores')">
+    <div class="inv-float-top">
+      <div class="inv-float-badge"><div class="inv-float-dot"></div>RONDA SEED</div>
+      <div class="inv-float-title">Arranca la ronda de inversión seed de Flambao</div>
+      <div class="inv-float-sub">¿Te la vas a perder?</div>
+    </div>
+    <div class="inv-float-body">
+      <div class="inv-float-stats">
+        <div class="inv-float-stat"><span class="inv-float-stat-num">600K€</span><span class="inv-float-stat-label">Objetivo</span></div>
+        <div class="inv-float-stat"><span class="inv-float-stat-num">10%</span><span class="inv-float-stat-label">Participación</span></div>
+      </div>
+      <button class="inv-float-btn">Ver oportunidad →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RESERVA -->
+<div class="modal-overlay" id="modalReserva">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalReserva')">✕</button>
+    <span class="modal-icon">🔌</span>
+    <div class="modal-title">Integración de reservas Flambao</div>
+    <p class="modal-body">Este botón tendrá una <strong>integración directa para los usuarios de tu restaurante</strong>, que podrán reservar una mesa Flambao en tu local desde la app.<br><br>La integración incluye gestión de disponibilidad en tiempo real, confirmación automática y sincronización con tu sistema de reservas.<br><br><strong>¿Quieres activarlo en tu restaurante?</strong> Escríbenos y lo configuramos juntos.</p>
+    <span class="modal-tag">🚀 Próximamente disponible</span>
+  </div>
+</div>
+<div id="invPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#fff;border-radius:12px;padding:48px 40px;max-width:460px;width:90%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.2);">
+    <div style="font-size:56px;margin-bottom:20px;">✅</div>
+    <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#002d74;margin-bottom:12px;">Tu solicitud ha sido registrada</div>
+    <p style="font-size:15px;font-weight:300;color:#4a5568;line-height:1.7;margin-bottom:28px;">Nos pondremos en contacto contigo en la mayor brevedad posible.</p>
+    <button onclick="document.getElementById('invPopup').style.display='none'" style="background:#002d74;color:#fff;padding:14px 32px;border:none;border-radius:4px;cursor:pointer;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;">Entendido</button>
+  </div>
+</div>
+
+<div class="screens">
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="hero-eyebrow">La app de cenas sociales · iOS y Android</span>
+        <h1>Comparte mesa<br>con <em>gente<br>increíble</em></h1>
+        <p class="hero-sub">Flambao transforma los swipes en <strong>cenas reales</strong> en restaurantes. Nuestra misión: acabar con la soledad a través de las conexiones humanas.</p>
+        <div class="hero-ctas">
+          <a href="https://apps.apple.com/es/app/flambao/id6747800633" class="btn-store btn-dark" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            App Store
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.dow.flambao" class="btn-store btn-outline" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.24.99.2l12.45-12.45L13.2 8.1 3.18 23.76zm17.14-10.96L17.8 11.4l-3.2 3.2 3.2 3.2 2.54-1.42c.73-.41.73-1.57-.02-1.98zM3.54.28C3.22.1 2.84.06 2.5.22L14.96 12.7 18.35 9.3 3.54.28zm1.44 2.58L13.2 11.1l-3.2 3.2-5.02-11.44z"/></svg>
+            Google Play
+          </a>
+          <span class="gratis-pill">Gratis</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-visual-glow"></div>
+        <img src="https://i.ibb.co/dwbCC8bR/93a8a165-78c3-4331-998f-f6da01cbde7e-1.jpg" alt="Flambao" style="position:relative;z-index:1;width:100%;max-width:420px;border-radius:12px;box-shadow:0 24px 64px rgba(0,0,0,0.18);object-fit:cover;" />
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker-band">
+    <div class="ticker-inner">
+      <span class="ticker-item"><span>✦</span> Madrid</span><span class="ticker-item"><span>✦</span> Barcelona</span><span class="ticker-item"><span>✦</span> Valencia</span><span class="ticker-item"><span>✦</span> Sevilla</span><span class="ticker-item"><span>✦</span> Bilbao</span><span class="ticker-item"><span>✦</span> Málaga</span><span class="ticker-item"><span>✦</span> México DF</span><span class="ticker-item"><span>✦</span> Buenos Aires</span><span class="ticker-item"><span>✦</span> Bogotá</span><span class="ticker-item"><span>✦</span> Lima</span><span class="ticker-item"><span>✦</span> Zaragoza</span><span class="ticker-item"><span>✦</span> Granada</span>
+      <span class="ticker-item"><span>✦</span> Madrid</span><span class="ticker-item"><span>✦</span> Barcelona</span><span class="ticker-item"><span>✦</span> Valencia</span><span class="ticker-item"><span>✦</span> Sevilla</span><span class="ticker-item"><span>✦</span> Bilbao</span><span class="ticker-item"><span>✦</span> Málaga</span><span class="ticker-item"><span>✦</span> México DF</span><span class="ticker-item"><span>✦</span> Buenos Aires</span><span class="ticker-item"><span>✦</span> Bogotá</span><span class="ticker-item"><span>✦</span> Lima</span><span class="ticker-item"><span>✦</span> Zaragoza</span><span class="ticker-item"><span>✦</span> Granada</span>
+    </div>
+  </div>
+
+  <div class="reviews-section">
+    <div class="section-header">
+      <span class="section-eyebrow">Lo que dicen los usuarios</span>
+      <h2 class="section-title">Miles de mesas.<br>Una sola <em>conclusión</em>.</h2>
+      <p class="section-sub">Personas reales que dejaron de comer solos gracias a Flambao.</p>
+    </div>
+    <div class="rating-summary">
+      <div class="rating-num">4.8</div>
+      <div class="rating-divider"></div>
+      <div class="rating-details">
+        <span class="rating-stars">★★★★★</span>
+        <span class="rating-count">Valoración media · App Store &amp; Google Play</span>
+      </div>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card"><span class="review-quote">“</span><div class="review-stars">★★★★★</div><p class="review-text">Llevaba meses viviendo en Madrid sin conocer a nadie. La primera cena de Flambao fue una locura en el buen sentido. Ahora quedamos casi todos los viernes con la misma gente.</p><div class="review-author"><div class="review-avatar av-red">L</div><div><span class="review-name">Laura M.</span><span class="review-meta">Madrid · Mesa Conocer Gente Nueva</span></div></div></div>
+      <div class="review-card"><span class="review-quote">“</span><div class="review-stars">★★★★★</div><p class="review-text">Me registré en la categoría Abierto al Amor sin muchas expectativas. Después de la tercera cena conocí a alguien especial. La app hace magia con las personas.</p><div class="review-author"><div class="review-avatar av-dark">A</div><div><span class="review-name">Alejandro R.</span><span class="review-meta">Barcelona · Mesa Abierto al Amor</span></div></div></div>
+      <div class="review-card"><span class="review-quote">“</span><div class="review-stars">★★★★★</div><p class="review-text">La uso para hacer networking y ha superado todas mis expectativas. Mucho más natural que cualquier evento de negocios. Totalmente recomendable.</p><div class="review-author"><div class="review-avatar av-orange">C</div><div><span class="review-name">Carolina V.</span><span class="review-meta">Valencia · Mesa Negocios</span></div></div></div>
+      <div class="review-card"><span class="review-quote">“</span><div class="review-stars">★★★★★</div><p class="review-text">Me mudé a Sevilla hace seis meses y no conocía a nadie. Gracias a Flambao tengo amigos de verdad, no solo contactos de Instagram.</p><div class="review-author"><div class="review-avatar av-red">D</div><div><span class="review-name">Daniel F.</span><span class="review-meta">Sevilla · Mesa Nuevos Comienzos</span></div></div></div>
+      <div class="review-card"><span class="review-quote">“</span><div class="review-stars">★★★★★</div><p class="review-text">Soy introvertida y pensé que no era para mí. Pero el formato de mesa pequeña hace que todo fluya de forma muy natural. Ya voy a mi quinta cena.</p><div class="review-author"><div class="review-avatar av-dark">S</div><div><span class="review-name">Sofía P.</span><span class="review-meta">Bilbao · Mesa Conocer Gente Nueva</span></div></div></div>
+      <div class="review-card"><span class="review-quote">“</span><div class="review-stars">★★★★★</div><p class="review-text">Viajo mucho por trabajo y uso Flambao en cada ciudad. Es la forma más rápida de conectar con gente local de calidad. El diseño de la app es muy intuitivo.</p><div class="review-author"><div class="review-avatar av-orange">M</div><div><span class="review-name">Marcos T.</span><span class="review-meta">Viajero frecuente · Mesa Negocios</span></div></div></div>
+    </div>
+    <div class="reviews-more"><p>Más de <strong>2.400 reseñas</strong> de 5 estrellas en App Store y Google Play.</p></div>
+  </div>
+
+
+
+  <div class="quote-band">“La soledad es el problema. Flambao es la respuesta.”</div>
+
+  <div class="susurros-section">
+    <div class="susurros-inner">
+      <div class="susurros-header-row">
+        <div>
+          <span class="section-eyebrow-light">Famosos que flambean</span>
+          <h2 class="section-title-light">Galería de <em>Susurros</em></h2>
+          <p class="section-sub-light">Los famosos también necesitan una buena mesa. Descubre sus susurros exclusivos sobre por qué se unieron a Flambao.</p>
+        </div>
+      </div>
+      <div class="susurros-grid">
+        <div class="susurro-card" data-src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1778609526/WhatsApp_Video_2026-05-08_at_14.10.08_tvbolq.mp4">
+          <video src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1779104364/WhatsApp_Video_2026-05-18_at_13.37.58_kryukd.mp4" loop playsinline preload="metadata"></video>
+          <div class="susurro-overlay"></div><span class="susurro-badge">Susurro</span>
+          <div class="susurro-play-btn" onclick="toggleSusurroPlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="susurro-info"><span class="susurro-name">Susurro Flambao</span><span class="susurro-desc">Descúbrelo</span></div>
+          <div class="susurro-progress-wrap"><div class="susurro-progress-bar-bg" onclick="seekSusurro(event, this)"><div class="susurro-progress-bar-fill"></div></div><span class="susurro-time-label">0:00 / 0:00</span></div>
+        </div>
+        <div class="susurro-card" data-src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1778609520/WhatsApp_Video_2026-05-08_at_14.10.04_akbtws.mp4">
+          <video src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1778609520/WhatsApp_Video_2026-05-08_at_14.10.04_akbtws.mp4" loop playsinline preload="metadata"></video>
+          <div class="susurro-overlay"></div><span class="susurro-badge">Susurro</span>
+          <div class="susurro-play-btn" onclick="toggleSusurroPlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="susurro-info"><span class="susurro-name">Susurro Flambao</span><span class="susurro-desc">Descúbrelo</span></div>
+          <div class="susurro-progress-wrap"><div class="susurro-progress-bar-bg" onclick="seekSusurro(event, this)"><div class="susurro-progress-bar-fill"></div></div><span class="susurro-time-label">0:00 / 0:00</span></div>
+        </div>
+        <div class="susurro-card" data-src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1778609524/WhatsApp_Video_2026-05-08_at_14.10.12_lmy4az.mp4">
+          <video src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1778609524/WhatsApp_Video_2026-05-08_at_14.10.12_lmy4az.mp4" loop playsinline preload="metadata"></video>
+          <div class="susurro-overlay"></div><span class="susurro-badge">Susurro</span>
+          <div class="susurro-play-btn" onclick="toggleSusurroPlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="susurro-info"><span class="susurro-name">Susurro Flambao</span><span class="susurro-desc">Descúbrelo</span></div>
+          <div class="susurro-progress-wrap"><div class="susurro-progress-bar-bg" onclick="seekSusurro(event, this)"><div class="susurro-progress-bar-fill"></div></div><span class="susurro-time-label">0:00 / 0:00</span></div>
+        </div>
+      </div>
+      <p class="susurros-coming">Los susurros se revelan próximamente · Mantente atento</p>
+    </div>
+  </div>
+
+  <div class="mapa-section">
+    <div class="mapa-inner">
+      <div class="mapa-layout">
+        <div>
+          <span class="section-eyebrow">Presencia global</span>
+          <h2 class="section-title">Flambao está<br><em>en el mundo</em></h2>
+          <p class="section-sub" style="text-align:left;margin:14px 0 0">Mesas activas en las principales ciudades de España. Próximamente en más países.</p>
+          <div class="mapa-stats-row">
+            <div><span class="mapa-stat-num" style="font-size:20px;line-height:1.4;">Decenas de</span><span class="mapa-stat-label">Ciudades activas</span></div>
+            <div><span class="mapa-stat-num" style="font-size:20px;line-height:1.4;">Miles de</span><span class="mapa-stat-label">Usuarios</span></div>
+          </div>
+          <div class="mapa-cities">
+            <span class="mapa-city-tag">Madrid</span><span class="mapa-city-tag">Barcelona</span><span class="mapa-city-tag">Valencia</span><span class="mapa-city-tag">Sevilla</span><span class="mapa-city-tag">Bilbao</span><span class="mapa-city-tag">Málaga</span><span class="mapa-city-tag">Zaragoza</span><span class="mapa-city-tag">Murcia</span><span class="mapa-city-tag">Palma</span><span class="mapa-city-tag">Alicante</span><span class="mapa-city-tag">Granada</span><span class="mapa-city-tag">San Sebastián</span>
+          </div>
+        </div>
+        <div class="spain-map-wrap" style="padding:0;overflow:hidden;background:transparent;border:none;">
+          <img src="https://i.ibb.co/Gr0wW3Z/Chat-GPT-Image-13-may-2026-18-01-54.png" alt="Flambao – Presencia global" style="width:100%;height:auto;display:block;border-radius:6px;" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="faq-section">
+    <div class="faq-inner">
+      <div class="section-header">
+        <span class="section-eyebrow">Resolvemos tus dudas</span>
+        <h2 class="section-title">Preguntas <em>frecuentes</em></h2>
+        <p class="section-sub">Todo lo que necesitas saber antes de tu primera mesa.</p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Cómo funciona exactamente Flambao?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Descárgate la app, crea tu perfil y elige una mesa cerca de ti según tu interés. En la mesa te reunirás con otras personas que comparten ese mismo objetivo. <strong>Tú solo tienes que aparecer.</strong></div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Es gratis usar Flambao?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">La descarga y el uso básico son <strong>completamente gratuitos</strong>. Solo pagas tu consumición en el restaurante, como en cualquier cena normal.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Cuántas personas hay en cada mesa?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Las mesas son pequeñas por diseño: entre <strong>2 y 8 personas</strong>. El tamaño ideal para una conversación real.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Qué pasa si no conozco a nadie en la mesa?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">¡Ese es exactamente el punto! <strong>Nadie se conoce de antes</strong>, lo que crea un ambiente sin presiones donde la conversación fluye de manera natural.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Es seguro quedar con desconocidos a través de la app?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Todos los perfiles están verificados y las cenas se realizan en <strong>restaurantes públicos</strong>. El entorno crea un espacio naturalmente seguro y cómodo.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /screen-home -->
+
+<!-- CATEGORÍAS - PATCHED: 5 tipos, Agenda card added -->
+<div class="screen" id="screen-categorias">
+  <div class="quote-band quote-band-dark">“Tu mood decide tu plan”</div>
+  <div class="cats-wrap">
+    <div class="screen-header">
+      <span class="eyebrow">Para cada momento</span>
+      <h2 class="screen-title">5 tipos de <em>mesa</em></h2>
+      <p class="screen-sub">Cada mesa tiene un propósito. Pasa el ratón por cada categoría para descubrirla.</p>
+    </div>
+    <div class="cats-grid" style="grid-template-columns:repeat(5,1fr);">
+      <div class="cat-card" onmouseenter="showCat(0)" onmouseleave="hideCat()" onclick="showCat(0)"><span class="cat-name">Conoce gente nueva</span></div>
+      <div class="cat-card" onmouseenter="showCat(1)" onmouseleave="hideCat()" onclick="showCat(1)"><span class="cat-name">Nuevos comienzos</span></div>
+      <div class="cat-card" onmouseenter="showCat(2)" onmouseleave="hideCat()" onclick="showCat(2)"><span class="cat-name">Negocios</span></div>
+      <div class="cat-card" onmouseenter="showCat(3)" onmouseleave="hideCat()" onclick="showCat(3)"><span class="cat-name">Abierto al amor</span></div>
+      <div class="cat-card" onmouseenter="showCat(4)" onmouseleave="hideCat()" onclick="showCat(4)"><span class="cat-name">Mi Agenda</span></div>
+    </div>
+    <div class="cat-detail-panel" id="catDetailPanel">
+      <div class="cat-detail-info">
+        <span class="cat-detail-eyebrow" id="catDetailEyebrow"></span>
+        <div class="cat-detail-title" id="catDetailTitle"></div>
+        <p class="cat-detail-desc" id="catDetailDesc"></p>
+      </div>
+      <div class="cat-detail-img">
+        <div class="cat-detail-img-placeholder" style="background:none;"><img id="catDetailImg" src="https://i.ibb.co/N62D6V8Y/Whats-App-Image-2026-04-08-at-16-27-46-4.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:0;" /><span class="ph-icon" id="catDetailIcon" style="position:relative;z-index:1;font-size:56px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4));"></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="quote-band" style="margin-top:0">“Elige con intención. Conecta de verdad.”</div>
+
+  <!-- FAQ El Arte de Flambear - PATCH 4 -->
+  <div class="faq-section" style="background:#fff;">
+    <div class="faq-inner" style="max-width:800px;">
+      <div class="section-header">
+        <span class="section-eyebrow">El arte de flambear</span>
+        <h2 class="section-title">Preguntas <em>frecuentes</em></h2>
+        <p class="section-sub">Todo lo que necesitas saber para sacarle el máximo partido a cada mesa.</p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Cómo puedo unirme a una mesa que ya existe?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Es muy sencillo. Abre el mapa y busca los pines con la letra <strong>“F”</strong>. Al pulsar sobre uno, verás los detalles: el restaurante, la categoría del plan, la hora y quiénes están ya apuntados. Si el plan te cuadra, pulsa en <strong>“Pedir que me inviten”</strong> para que el anfitrión reciba tu solicitud.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Puedo ver quién está sentado a la mesa antes de ir?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Sí. Flambao fomenta la transparencia para que te sientas seguro y cómodo. Puedes revisar los <strong>perfiles de los comensales actuales</strong> para ver si tienes intereses comunes antes de solicitar tu invitación. Esto ayuda a bajar la guardia y permite que la conversación fluya mejor desde el primer minuto.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Qué pasa si quiero crear mi propia mesa?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">¡Eres bienvenido a ser el anfitrión! Localiza tu restaurante favorito en el mapa, activa el pin <strong>“F”</strong>, elige el plan y tu mesa estará lista en menos de un minuto. A partir de ahí, puedes esperar a que otros te pidan unirse o invitar directamente a personas deslizando sus perfiles hacia abajo.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Cómo coordino los detalles con el resto de la mesa?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Cada mesa tiene su propio <strong>chat de mesa</strong>. Una vez que tu solicitud sea aceptada, entrarás en este espacio grupal para coordinar la llegada, la reserva o cualquier detalle de la cena. El objetivo es pasar del chat a la vida real lo antes posible.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Es seguro cenar con personas que no conozco?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Flambao está diseñado para provocar encuentros humanos reales de forma controlada. Al elegir el lugar — un <strong>espacio público como un restaurante</strong> — y poder gestionar quién se sienta a tu mesa aceptando o rechazando solicitudes, mantienes siempre el control de tu experiencia.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Por qué usar Flambao en lugar de una red social tradicional?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Porque Flambao no es para acumular matches o likes, sino para <strong>sentarse a cenar</strong>. Mientras que las pantallas pueden aumentar la sensación de aislamiento, compartir una mesa es la forma más humanizadora de conectar: mirarse a los ojos y escuchar de forma distinta.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Qué es el “Chat Universal”?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Es un espacio centralizado donde puedes hablar con <strong>cualquier usuario de la comunidad Flambao</strong>, facilitando la creación de planes espontáneos incluso antes de fijar una mesa en el mapa. También tienes el chat privado 1 a 1 y el chat de mesa con todos los comensales.</div></div></div>
+      </div>
+      <div style="margin-top:48px;padding:32px 40px;background:var(--dark);border-radius:4px;text-align:center;">
+        <p style="font-family:'Playfair Display',serif;font-size:clamp(18px,2.2vw,26px);font-style:italic;color:rgba(255,255,255,0.85);line-height:1.5;font-weight:400;margin:0;">¿<em style="color:var(--orange);font-style:normal;font-weight:700;">Flambeamos?</em> Porque al final, todos necesitamos una excusa para encontrarnos y alguien con quien compartir la mesa.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CÓMO FUNCIONA -->
+<div class="screen" id="screen-como">
+  <div class="quote-band quote-band-dark">“De la pantalla a la mesa en 5 minutos”</div>
+  <div class="como-wrap">
+    <div class="screen-header">
+      <span class="eyebrow">Tutorial · Cómo funciona</span>
+      <h2 class="screen-title">Todo lo que necesitas<br>saber en un <em>vistazo</em></h2>
+      <p class="screen-sub">Descarga la app y empieza a flambear en menos de 5 minutos.</p>
+    </div>
+  
+      
+    <div class="steps">
+      <div class="step">
+        <div class="step-body">
+          <span class="step-label">Perfiles · Swipe</span>
+          <div class="step-title">Selecciona personas en base a tus intereses</div>
+          <p class="step-desc">Explora perfiles, conecta con quienes te inspiren y crea momentos únicos alrededor de una mesa. Desliza a la <strong>derecha</strong> para mostrar interés, a la <strong>izquierda</strong> si no encaja contigo, o arrastra hacia <strong>abajo</strong> para invitar a esa persona directamente a tu mesa.<br><br><em>Porque en Flambao, cada mesa tiene una intención. Y tú decides quién forma parte de ella.</em></p>
+          <div class="step-tags"><span class="step-tag">→ Me interesa</span><span class="step-tag">← Paso</span><span class="step-tag">↓ Te invito a mi mesa</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-body">
+          <span class="step-label">Crea · Mapa</span>
+          <div class="step-title">Crea una mesa en tu restaurante favorito</div>
+          <p class="step-desc">Todo empieza abriendo el mapa. Explora los restaurantes disponibles cerca de ti y descubre dónde podría nacer tu próximo plan. Cuando encuentres ese sitio que te apetece —una terraza, un restaurante especial, un lugar al que hace tiempo querías ir— solo tienes que pulsar el pin 📍 y crear tu mesa. Elige la categoría que mejor define lo que buscas, marca la fecha y la hora, y deja que Flambao haga que ese plan empiece a cobrar vida.<br><br>En menos de un minuto, tu mesa estará activa y visible para otros usuarios que, como tú, también quieren vivir momentos reales alrededor de una mesa.<br><br><em>Porque a veces no hace falta tener un plan cerrado. Solo hace falta elegir el lugar, abrir una mesa… y dejar que empiecen a pasar cosas.</em></p>
+          <div class="step-tags"><span class="step-tag">📍 Elige restaurante</span><span class="step-tag">🗓 Fecha y hora</span><span class="step-tag">🩑 Tu mesa, en vivo</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-body">
+          <span class="step-label">Explora · Categorías</span>
+          <div class="step-title">Busca tu mesa favorita</div>
+          <p class="step-desc">En Flambao, cada mesa tiene una intención. Según lo que estés buscando en ese momento, puedes explorar las mesas disponibles cerca de ti y encontrar la que mejor encaje contigo. Filtra por <strong>Conocer Gente Nueva</strong>, <strong>Abierto al Amor</strong>, <strong>Negocios</strong>, <strong>Nuevos Comienzos</strong> o <strong>Mi Agenda</strong>, tu espacio personal para compartir planes con tus propios contactos. Elige la mesa que más conecte con lo que necesitas hoy y solicita unirte.<br><br><em>Porque no todos los días buscamos lo mismo: a veces queremos conocer gente nueva, otras abrirnos al amor, hacer contactos profesionales, empezar de cero o simplemente organizar un plan con quienes ya forman parte de nuestra vida. En Flambao, tú decides qué tipo de momento quieres vivir alrededor de una mesa.</em></p>
+          <div class="step-tags"><span class="step-tag">🔍 Filtra por categoría</span><span class="step-tag">📍 Mesas cerca de ti</span><span class="step-tag">🩑 Únete al instante</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-body">
+          <span class="step-label">Comunícate · Chat</span>
+          <div class="step-title">Comunícate, habla, coordina y conecta</div>
+          <p class="step-desc">Flambao también te ayuda a romper el hielo antes de sentarte a la mesa. Una vez haces match con otro usuario, puedes abrir un <strong>chat privado 1 a 1</strong> para empezar a conoceros de forma natural. Además, cada mesa cuenta con su propio <strong>chat grupal</strong>, donde todos los comensales pueden hablar antes del encuentro, coordinar la llegada, comentar detalles del plan o simplemente empezar la conversación antes de verse en persona.<br><br><em>Porque en Flambao, la conexión no empieza cuando llegas al restaurante: empieza desde el momento en que decides compartir mesa.</em></p>
+          <div class="step-tags"><span class="step-tag">💬 Chat privado 1 a 1</span><span class="step-tag">🍽 Chat de mesa</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:72px;padding-top:56px;border-top:1px solid var(--border);">
+      <div class="section-header" style="text-align:left;margin-bottom:36px;">
+        <span class="eyebrow">Dudas frecuentes</span>
+        <h3 style="font-family:'Playfair Display',serif;font-size:clamp(24px,3vw,36px);font-weight:700;color:var(--dark);line-height:1.1;margin-top:8px;">Preguntas sobre <em style="color:var(--red);">cómo funciona</em></h3>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Puedo unirme a una mesa que ya existe o solo puedo crear una nueva?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Puedes hacer las dos cosas. En el mapa verás los pins de mesas ya creadas — pulsa sobre cualquiera para ver los detalles y unirte. Si prefieres crear la tuya, pulsa <strong>“Crear mesa”</strong>.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Qué pasa si no aparece ninguna mesa cerca de mí?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Si no hay mesas activas, <strong>crea tú la primera</strong>. Otros usuarios de tu zona recibirán la notificación y podrán unirse.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Cómo cancelo una mesa o me salgo de una a la que me he unido?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Esta funcionalidad está en camino. Con la próxima actualización de Flambao — <strong>Coming Soon</strong> — podrás cancelar tu mesa o salirte de una con hasta <strong>48 horas de antelación</strong>. Mientras tanto, si necesitas cancelar ponte en contacto con nosotros a través del chat o escríbenos a flambaoapp@gmail.com.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Puedo elegir quién se sienta conmigo o se une cualquiera?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Tú tienes el control. Cuando alguien solicita unirse a tu mesa, recibes una notificación y puedes <strong>aceptar o rechazar</strong> la solicitud antes de que se confirme su plaza. También puedes invitar directamente a usuarios deslizando hacia abajo en la sección de perfiles.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Cuántas categorías hay y cuál me recomiendas para empezar?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">Hay 5 categorías: <strong>Conocer Gente Nueva, Abierto al Amor, Nuevos Comienzos, Negocios y Mi Agenda.</strong> Si es tu primera vez, te recomendamos empezar por <strong>Conocer Gente Nueva</strong> — es la más popular, sin expectativas concretas y donde más fácil es que la conversación fluya de forma natural.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿Cómo funciona el Chat Universal?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">El Chat Universal es el espacio donde puedes hablar con <strong>cualquier usuario de Flambao</strong>, aunque no estéis en la misma mesa. Es ideal para conocer gente antes de quedar, coordinar planes o simplemente romper el hielo. Tienes también el chat privado 1 a 1 y el chat de mesa con todos los comensales.</div></div></div>
+        <div class="faq-item"><button class="faq-trigger" onclick="toggleFaq(this)"><span class="faq-q">¿El restaurante sabe que venimos a través de Flambao?</span><span class="faq-icon"><svg viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" class="faq-vert"/><line x1="1" y1="7" x2="13" y2="7"/></svg></span></button><div class="faq-body"><div class="faq-body-inner">En los restaurantes colaboradores de Flambao, <strong>sí</strong> — tienen acceso al panel de reservas y saben que la mesa viene a través de la app. En restaurantes no colaboradores, la reserva la gestionáis vosotros directamente. Puedes identificar los restaurantes colaboradores por el sello Flambao en el mapa.</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="quote-band">“De la pantalla a la mesa. Así de fácil.”</div>
+</div>
+
+<!-- SAMANTHAS -->
+<div class="screen" id="screen-samanthas">
+  <div class="quote-band quote-band-dark">“La mejor mesa no es la más cara. Es la que mejor recuerdas.”</div>
+  <div class="samanthas-wrap">
+    <div class="screen-header">
+      <span class="eyebrow">Selección especial</span>
+      <h2 class="screen-title">Samantha's <em>Favourite</em></h2>
+      <p class="screen-sub">Mesas, restaurantes y experiencias seleccionadas personalmente por Samantha Vallejo-Nágera, socia de Flambao.</p>
+    </div>
+    <div class="samanthas-layout">
+      <div style="padding:0;background:none;border:none;aspect-ratio:3/4;border-radius:8px;overflow:hidden;position:relative;">
+  <img src="https://i.ibb.co/S4Xn9Srg/Whats-App-Image-2026-06-04-at-21-05-06.jpg" alt="Samantha Vallejo-Nágera · Flambao" style="width:100%;height:100%;object-fit:cover;display:block;" />
+  <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,transparent 100%);padding:32px 24px 24px;border-radius:0 0 8px 8px;">
+    <span style="display:block;font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:4px;">Samantha Vallejo-Nágera</span>
+    <span style="display:block;font-size:12px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);">Socia · Flambao</span>
+  </div>
+</div>
+      <div class="samanthas-content">
+       
+        <blockquote>“Lo mejor no siempre está en el restaurante más caro, sino en la mesa donde mejor se escucha.”</blockquote>
+        <p>Samantha Vallejo-Nágera es una de las caras más reconocibles de la gastronomía española. Tras <strong>13 años como jurado de MasterChef</strong> junto a Jordi Cruz y Pepe Rodríguez, y al frente de su reconocida empresa <strong>Samantha de España Catering</strong>, se unió a Flambao porque comparte algo esencial: la convicción de que la mejor experiencia no es el plato, sino la persona que tienes enfrente.</p>
+        <p>Ahora, Samantha pone su criterio gastronómico al servicio de la comunidad Flambao: selecciona personalmente las mesas, los restaurantes y los momentos que merecen ser vividos. Con más de <em>30 años de trayectoria</em> en cocina y eventos, nadie mejor que ella sabe lo que hace memorable una cena.</p>
+        <div class="samanthas-picks">
+          <span class="samanthas-picks-title">Sus criterios de selección</span>
+          <div class="samanthas-pick-tags">
+            <span class="sam-tag">&#10022; Cocina con alma</span>
+            <span class="sam-tag">&#10022; Ambiente único</span>
+            <span class="sam-tag">&#10022; Conversación garantizada</span>
+            <span class="sam-tag">&#10022; Experiencia memorable</span>
+            <span class="sam-tag">&#10022; Producto de temporada</span>
+            <span class="sam-tag">&#10022; Servicio con carácter</span>
+          </div>
+        </div>
+        <div style="margin-top:28px;padding:22px 24px;background:var(--dark);border-radius:4px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-10px;font-family:'Playfair Display',serif;font-size:100px;color:rgba(255,255,255,0.04);font-weight:900;line-height:1;pointer-events:none;">“</div>
+          <span style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:10px;">Próximamente</span>
+          <p style="font-size:16px;font-weight:300;color:rgba(255,255,255,0.75);line-height:1.7;margin:0;">Los favoritos de Samantha se revelan pronto. Activa las notificaciones en la app para ser la primera persona en descubrir su selección.</p>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:72px;padding-top:56px;border-top:1px solid var(--border);">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:28px 24px;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:var(--red);line-height:1;margin-bottom:8px;">13</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);">Años en MasterChef</div>
+        </div>
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:28px 24px;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:var(--red);line-height:1;margin-bottom:8px;">38</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);">Ediciones como jurado</div>
+        </div>
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:28px 24px;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:var(--red);line-height:1;margin-bottom:8px;">+30</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);">Años de trayectoria</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:40px;padding:40px 48px;background:var(--dark);border-radius:4px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
+      <div>
+        <span style="font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:14px;">Por qué Flambao</span>
+        <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,2.5vw,30px);font-weight:700;color:#fff;line-height:1.2;margin-bottom:18px;">“La gastronomía siempre ha sido <em style="color:var(--orange);">conexión humana</em>”</h3>
+        <p style="font-size:16px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.75;">Después de 13 años viendo cómo la comida transforma a las personas en televisión, Samantha se unió a Flambao para llevar esa transformación a la vida real. Porque lo que ocurre alrededor de una buena mesa no tiene guión.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;">
+         
+          <div><span style="display:block;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">Restaurantes con criterio</span><span style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.6;">Solo los espacios que Samantha recomendaría a sus propios invitados.</span></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;">
+         
+          <div><span style="display:block;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">Mesas con propósito</span><span style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.6;">Porque no es lo mismo cenar que compartir una experiencia de verdad.</span></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;">
+          
+          <div><span style="display:block;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">Aval de confianza</span><span style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.6;">Su nombre es una garantía de calidad y autenticidad para toda la comunidad.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="quote-band">“Treinta años en cocinas me han enseñado una sola cosa: lo que importa siempre es la gente.”</div>
+</div>
+
+<!-- RESTAURANTES -->
+<div class="screen" id="screen-restaurantes">
+  <div class="quote-band quote-band-dark">“Más comensales, más conversaciones”</div>
+  <div class="rest-wrap">
+    <div class="screen-header">
+      <span class="eyebrow">Para restaurantes</span>
+      <h2 class="screen-title">¿Eres un restaurante?<br><em>Colabora con Flambao</em></h2>
+      <p class="screen-sub">Si eres un restaurante y quieres colaborar con Flambao, únete a la red de espacios donde nacen las mejores conexiones.</p>
+    </div>
+    <div class="rest-layout">
+      <div>
+        <div class="rest-benefits">
+          <div class="rest-benefit"><div><span class="rest-benefit-title">Llena más mesas</span><span class="rest-benefit-desc">Flambao crea demanda real. Usuarios activos buscando restaurantes con ambiente para cenar en grupo.</span></div></div>
+          <div class="rest-benefit"><div><span class="rest-benefit-title">Visibilidad en el mapa</span><span class="rest-benefit-desc">Tu restaurante aparece en el mapa de Flambao con pin destacado, visible para miles de usuarios en tu ciudad.</span></div></div>
+          <div class="rest-benefit"><div><span class="rest-benefit-title">Sin comisiones por reserva</span><span class="rest-benefit-desc">Modelo de colaboración flexible. Sin dependencias ni comisiones abusivas. El cliente es tuyo.</span></div></div>
+          <div class="rest-benefit"><div><span class="rest-benefit-title">Samantha's Favourite</span><span class="rest-benefit-desc">Los mejores restaurantes colaboradores optan a ser seleccionados por Samantha Vallejo-Nágera, socia de Flambao.</span></div></div>
+        </div>
+        <button onclick="showScreen('rest-form')" class="btn-rest-contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Escríbenos para colaborar
+        </button>
+        <p style="margin-top:12px;font-size:14px;font-weight:300;color:var(--gray);">flambaoapp@gmail.com · Te respondemos en menos de 24h</p>
+      </div>
+      <div style="border-radius:8px;overflow:hidden;border:1px solid var(--border);">
+        <img src="https://i.ibb.co/x8HsbW1r/Whats-App-Image-2026-05-04-at-23-52-49.jpg" alt="Planes precios Flambao restaurantes" style="width:100%;height:auto;display:block;object-fit:contain;" />
+      </div>
+    </div>
+    
+    <!-- CTA PABBLOS -->
+    <div style="margin-top:72px;padding-top:56px;border-top:1px solid var(--border);">
+      <div style="background:var(--dark);border-radius:8px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;position:relative;">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(201,162,39,.15) 0%,transparent 70%);pointer-events:none;"></div>
+        <div style="padding:48px 40px;position:relative;z-index:1;">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#c9a227,#f0c040);color:#fff;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:5px 14px;border-radius:2px;margin-bottom:20px;">🏅 Samantha's Golden Favourite</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:clamp(24px,2.8vw,36px);font-weight:900;color:#fff;line-height:1.1;margin-bottom:14px;">Pabblos · <em style="color:#f0c040;font-style:italic;">Un lugar increíble</em></h3>
+          <p style="font-size:16px;font-weight:300;color:rgba(255,255,255,.6);line-height:1.75;margin-bottom:28px;max-width:380px;">Descubre la primera selección Golden de Samantha. Una experiencia Flambao que no olvidarás.</p>
+          <button onclick="showScreen('pabblos')" style="display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--dark);padding:14px 26px;border-radius:2px;font-family:'Gotham Book',serif;font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;cursor:pointer;transition:background .2s;">Ver restaurante →</button>
+        </div>
+        <div style="position:relative;overflow:hidden;min-height:300px;">
+          <img src="https://i.ibb.co/4RhLCmNW/673b758a-c487-4d8d-8832-b730946ea2ff.jpg" alt="Pabblos" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+          <div style="position:absolute;inset:0;background:linear-gradient(to right,var(--dark) 0%,transparent 40%);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="quote-band">“Tu restaurante, la escena perfecta para el encuentro.”</div>
+</div>
+
+<!-- PABBLOS LANDING -->
+<div class="screen" id="screen-pabblos">
+  <div class="quote-band quote-band-dark">"No te pierdas una mesa Flambao en Pabblos"</div>
+  <div class="pabblos-wrap">
+    <div style="margin-bottom:12px;">
+      <button onclick="showScreen('restaurantes')" style="background:none;border:none;cursor:pointer;font-family:'Gotham Book',serif;font-size:14px;color:var(--gray);letter-spacing:.06em;display:flex;align-items:center;gap:6px;padding:0;">← Volver a Restaurantes</button>
+    </div>
+    <div class="pabblos-header">
+      
+      <div>
+        <div class="pabblos-name">Pabblos</div>
+        <div style="margin-top:6px;"><span class="pabblos-golden-badge">🏅 Samantha's Golden Favourite</span></div>
+      </div>
+    </div>
+    <div class="pabblos-layout">
+      <div>
+        <div class="pabblos-photos">
+          <div class="pabblos-photo"><img src="https://i.ibb.co/4RhLCmNW/673b758a-c487-4d8d-8832-b730946ea2ff.jpg" alt="Pabblos interior" /></div>
+          <div class="pabblos-photo"><img src="https://i.ibb.co/B2hbfZjZ/669cd552-3557-4f8a-bd03-7fcdbdd51bfd.jpg" alt="Pabblos comedor" /></div>
+        </div>
+        <div class="pabblos-badges">
+          <div class="pabblos-badge-item">Pabblos es Golden Samantha's Favourite</div>
+          <div class="pabblos-badge-item">Un lugar increíble para cenar</div>
+          <div class="pabblos-badge-item">Ambiente exclusivo y cuidado</div>
+          <div class="pabblos-badge-item">Cocina de producto con alma</div>
+        </div>
+        <button class="pabblos-cta-btn" onclick="openModal('modalReserva')">🍽 Reserva tu mesa Flambao en Pabblos</button>
+      </div>
+      <div>
+        <div class="pabblos-sam-photo">
+          <img src="https://i.ibb.co/R4Z1NLmm/Whats-App-Image-2026-05-08-at-22-54-02.jpg" alt="Samantha Vallejo-Nágera" />
+          <div class="pabblos-sam-overlay">
+            <div class="pabblos-sam-quote">"No te pierdas una mesa Flambao en Pabblos, la experiencia está garantizada"</div>
+            <div class="pabblos-sam-name">Samantha Vallejo-Nágera · Socia Flambao</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pabblos-cta-rest">
+    <div class="pabblos-cta-rest-inner">
+      <p>No esperes más. Si eres un restaurante, ahora puedes ser <strong>Samantha's Favourite</strong> y tener esta página en tu web.</p>
+      <button class="btn-quiero-info" onclick="showScreen('rest-form')">Quiero más info →</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORMULARIO RESTAURANTES -->
+<div class="screen" id="screen-rest-form">
+  <div class="quote-band quote-band-dark">"Únete a la red Flambao"</div>
+  <div class="restform-wrap">
+    <div style="margin-bottom:24px;">
+      <button onclick="showScreen('pabblos')" style="background:none;border:none;cursor:pointer;font-family:'Gotham Book',serif;font-size:14px;color:var(--gray);letter-spacing:.06em;display:flex;align-items:center;gap:6px;padding:0;">← Volver</button>
+    </div>
+    <div class="screen-header" style="text-align:left;margin-bottom:0;">
+      <span class="eyebrow">Para restaurantes</span>
+      <h2 class="screen-title" style="text-align:left;">Cuéntanos sobre<br>tu <em>restaurante</em></h2>
+      <p class="screen-sub" style="text-align:left;margin:16px 0 0;">Rellena el formulario y te contactamos en menos de 24 horas.</p>
+    </div>
+    <div class="restform-card" style="margin-top:40px;">
+      <div id="restFormContent">
+        <div class="form-field"><label>Nombre del restaurante *</label><input type="text" id="rf-nombre" placeholder="Ej: Restaurante Pabblos" /></div>
+        <div class="form-row-2">
+          <div class="form-field"><label>Persona de contacto *</label><input type="text" id="rf-contacto" placeholder="Tu nombre y apellido" /></div>
+          <div class="form-field"><label>Teléfono *</label><input type="tel" id="rf-telefono" placeholder="+34 600 000 000" /></div>
+        </div>
+        <div class="form-field"><label>Email *</label><input type="email" id="rf-email" placeholder="restaurante@email.com" /></div>
+        <div class="form-row-2">
+          <div class="form-field"><label>Ciudad *</label><input type="text" id="rf-ciudad" placeholder="Madrid, Barcelona..." /></div>
+          <div class="form-field"><label>Capacidad (comensales)</label><select id="rf-comensales">
+  <option value="">Selecciona...</option>
+  <option value="Menos de 30">Menos de 30</option>
+  <option value="30-60 comensales">30-60 comensales</option>
+  <option value="60-100 comensales">60-100 comensales</option>
+  <option value="Más de 100 comensales">Más de 100 comensales</option>
+</select></div>
+        </div>
+        <div class="form-field"><label>Tipo de cocina</label>
+          <select id="rf-cocina">
+  <option value="">Selecciona...</option>
+  <option value="Española">Española</option>
+  <option value="Mediterránea">Mediterránea</option>
+  <option value="Italiana">Italiana</option>
+  <option value="Japonesa">Japonesa</option>
+  <option value="Asiática">Asiática</option>
+  <option value="Internacional">Internacional</option>
+  <option value="Fusión">Fusión</option>
+  <option value="Vegetariana">Vegetariana</option>
+  <option value="Vegana">Vegana</option>
+  <option value="Otro">Otro</option>
+</select></div>
+<div class="form-field"><label>Ticket medio por persona</label><select id="rf-ticket">
+  <option value="">Selecciona...</option>
+  <option value="Menos de 25€">Menos de 25€</option>
+  <option value="25-45€">25-45€</option>
+  <option value="45-70€">45-70€</option>
+  <option value="Más de 70€">Más de 70€</option>
+  <option value="Otro">Otro</option>
+</select></div>
+       <div class="form-row-2">
+  <div class="form-field"><label>Web del restaurante</label><input type="url" id="rf-web" placeholder="https://turestaurante.com" /></div>
+  <div class="form-field"><label>Instagram</label><input type="text" id="rf-instagram" placeholder="@turestaurante" /></div>
+</div>
+<div class="form-field"><label>¿Dónde nos has conocido y qué te llama la atención de Flambao para tu restaurante?</label><textarea id="rf-interes" placeholder="Cuéntanos dónde nos has conocido y qué te llama la atención de colaborar con nosotros..."></textarea></div> <div class="form-check" style="margin-top:8px;"><input type="checkbox" id="rf-consent" /><label for="rf-consent">Acepto la <a href="politicaPrivacidad.html" target="_blank">política de privacidad</a> y doy mi consentimiento para ser contactado por Flambao.</label></div>
+        <button class="btn-form-submit" onclick="submitRestForm()">Enviar solicitud →</button>
+      </div>
+      <div class="restform-success" id="restFormSuccess">
+        <span class="restform-success-icon">🎉</span>
+        <div class="restform-success-title">¡Solicitud recibida!</div>
+        <p class="restform-success-msg">Gracias por tu interés. Nuestro equipo te contactará en menos de <strong>24 horas</strong>.<br><br>¿Dudas urgentes? Escríbenos a <strong>flambaoapp@gmail.com</strong>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- INVERSORES -->
+<div class="screen" id="screen-inversores">
+  <div class="inv-wrap">
+    <div class="inv-logo-row">
+      <img src="https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png" style="height:44px;width:auto;mix-blend-mode:multiply;" alt="Flambao" />
+      <span class="inv-brand">Flambao</span>
+    </div>
+    <h1 class="inv-main-title">Invierte en Flambao</h1>
+    <p class="inv-main-sub">Únete a la misión de acabar con la soledad a través de experiencias reales.</p>
+    <div class="inv-obj-grid">
+      <div class="inv-obj-card">
+        <div class="inv-obj-icon">🎯</div>
+        <span class="inv-obj-amount">600.000 €</span>
+        <span class="inv-obj-label">por el 10% de Flambao</span>
+        <span class="inv-obj-sub">Valoración pre-money: 6.000.000 €</span>
+      </div>
+      <div class="inv-obj-card">
+        <div class="inv-obj-icon" style="background:rgba(74,222,128,.15);">📈</div>
+        <span class="inv-obj-amount" style="color:#4ade80;">150.000 €</span>
+        <span class="inv-obj-label">comprometidos · 2,5%</span>
+        <span class="inv-obj-sub">Inversores FFF · Tramo abierto</span>
+      </div>
+    </div>
+    <div class="inv-progress-section">
+      <div class="inv-progress-header">
+        <span class="inv-progress-target">Target: 600.000 € (10%)</span>
+        <span class="inv-progress-pct">25%</span>
+      </div>
+      <div class="inv-progress-bar"><div class="inv-progress-fill"></div></div>
+      <div class="inv-progress-labels"><span>Comprometido: 150.000 €</span><span>Objetivo: 600.000 €</span></div>
+    </div>
+   <div id="invFormContent">
+  <div class="inv-form-cta" style="flex-direction:column;align-items:stretch;gap:16px;">
+    <div style="margin-bottom:8px;">
+      <strong style="font-size:18px;color:var(--inv-blue);display:block;margin-bottom:8px;">Formulario de Inversores</strong>
+      <p style="font-size:13px;font-weight:300;color:#6b7a8d;line-height:1.6;">Rellena tus datos y nos pondremos en contacto contigo en la mayor brevedad.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div><label style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6b7a8d;display:block;margin-bottom:6px;">Nombre *</label><input type="text" id="inv-nombre" placeholder="Tu nombre" style="width:100%;padding:12px 14px;background:#f8faff;border:1px solid #c8d8f0;color:var(--inv-blue);font-family:'Montserrat',sans-serif;font-size:15px;outline:none;" /></div>
+      <div><label style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6b7a8d;;display:block;margin-bottom:6px;">Apellidos *</label><input type="text" id="inv-apellidos" placeholder="Tus apellidos" style="width:100%;padding:12px 14px;background:#f8faff;border:1px solid #c8d8f0;color:var(--inv-blue);font-family:'Montserrat',sans-serif;font-size:15px;outline:none;" /></div>
+      <div><label style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6b7a8d;;display:block;margin-bottom:6px;">Teléfono *</label><input type="tel" id="inv-telefono" placeholder="+34 600 000 000" style="width:100%;padding:12px 14px;background:#f8faff;border:1px solid #c8d8f0;color:var(--inv-blue);border-radius:4px;font-family:'Montserrat',sans-serif;font-size:15px;outline:none;" /></div>
+    </div>
+    <div><label style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6b7a8d;display:block;margin-bottom:6px;">Email *</label><input type="email" id="inv-email" placeholder="tu@email.com" style="width:100%;padding:12px 14px;background:#f8faff;border:1px solid #c8d8f0;color:var(--inv-blue);font-family:'Montserrat',sans-serif;font-size:15px;outline:none;" /></div>
+    <div><label style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6b7a8d;display:block;margin-bottom:6px;">¿Eres Business Angel en otras startups?</label>
+    <select id="inv-angel" style="width:100%;padding:12px 14px;color:var(--inv-blue);border:1px solid #c8d8f0;border-radius:4px;background:#f8faff;font-family:'Montserrat',sans-serif;font-size:15px;outline:none;">
+      <option value="" style="color:#000;">Selecciona...</option>
+<option value="Sí" style="color:#000;">Sí</option>
+<option value="No" style="color:#000;">No</option>
+    </select></div>
+    <div>
+      <label style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6b7a8d;display:block;margin-bottom:6px;">Número de tickets (1 ticket = 6.000€ · 0,1%)</label>
+      <select id="inv-tickets" onchange="updateTicketOutput()" style="width:100%;padding:12px 14px;background:#f8faff;border:1px solid #c8d8f0;border-radius:4px;color:var(--inv-blue);font-family:'Montserrat',sans-serif;font-size:15px;outline:none;">
+        <option value="" style="color:#000;">Selecciona número de tickets...</option>
+      <option value="" style="color:#000;">Selecciona número de tickets...</option>
+<option value="1">1 ticket</option>
+<option value="2">2 tickets</option>
+<option value="3">3 tickets</option>
+<option value="4">4 tickets</option>
+<option value="5">5 tickets</option>
+<option value="6">6 tickets</option>
+<option value="7">7 tickets</option>
+<option value="8">8 tickets</option>
+<option value="9">9 tickets</option>
+<option value="10">10 tickets</option>
+ </select>
+      <div id="ticketOutput" style="display:none;margin-top:8px;padding:10px 14px;background:#edf3fb;border:1px solid #c8d8f0;border-radius:4px;font-size:14px;font-weight:600;color:var(--inv-blue);"></div>
+    </div>
+    <div><label style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6b7a8d;display:block;margin-bottom:6px;">¿Qué te gusta de Flambao? <span style="font-weight:300;">(máx. 300 palabras)</span></label><textarea id="inv-mensaje" placeholder="Cuéntanos qué te atrae del proyecto..." oninput="limitWords(this,300)" style="width:100%;padding:12px 14px;background:#f8faff;border:1px solid #c8d8f0;border-radius:4px;color:var(--inv-blue);font-family:'Montserrat',sans-serif;font-size:15px;outline:none;min-height:100px;resize:vertical;"></textarea>
+    <div style="font-size:11px;color:#6b7a8d;margin-top:4px;text-align:right;" id="wordCount">0 / 300 palabras</div></div>
+    <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;font-weight:300;color:#6b7a8d;line-height:1.6;"><input type="checkbox" id="inv-consent" style="margin-top:3px;accent-color:var(--inv-blue);flex-shrink:0;" /><label for="inv-consent">Acepto la <a href="politicaPrivacidad.html" target="_blank" style="color:var(--inv-blue);">política de privacidad</a> y doy mi consentimiento para ser contactado por Flambao.</label></div>
+    <button onclick="submitInvForm()" style="width:100%;padding:16px;background:var(--inv-blue);color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:background .2s;">Enviar Solicitud →</button>
+  </div>
+</div>
+  
+<div id="invFormSuccess" style="display:none;text-align:center;padding:40px 24px;background:#fff;border:1px solid #c8d8f0;border-radius:8px;margin-bottom:32px;">
+  <span style="font-size:56px;display:block;margin-bottom:20px;">🎉</span>
+  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--inv-blue);margin-bottom:14px;">Formulario de Inversores · ¡Solicitud recibida!</div>
+  <p style="font-size:17px;font-weight:300;color:#4a5568;line-height:1.7;">Gracias por tu interés en Flambao. Nuestro equipo te contactará en menos de <strong style="color:var(--inv-blue)">24 horas</strong>.<br><br>¿Dudas urgentes? Escríbenos a <strong style="color:var(--inv-blue);">flambaoapp@gmail.com</strong></p>
+</div>
+    <div class="inv-countdown-section">
+      <span class="inv-countdown-label">Cierre tramo FFF – Solo hasta el 30 de junio</span>
+      <div class="inv-countdown-digits">
+        <div class="inv-cd-block"><span class="inv-cd-num" id="cd-days">--</span><span class="inv-cd-unit">Días</span></div>
+        <span class="inv-cd-sep">:</span>
+        <div class="inv-cd-block"><span class="inv-cd-num" id="cd-hours">--</span><span class="inv-cd-unit">Horas</span></div>
+        <span class="inv-cd-sep">:</span>
+        <div class="inv-cd-block"><span class="inv-cd-num" id="cd-mins">--</span><span class="inv-cd-unit">Minutos</span></div>
+        <span class="inv-cd-sep">:</span>
+        <div class="inv-cd-block"><span class="inv-cd-num" id="cd-secs">--</span><span class="inv-cd-unit">Segundos</span></div>
+      </div>
+    </div>
+    <div class="inv-features-grid">
+      <div class="inv-feature"><div class="inv-feature-title">Negocio hyper-growth</div><div class="inv-feature-desc">Mercado global en expansión con alto potencial de escala.</div></div>
+      <div class="inv-feature"><div class="inv-feature-title">IA intensivo</div><div class="inv-feature-desc">Tecnología propia e IA aplicada para experiencias únicas y personalizadas.</div></div>
+      <div class="inv-feature"><div class="inv-feature-title">Únete a socios como Samantha, Ramón y Eduardo</div><div class="inv-feature-desc">Equipo fundador con experiencia contrastada y visión global.</div></div>
+      <div class="inv-feature"><div class="inv-feature-title">Misión: Acabar con la soledad</div><div class="inv-feature-desc">Construimos conexiones reales para un impacto social positivo.</div></div>
+    </div>
+    <div class="inv-timeline">
+      <span class="inv-timeline-title">Timeline de Inversores</span>
+      <div class="inv-tl-track">
+        <div class="inv-tl-line"><div class="inv-tl-fill"></div></div>
+        <div class="inv-tl-dots">
+          <div class="inv-tl-dot active"></div>
+          <div class="inv-tl-dot current"></div>
+          <div class="inv-tl-dot"></div>
+        </div>
+      </div>
+      <div class="inv-tl-labels">
+        <div class="inv-tl-label"><strong>Hoy</strong>Apertura tramo FFF</div>
+        <div class="inv-tl-label"><strong>30 Junio</strong>Cierre tramo FFF</div>
+        <div class="inv-tl-label"><strong>30 Septiembre</strong>Cierre institucionales</div>
+      </div>
+    </div>
+    <div class="inv-partners">
+      <span class="inv-partners-label">Socios &amp; equipo fundador</span>
+     <span class="inv-partner-item">Samantha Vallejo-Nágera (Masterchef)</span>
+<span style="color:rgba(255,255,255,.15);">·</span>
+<span class="inv-partner-item">Ramón Argelaguet (Graduado Harvard y Spain CFO 2021)</span>
+<span style="color:rgba(255,255,255,.15);">·</span>
+<span class="inv-partner-item">Eduardo Diéz Hart (Empresario graduado IE)</span>
+    </div>
+    
+  </div>
+</div>
+
+
+
+<!-- HISTORIA -->
+<div class="screen" id="screen-historia">
+  <div class="quote-band quote-band-dark">“Nadie debería comer sólo”</div>
+  <div class="historia-wrap">
+    <div class="screen-header" style="margin-bottom:0">
+      <span class="eyebrow">Cómo empezó todo</span>
+      <h2 class="screen-title">Nuestra <em>historia</em></h2>
+    </div>
+    <div class="historia-lede">Flambao nace de una experiencia muy humana: sentirse solo cuando, en realidad, te gustaría estar acompañado.</div>
+    <div class="historia-body">
+      <p>Sus fundadores basados en este momento en España,  han trabajado y viajado durante años por mercados como <strong>Reino Unido, Irlanda, Dublín, Ámsterdam, México o República Dominicana</strong>. En ese camino, muchas veces se encontraron cenando solos.</p>
+      <p>Esa sensación, tan común y tan poco visible, fue el punto de partida.</p>
+      <p>Porque la soledad no siempre significa estar aislado. A veces significa tener ganas de salir, de hablar, de conocer a alguien, de improvisar una cena… y no saber con quién hacerlo.</p>
+    </div>
+    <div class="historia-highlight">
+      <p>De ahí nace <em>Flambao</em>.<br>De la idea de transformar ese momento de<br>“hoy ceno solo” en una oportunidad para compartir mesa.</p>
+    </div>
+    <div class="historia-body">
+      <p>Flambao nace de la mano de <strong>un empresario de éxito y un alto ejecutivo del área financiera</strong> que, tras más de un año y medio de trabajo, decidieron convertir una vivencia personal en una solución real.</p>
+      <p><strong>Así nace Flambao: la aplicación para conocer gente alrededor de una mesa.</strong></p>
+    </div>
+    <div class="fundadores-section">
+      <span class="eyebrow">Quiénes somos</span>
+      <h3 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--dark);margin-top:8px;">Los fundadores</h3>
+      <div class="fundadores-grid">
+        <div class="fundador-card">
+          <div class="fundador-avatar">R</div>
+          <span class="fundador-name">Ramón Argelaguet</span>
+          <span class="fundador-role">Co-fundador</span>
+          <p class="fundador-bio">Harvard GMP 2025 · Economista y MBA · Premio al Mejor CFO 2021 España.</p>
+        </div>
+        <div class="fundador-card">
+          <div class="fundador-avatar" style="background:var(--dark)">E</div>
+          <span class="fundador-name">Eduardo Diez Hart</span>
+          <span class="fundador-role">Co-fundador</span>
+          <p class="fundador-bio">IE MBA · Emprendedor exitoso · Lista de los 100 Jóvenes Líderes Globales.</p>
+        </div>
+      </div>
+    </div>
+    <div class="mision-vision">
+      <div class="mv-card mv-card-mision">
+        <span class="mv-label">Nuestra misión</span>
+        <div class="mv-title">Acabar con la soledad en el mundo</div>
+        <p class="mv-text">La OMS ha declarado la soledad como una prioridad de salud pública. Flambao transforma esa paradoja convirtiendo cualquier restaurante del mundo en un punto de encuentro real.</p>
+      </div>
+      <div class="mv-card mv-card-vision">
+        <span class="mv-label">Nuestra visión</span>
+        <div class="mv-title">Desbloquear el potencial de las conexiones humanas</div>
+        <p class="mv-text">Un mundo donde nadie come solo. Donde cualquier restaurante puede ser el escenario de una conexión real, un nuevo amigo, un socio de negocios o el amor de tu vida.</p>
+      </div>
+    </div>
+  </div>
+  <div class="quote-band" style="margin-top:0">“De la pantalla a la mesa. Del swipe al encuentro real.”</div>
+</div>
+
+<!-- MEDIA -->
+<div class="screen" id="screen-media">
+  <div class="quote-band quote-band-dark">“Cuando la prensa habla, Flambao escucha”</div>
+  <div class="media-wrap">
+    <div class="screen-header" style="text-align:left;margin-bottom:0;">
+    <span class="eyebrow" style="color:var(--red);">Prensa · Podcast · Susurros</span>
+<h2 class="screen-title" style="color:var(--dark);">Flambao <em style="color:var(--red);">en los medios</em></h2>
+<p class="screen-sub" style="color:var(--gray);margin:14px 0 0;text-align:left;"> </div>
+    <div class="media-logos-row">
+      <span class="media-logos-label">Han hablado de nosotros</span>
+      <span class="media-logo-item" style="color:var(--dark);">Applicantes</span>
+<span class="media-logo-item" style="color:var(--dark);">Capital Radio</span>
+<span class="media-logo-item" style="color:var(--dark);">+ próximamente</span>
+    </div>
+    <div class="media-prensa-grid">
+      <a class="media-card media-card-article" href="https://applicantes.com/flambao-app/" target="_blank" rel="noopener">
+        <span class="media-card-source">📰 Applicantes · 24 marzo 2026</span>
+        <div class="media-card-title">Flambao, la app para unirte a comidas y cenas con desconocidos</div>
+        <p class="media-card-excerpt">Una aplicación que da una vuelta de tuerca más a estos encuentros alrededor de la mesa con personas afines. «Cenas, no solo likes».</p>
+        <div class="media-card-meta"><span>Alberto Payo</span><span class="media-card-link-label">Leer artículo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span></div>
+      </a>
+      <a class="media-card media-card-podcast" href="https://www.capitalradio.es/audio/69bc47f236d71700128bea53/144117237" target="_blank" rel="noopener">
+        <div class="media-card-podcast-icon"><svg viewBox="0 0 24 24"><path d="M12 1a9 9 0 100 18A9 9 0 0012 1zm-1 13V8l5 3-5 3z"/></svg></div>
+        <span class="media-card-podcast-badge">🎙️ Podcast · Capital Radio</span>
+        <div class="media-card-title">Flambao en Capital Radio: cómo una cena puede cambiar tu vida</div>
+        <p class="media-card-excerpt">Ramón Argelaguet y Eduardo Diez Hart, explican cómo nació la app y su visión para acabar con la soledad moderna.</p>
+        <div class="media-listen-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Escuchar en Capital Radio</div>
+      </a>
+      <a class="media-card media-card-podcast" href="https://www.youtube.com/live/x_7XyZMZo0A" target="_blank" rel="noopener" style="background:var(--cream);border:1px solid var(--border);">
+        <div class="media-card-podcast-icon" style="background:#FF0000;">
+          <svg viewBox="0 0 24 24" fill="white" width="24" height="24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+        </div>
+        <span class="media-card-podcast-badge" style="color:#FF0000;background:rgba(255,0,0,0.1);border-color:rgba(255,0,0,0.2);">▶ YouTube Live · Entrevista</span>
+        <div class="media-card-title">Entrevista en directo: Flambao en YouTube</div>
+        <p class="media-card-excerpt">Eduardo Diez Hart explica la visión de Flambao y el futuro de las conexiones sociales en este live.</p>
+        <div class="media-listen-btn" style="background:#FF0000;"><svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>Ver en YouTube</div>
+      </a>
+      <div class="media-card media-card-podcast" id="sorteo-media-anchor"style="background:var(--cream);border:1px solid var(--border);">
+        <div class="media-card-podcast-icon" style="background:var(--red);"><svg viewBox="0 0 24 24" fill="white" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg></div>
+        
+        <div class="media-card-title">Alberto Contador · Descubre Flambao</div>
+        <p class="media-card-excerpt">El doble ganador del Tour de France y la Vuelta a España descubre Flambao. Participa en el sorteo y gana un premio exclusivo.</p>
+        <div style="margin-top:12px;border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/9;">
+          <video src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1778687570/WhatsApp_Video_2026-05-13_at_17.40.06_h0ohi6.mp4" controls playsinline style="width:100%;height:100%;object-fit:cover;display:block;">Tu navegador no soporta video HTML5.</video>
+        </div>
+        <div class="media-listen-btn" style="background:var(--red);margin-top:8px;cursor:pointer;" onclick="this.closest('.media-card').querySelector('video').play()">
+          <svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>Ver y participar en el sorteo
+        </div>
+      </div>
+    </div>
+    <div class="media-susurros-section">
+      <span class="section-eyebrow-light">Famosos que flambean</span>
+      <h2 class="section-title-light" style="margin-top:6px;">Galería de <em>Susurros</em></h2>
+      <p class="section-sub-light">Los famosos también necesitan una buena mesa.</p>
+      <div class="media-susurros-grid">
+        <div class="susurro-card"><video src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1779104364/WhatsApp_Video_2026-05-18_at_13.37.58_kryukd.mp4" loop playsinline preload="metadata"></video><div class="susurro-overlay"></div><span class="susurro-badge">Susurro</span><div class="susurro-play-btn" onclick="toggleSusurroPlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="susurro-info"><span class="susurro-name">Susurro Flambao</span><span class="susurro-desc">Descúbrelo</span></div><div class="susurro-progress-wrap"><div class="susurro-progress-bar-bg" onclick="seekSusurro(event, this)"><div class="susurro-progress-bar-fill"></div></div><span class="susurro-time-label">0:00 / 0:00</span></div></div>
+        <div class="susurro-card"><video src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1778609520/WhatsApp_Video_2026-05-08_at_14.10.04_akbtws.mp4" loop playsinline preload="metadata"></video><div class="susurro-overlay"></div><span class="susurro-badge">Susurro</span><div class="susurro-play-btn" onclick="toggleSusurroPlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="susurro-info"><span class="susurro-name">Susurro Flambao</span><span class="susurro-desc">Descúbrelo</span></div><div class="susurro-progress-wrap"><div class="susurro-progress-bar-bg" onclick="seekSusurro(event, this)"><div class="susurro-progress-bar-fill"></div></div><span class="susurro-time-label">0:00 / 0:00</span></div></div>
+        <div class="susurro-card"><video src="https://res.cloudinary.com/dpoqyfjvp/video/upload/v1778609524/WhatsApp_Video_2026-05-08_at_14.10.12_lmy4az.mp4" loop playsinline preload="metadata"></video><div class="susurro-overlay"></div><span class="susurro-badge">Susurro</span><div class="susurro-play-btn" onclick="toggleSusurroPlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="susurro-info"><span class="susurro-name">Susurro Flambao</span><span class="susurro-desc">Descúbrelo</span></div><div class="susurro-progress-wrap"><div class="susurro-progress-bar-bg" onclick="seekSusurro(event, this)"><div class="susurro-progress-bar-fill"></div></div><span class="susurro-time-label">0:00 / 0:00</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="quote-band" style="background:var(--cream);border-top:1px solid var(--border);color:var(--gray);">“Flambao no es solo una app. Es una historia que vale la pena contar.”</div>
+</div>
+
+<!-- CONTACTO -->
+<div class="screen" id="screen-contacto">
+  <div class="quote-band quote-band-dark">“Estamos al otro lado de la mesa”</div>
+  <div class="contacto-wrap">
+    <div class="contacto-left">
+      <span class="eyebrow">¿Tienes preguntas?</span>
+      <h2>Habla con <em>nosotros</em></h2>
+      <p>Estamos aquí para ayudarte. Escríbenos y te responderemos lo antes posible.</p>
+      <div class="c-info">
+        <div class="c-info-item"><strong>Email</strong>flambaoapp@gmail.com</div>
+        <div class="c-info-item"><strong>App disponible en</strong>iOS App Store · Google Play</div>
+      </div>
+    </div>
+ <div id="contactFormContent">
+  <div class="form-row"><input type="email" id="c-email" placeholder="Tu correo electrónico" /></div>
+  <div class="form-row"><textarea id="c-mensaje" placeholder="Cuéntanos cómo podemos ayudarte"></textarea></div>
+  <div class="form-check">
+    <input type="checkbox" id="c-consent" />
+    <label for="c-consent">Acepto la <a href="politicaPrivacidad.html" target="_blank">política de privacidad</a> y doy mi consentimiento para recibir comunicaciones.</label>
+  </div>
+  <button class="btn-submit" onclick="submitContactForm()">Enviar mensaje</button>
+</div>
+<div id="contactFormSuccess" style="display:none;text-align:center;padding:40px 0;">
+  <div style="font-size:48px;margin-bottom:16px;">✅</div>
+  <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--dark);margin-bottom:12px;">¡Mensaje enviado!</div>
+  <p style="font-size:16px;font-weight:300;color:var(--gray);">Te responderemos en menos de <strong>24 horas</strong>.</p>
+</div>
+    <div class="footer-bar">
+      <div class="footer-legal">
+        <a href="politicaPrivacidad.html" target="_blank">Política de privacidad</a>
+        <a href="politicaCookies.html" target="_blank">Política de cookies</a>
+        <a href="avisoLegal.html" target="_blank">Aviso legal</a>
+      </div>
+      <span class="footer-copy">© Flambao. Todos los derechos reservados.</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /screens -->
+<script>
+const FOOTER_HTML = `<footer class="site-footer">
+  <div class="footer-top">
+    <div>
+      <span class="footer-brand-name">Flambao</span>
+      <span class="footer-brand-tagline">Nadie come solo.</span>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/flambao?igsh=MW5zaWp5MnFwMG95cA==" class="footer-social-link" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+        <a href="https://www.tiktok.com/@flambao_app?_r=1&_t=ZN-96IvMYyKv9a" class="footer-social-link" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <span class="footer-col-title">La app</span>
+      <div class="footer-col-links">
+        <a onclick="showScreen('como')">Cómo funciona</a>
+        <a onclick="showScreen('categorias')">Categorías</a>
+        <a onclick="showScreen('samanthas')">Samantha's Favourite</a>
+        <a onclick="showScreen('home')">Descargar</a>
+      </div>
+    </div>
+    <div>
+      <span class="footer-col-title">La empresa</span>
+      <div class="footer-col-links">
+        <a onclick="showScreen('historia')">Nuestra historia</a>
+        <a onclick="showScreen('media')">Flambao Media</a>
+        <a onclick="showScreen('restaurantes')">Restaurantes</a>
+        <a onclick="showScreen('contacto')">Contacto</a>
+      </div>
+    </div>
+    <div>
+      <span class="footer-col-title">Legal</span>
+      <div class="footer-col-links">
+        <a href="politicaPrivacidad.html" target="_blank">Política de privacidad</a>
+        <a href="politicaCookies.html" target="_blank">Política de cookies</a>
+        <a href="avisoLegal.html" target="_blank">Aviso legal</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-legal-links">
+      <a href="politicaPrivacidad.html" target="_blank">Privacidad</a>
+      <a href="politicaCookies.html" target="_blank">Cookies</a>
+      <a href="avisoLegal.html" target="_blank">Aviso legal</a>
+    </div>
+    <span class="footer-copy-text">© 2025 Flambao. Todos los derechos reservados.</span>
+  </div>
+</footer>`;
+
+document.querySelectorAll('.screen').forEach(s => s.insertAdjacentHTML('beforeend', FOOTER_HTML));
+
+const SCREENS = { home:'screen-home', categorias:'screen-categorias', como:'screen-como', samanthas:'screen-samanthas', restaurantes:'screen-restaurantes', pabblos:'screen-pabblos', 'rest-form':'screen-rest-form', inversores:'screen-inversores', historia:'screen-historia', media:'screen-media', contacto:'screen-contacto' };
+const NAV_IDS = { categorias:'nav-categorias', como:'nav-como', samanthas:'nav-samanthas', restaurantes:'nav-restaurantes', historia:'nav-historia', media:'nav-media', contacto:'nav-contacto' };
+let current = 'home';
+
+function showScreen(key) {
+  if (!SCREENS[key] || key === current) return;
+  document.getElementById(SCREENS[current])?.classList.remove('active');
+  document.querySelectorAll('nav ul li a').forEach(a => a.classList.remove('active'));
+  const el = document.getElementById(SCREENS[key]);
+  if (el) { el.classList.add('active'); el.scrollTop = 0; }
+  if (NAV_IDS[key]) document.getElementById(NAV_IDS[key])?.classList.add('active');
+  current = key;
+  closeMobile();
+}
+(function(){
+  const p = new URLSearchParams(window.location.search).get('pantalla');
+  if(p && SCREENS[p]) showScreen(p);
+})();
+
+function closeMobile() { document.querySelector('.nav-mobile').classList.remove('open'); }
+
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item'), isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+function toggleLang(e) { e.stopPropagation(); document.getElementById('langSelector').classList.toggle('open'); }
+function setLang(code, label) {
+  if (code === 'es') {
+    document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    document.cookie = 'googtrans=; path=/; domain=' + location.hostname + '; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    window.location.reload();
+    return;
+  }
+  document.getElementById('langLabel').textContent = label;
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('active'));
+  event.target.closest('.lang-option').classList.add('active');
+  document.getElementById('langSelector').classList.remove('open');
+  document.documentElement.lang = code;
+  const sel = document.querySelector('.goog-te-combo');
+  if (sel) { sel.value = code; sel.dispatchEvent(new Event('change')); }
+}
+
+(function(){
+  const gt = document.cookie.split(';').find(c => c.trim().startsWith('googtrans='));
+  if (gt && gt.includes('/pt')) {
+    document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    document.cookie = 'googtrans=; path=/; domain=' + location.hostname + '; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    window.location.reload();
+  }
+})();
+
+document.addEventListener('click', e => { const ls = document.getElementById('langSelector'); if (ls && !ls.contains(e.target)) ls.classList.remove('open'); });
+
+(function() {
+  const dropdowns = document.querySelectorAll('.nav-dropdown');
+  dropdowns.forEach(dd => {
+    let closeTimer = null;
+    function openDD() { clearTimeout(closeTimer); dropdowns.forEach(other => { if (other !== dd) other.classList.remove('open'); }); dd.classList.add('open'); }
+    function closeDD() { closeTimer = setTimeout(() => dd.classList.remove('open'), 220); }
+    dd.addEventListener('mouseenter', openDD);
+    dd.addEventListener('mouseleave', closeDD);
+    const menu = dd.querySelector('.nav-dropdown-menu');
+    if (menu) { menu.addEventListener('mouseenter', () => clearTimeout(closeTimer)); menu.addEventListener('mouseleave', closeDD); }
+    const label = dd.querySelector('a');
+    if (label) { label.addEventListener('click', e => { e.stopPropagation(); dd.classList.contains('open') ? dd.classList.remove('open') : openDD(); }); }
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('.nav-dropdown')) dropdowns.forEach(dd => dd.classList.remove('open')); });
+})();
+
+function shareWeb() {
+  const url = window.location.href;
+  if (navigator.share) { navigator.share({ title: 'Flambao – Come con gente increíble', url }).catch(() => {}); }
+  else { navigator.clipboard.writeText(url).then(() => { const toast = document.getElementById('shareToast'); toast.classList.add('visible'); setTimeout(() => toast.classList.remove('visible'), 2800); }); }
+}
+
+function fmtTime(s) {
+  if (!isFinite(s)) return '0:00';
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function toggleSusurroPlay(btn) {
+  const card = btn.closest('.susurro-card');
+  const video = card.querySelector('video');
+  const icon = btn.querySelector('svg path');
+  if (video.paused) {
+    document.querySelectorAll('.susurro-card video').forEach(v => {
+      if (v !== video) { v.pause(); const oc = v.closest('.susurro-card'); oc.classList.remove('playing'); const op = oc.querySelector('.susurro-play-btn svg path'); if (op) op.setAttribute('d', 'M8 5v14l11-7z'); }
+    });
+    video.play(); card.classList.add('playing'); icon.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
+  } else { video.pause(); card.classList.remove('playing'); icon.setAttribute('d', 'M8 5v14l11-7z'); }
+}
+
+function seekSusurro(event, barBg) {
+  event.stopPropagation();
+  const card = barBg.closest('.susurro-card');
+  const video = card.querySelector('video');
+  if (!video.duration) return;
+  const rect = barBg.getBoundingClientRect();
+  const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+  video.currentTime = ratio * video.duration;
+}
+
+function initSusurroProgress() {
+  document.querySelectorAll('.susurro-card').forEach(card => {
+    const video = card.querySelector('video');
+    if (!video) return;
+    const fill = card.querySelector('.susurro-progress-bar-fill');
+    const label = card.querySelector('.susurro-time-label');
+    video.addEventListener('timeupdate', () => {
+      if (!video.duration) return;
+      const pct = (video.currentTime / video.duration) * 100;
+      if (fill) fill.style.width = pct + '%';
+      if (label) label.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+    });
+    video.addEventListener('ended', () => {
+      video.pause(); video.currentTime = 0; card.classList.remove('playing');
+      const path = card.querySelector('.susurro-play-btn svg path');
+      if (path) path.setAttribute('d', 'M8 5v14l11-7z');
+      if (fill) fill.style.width = '0%';
+      if (label) label.textContent = '0:00 / ' + fmtTime(video.duration);
+    });
+    video.removeAttribute('loop');
+  });
+}
+document.addEventListener('DOMContentLoaded', initSusurroProgress);
+
+// PATCH 3: CAT_DATA with Agenda added
+const CAT_DATA = [
+  { eyebrow: 'Amistad & comunidad', title: 'Conoce gente nueva', desc: 'La categoría más popular de Flambao. Perfecta para quienes se han mudado a una nueva ciudad, quieren ampliar su círculo social o simplemente buscan una noche diferente con personas increíbles.', icon: '🤝' },
+  { eyebrow: 'Cambio & reinicio', title: 'Nuevos comienzos', desc: 'Para quienes están en un momento de cambio: nueva conversaciones, nueva etapa vital, nueva mentalidad. Flambao te conecta con personas que entienden perfectamente ese momento.', icon: '🌱' },
+  { eyebrow: 'Networking & oportunidades', title: 'Negocios', desc: 'El networking más natural que existe. Comparte mesa con profesionales, emprendedores e inversores. Las mejores conversaciones de negocios nacen alrededor de una buena cena.', icon: '💼' },
+  { eyebrow: 'Romance & conexión', title: 'Abierto al amor', desc: 'Para quienes están abiertos a conocer a alguien especial alrededor de una mesa. Sin perfiles filtrados. Solo personas reales con ganas de conectar de verdad.', icon: '❤️' },
+  { eyebrow: 'Planes con control total', title: 'Mi Agenda', desc: '¿Quieres organizar cenas con desconocidos y amigos? Tenemos la opción de Agenda: así puedes invitar directamente a las personas que quieras desde tu agenda personal y combinar lo mejor de los dos mundos.', icon: '📅' },
+];
+let catHideTimer = null;
+
+function showCat(i) {
+  clearTimeout(catHideTimer);
+  const d = CAT_DATA[i], panel = document.getElementById('catDetailPanel');
+  document.getElementById('catDetailEyebrow').textContent = d.eyebrow;
+  document.getElementById('catDetailTitle').textContent = d.title;
+  document.getElementById('catDetailDesc').textContent = d.desc;
+  document.getElementById('catDetailIcon').textContent = d.icon;
+  panel.classList.add('visible');
+  document.querySelectorAll('.cat-card').forEach((c,idx) => c.classList.toggle('active-cat', idx === i));
+}
+function hideCat() {
+  catHideTimer = setTimeout(() => {
+    document.getElementById('catDetailPanel').classList.remove('visible');
+    document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active-cat'));
+  }, 200);
+}
+document.getElementById('catDetailPanel')?.addEventListener('mouseenter', () => clearTimeout(catHideTimer));
+document.getElementById('catDetailPanel')?.addEventListener('mouseleave', hideCat);
+
+// ── Modal ──
+function openModal(id){const m=document.getElementById(id);if(m)m.classList.add('open');}
+function closeModal(id){const m=document.getElementById(id);if(m)m.classList.remove('open');}
+
+
+// ── Restaurant form ──
+
+async function submitRestForm(){
+  const n=document.getElementById('rf-nombre').value.trim();
+  const c=document.getElementById('rf-contacto').value.trim();
+  const t=document.getElementById('rf-telefono').value.trim();
+  const e=document.getElementById('rf-email').value.trim();
+  const ci=document.getElementById('rf-ciudad').value.trim();
+  const priv=document.getElementById('rf-consent').checked;
+  if(!n||!c||!t||!e||!ci){alert('Por favor rellena los campos obligatorios (*).');return;}
+  if(!priv){alert('Debes aceptar la política de privacidad.');return;}
+  const params=new URLSearchParams();
+  params.append('entry.1887114772',n);
+  params.append('entry.97786375',c);
+  params.append('entry.1680261469',t);
+  params.append('entry.1561875294',e);
+  params.append('entry.838983447',ci);
+  const com=document.getElementById('rf-comensales').value;
+  const tic=document.getElementById('rf-ticket').value;
+  const web=document.getElementById('rf-web').value;
+  const inst=document.getElementById('rf-instagram').value;
+  const intr=document.getElementById('rf-interes').value;
+  if(com) params.append('entry.892014151',com);
+  if(tic) params.append('entry.226219542',tic);
+  if(web) params.append('entry.914340885',web);
+  if(inst) params.append('entry.1047485153',inst);
+  if(intr) params.append('entry.902394115',intr);
+  const coc=document.getElementById('rf-cocina').value;
+  if(coc) params.append('entry.641611240',coc);
+  try{
+    await fetch('https://docs.google.com/forms/d/e/1FAIpQLSeIfPAzY5C2kKns_MDu9FDJeZ-jepti-DBMFnGg2ngrRWnFPw/formResponse',{method:'POST',body:params,mode:'no-cors'});
+  }catch(err){}
+  document.getElementById('restFormContent').style.display='none';
+  const s=document.getElementById('restFormSuccess');
+  s.classList.add('visible');
+  s.querySelector('.restform-success-title').textContent='Formulario de Restaurantes · ¡Solicitud recibida!';
+}
+
+// ── Inversores form ──
+async function submitInvForm(){
+  const n=document.getElementById('inv-nombre').value.trim();
+  const ap=document.getElementById('inv-apellidos').value.trim();
+  const t=document.getElementById('inv-telefono').value.trim();
+  const e=document.getElementById('inv-email').value.trim();
+  const priv=document.getElementById('inv-consent').checked;
+  if(!n||!ap||!t||!e){alert('Por favor rellena los campos obligatorios (*).');return;}
+  if(!priv){alert('Debes aceptar la política de privacidad.');return;}
+  const params=new URLSearchParams();
+  params.append('entry.1863124080',n);
+  params.append('entry.856031717',ap);
+ params.append('entry.1330688136', t);         // teléfono
+params.append('entry.281398493', e);          // email
+params.append('entry.134364403', document.getElementById('inv-angel').value || '');  // angel
+  const tickets=document.getElementById('inv-tickets').value;
+  const mensaje=document.getElementById('inv-mensaje').value;
+  if(tickets) params.append('entry.704396249',tickets);
+  if(mensaje) params.append('entry.1778876457',mensaje);
+  try{
+    await fetch('https://docs.google.com/forms/d/e/1FAIpQLSfmR-zTcl7VbjHWJc-JcXCy_A5huhZQZFON1-O-AgFyvZauYw/formResponse',{method:'POST',body:params,mode:'no-cors'});
+  }catch(err){}
+  document.getElementById('invFormContent').style.display='none';
+  document.getElementById('invFormSuccess').style.display='block';
+  const popup=document.getElementById('invPopup');
+  popup.style.display='flex';
+  setTimeout(()=>{popup.style.display='none';},15000);
+}
+
+
+// ── Contact form ──
+async function submitContactForm(){
+  const email=document.getElementById('c-email').value.trim();
+  const mensaje=document.getElementById('c-mensaje').value.trim();
+  const consent=document.getElementById('c-consent').checked;
+  if(!email||!mensaje){alert('Por favor rellena el email y el mensaje.');return;}
+  if(!consent){alert('Debes aceptar la política de privacidad.');return;}
+  const fd=new FormData();
+  fd.append('entry.40539682',email);
+  fd.append('entry.1396361417',mensaje);
+ try{
+  const params=new URLSearchParams();
+  params.append('entry.40539682',email);
+  params.append('entry.1396361417',mensaje);
+  await fetch('https://docs.google.com/forms/d/e/1FAIpQLSdwo3TXG13YIzfxN3ZzeFEtlYaezl9cF0rL7yyjqePBkzUWzw/formResponse',{method:'POST',body:params,mode:'no-cors'});
+}catch(err){}
+  document.getElementById('contactFormContent').style.display='none';
+  document.getElementById('contactFormSuccess').style.display='block';
+}
+// ── Inversores countdown ──
+function updateCountdown(){
+ const target=new Date('2026-06-30T23:59:59');
+  const now=new Date();
+  const diff=target-now;
+  if(diff<=0){
+    document.getElementById('cd-days').textContent='0';
+    document.getElementById('cd-hours').textContent='00';
+    document.getElementById('cd-mins').textContent='00';
+    document.getElementById('cd-secs').textContent='00';
+    return;
+  }
+  const d=Math.floor(diff/86400000);
+  const h=Math.floor((diff%86400000)/3600000);
+  const m=Math.floor((diff%3600000)/60000);
+  const s=Math.floor((diff%60000)/1000);
+  document.getElementById('cd-days').textContent=d;
+  document.getElementById('cd-hours').textContent=String(h).padStart(2,'0');
+  document.getElementById('cd-mins').textContent=String(m).padStart(2,'0');
+  document.getElementById('cd-secs').textContent=String(s).padStart(2,'0');
+}
+
+updateCountdown();
+setInterval(updateCountdown,1000);
+setTimeout(()=>{document.getElementById('invFloat').classList.add('hidden');},10000);
+</script>
+
+<div id="google_translate_element" style="display:none;"></div>
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({ pageLanguage: 'es', includedLanguages: 'en,pt', autoDisplay: false }, 'google_translate_element');
+}
+</script>
+
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<style>
+  .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame { display:none !important; }
+  body { top: 0 !important; }
+  .skiptranslate { display:none !important; }
+</style>
+
+</body>
+</html>

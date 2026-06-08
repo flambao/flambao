@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aviso Legal – Flambao</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { --red:#C0143C; --dark:#1C1C1C; --cream:#F8F5F0; --gray:#6B6B6B; --border:#E5DDD3; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family: "Cormorant Garamond", serif; background:#fff; color:var(--dark); line-height:1.8; }
+    .top-bar { background:var(--dark); padding:14px 40px; display:flex; align-items:center; justify-content:space-between; }
+    .top-bar-logo { font-family:"Playfair Display",serif; font-size:20px; font-weight:700; color:#fff; letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; }
+    .top-bar-back { font-size:13px; color:rgba(255,255,255,0.6); text-decoration:none; display:flex; align-items:center; gap:6px; transition:color 0.2s; }
+    .top-bar-back:hover { color:#fff; }
+    .wrap { max-width:800px; margin:0 auto; padding:60px 40px 100px; }
+    .page-eyebrow { font-size:11px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--red); display:block; margin-bottom:12px; }
+    h1 { font-family:"Playfair Display",serif; font-size:clamp(30px,4vw,46px); font-weight:700; color:var(--dark); line-height:1.1; margin-bottom:32px; }
+    h2 { font-family:"Playfair Display",serif; font-size:22px; font-weight:700; color:var(--dark); margin:40px 0 14px; }
+    p { font-size:17px; font-weight:300; color:var(--gray); margin-bottom:16px; }
+    ul { margin:0 0 16px 20px; }
+    ul li { font-size:17px; font-weight:300; color:var(--gray); margin-bottom:6px; }
+    a { color:var(--red); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .divider { height:1px; background:var(--border); margin:32px 0; }
+    .datos-card { background:var(--cream); border:1px solid var(--border); border-radius:4px; padding:28px 32px; margin-bottom:28px; display:grid; grid-template-columns:1fr 1fr; gap:16px 32px; }
+    .dato { display:flex; flex-direction:column; gap:2px; }
+    .dato-label { font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:rgba(0,0,0,0.35); }
+    .dato-value { font-size:17px; font-weight:400; color:var(--dark); }
+    .footer-legal { margin-top:60px; padding-top:24px; border-top:1px solid var(--border); display:flex; gap:24px; flex-wrap:wrap; }
+    .footer-legal a { font-size:13px; color:var(--gray); text-decoration:none; transition:color 0.2s; }
+    .footer-legal a:hover { color:var(--dark); }
+    @media(max-width:600px){ .wrap{padding:40px 20px 80px;} .top-bar{padding:12px 20px;} .datos-card{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="top-bar-logo">Flambao</a>
+    <a href="index.html" class="top-bar-back">← Volver a la web</a>
+  </div>
+  <div class="wrap">
+    <span class="page-eyebrow">Legal</span>
+    <h1>Aviso Legal</h1>
+    <p>En cumplimiento del artículo 10 de la Ley 34/2002, del 11 de julio, de Servicios de la Sociedad de la Información y Comercio Electrónico (LSSICE), se exponen a continuación los datos identificativos de la empresa titular de esta página web.</p>
+
+    <div class="datos-card">
+      <div class="dato"><span class="dato-label">Denominación social</span><span class="dato-value">Flambao, S.L.</span></div>
+      <div class="dato"><span class="dato-label">NIF</span><span class="dato-value">B21749692</span></div>
+      <div class="dato"><span class="dato-label">Domicilio social</span><span class="dato-value">Calle Traviata, 28220 Majadahonda, Madrid</span></div>
+      <div class="dato"><span class="dato-label">Correo electrónico</span><span class="dato-value"><a href="mailto:flambao@flambao.com">flambao@flambao.com</a></span></div>
+      <div class="dato"><span class="dato-label">Teléfono</span><span class="dato-value">661 407 651</span></div>
+    </div>
+
+    <p>Este sitio web ha sido creado por Flambao, S.L. con carácter informativo y para uso personal de los usuarios.</p>
+    <p>A través de este Aviso Legal se pretende regular el acceso y uso de este sitio web, así como la relación entre el sitio web y sus usuarios.</p>
+
+    <div class="divider"></div>
+
+    <h2>Términos y condiciones de uso</h2>
+    <p>Accediendo a este sitio web se aceptan los siguientes términos y condiciones:</p>
+    <ul>
+      <li>El acceso a este sitio web es responsabilidad exclusiva de los usuarios.</li>
+      <li>El simple acceso no supone entablar ningún tipo de relación comercial entre Flambao, S.L. y el usuario.</li>
+      <li>La navegación en este sitio web supone aceptar y conocer las advertencias legales, condiciones y términos de uso contenidos en ella.</li>
+      <li>El titular del sitio web puede ofrecer servicios o productos sometidos a condiciones particulares propias que sustituyan, completen y/o modifiquen las presentes condiciones.</li>
+    </ul>
+
+    <div class="footer-legal">
+      <a href="politicaPrivacidad.html">Política de privacidad</a>
+      <a href="politicaCookies.html">Política de cookies</a>
+      <a href="avisoLegal.html">Aviso legal</a>
+      <a href="index.html">Volver al inicio</a>
+    </div>
+  </div>
+</body>
+</html>
