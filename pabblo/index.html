@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flambao · Pabblo</title>
+<meta name="description" content="Apúntate a una mesa Flambao en Pabblo." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --red:#002d74; --orange:#d0b787; --dark:#1d1d1b; --cream:#F8F5F0; --gray:#6B6B6B; --border:#E5DDD3;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{max-width:100%;overflow-x:hidden;}
+  body{font-family:'Montserrat',sans-serif;background:#FDFAF6;color:var(--dark);line-height:1.5;}
+
+  /* ===== SAMANTHA'S FAVOURITE BANNER ===== */
+  .sam-fav-banner{background:linear-gradient(135deg,#c9a227,#f0c040);color:var(--dark);text-align:center;padding:9px 12px;font-family:'Playfair Display',serif;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;}
+
+  /* ===== NAV ===== */
+  .topbar{display:flex;align-items:center;justify-content:center;padding:22px 24px;border-bottom:1px solid var(--border);background:rgba(253,250,246,0.97);}
+  .topbar img{height:40px;width:auto;}
+
+  /* ===== LAYOUT ===== */
+  .page{max-width:1180px;margin:0 auto;padding:48px 24px 100px;}
+
+  /* ===== HERO ROW: nombre a la izquierda, fotos+vídeo a la derecha ===== */
+  .hero-row{display:block;margin-bottom:16px;}
+  .rest-eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:10px;}
+  h1.rest-title{font-family:'Playfair Display',serif;font-size:clamp(30px,4vw,46px);font-weight:900;line-height:1.05;letter-spacing:-.02em;margin-bottom:14px;}
+  h1.rest-title em{font-style:italic;color:var(--red);}
+  .rest-location{font-size:14px;font-weight:600;color:var(--dark);max-width:100%;overflow-wrap:break-word;}
+
+  /* Vídeo + fotos: pensado mobile-first (el usuario solo abre esto en el móvil) */
+  .hero-media{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px;margin-top:24px;}
+  .video-wrap{position:relative;width:100%;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:var(--dark);}
+  .video-wrap video{width:100%;height:100%;object-fit:cover;display:block;filter:blur(0px);transition:filter .8s ease, opacity .8s ease;}
+  .video-wrap video.blurred{filter:blur(7px);opacity:.75;}
+  .video-mute-btn{position:absolute;bottom:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);border:none;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);z-index:4;}
+  .photos-row{display:flex;gap:8px;}
+  .photos-row img{flex:1;width:0;aspect-ratio:1/1;object-fit:cover;border-radius:10px;display:block;}
+
+  /* ===== TAGLINE (sustituye al texto del restaurante) ===== */
+  .rest-tagline{font-family:'Playfair Display',serif;font-size:clamp(20px,2.6vw,28px);font-weight:700;font-style:italic;color:var(--dark);margin:22px 0 4px;max-width:640px;}
+
+  /* ===== CATEGORÍAS: superpuestas sobre el vídeo, aparecen cuando acaba ===== */
+  .cat-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:14px;z-index:3;opacity:0;pointer-events:none;transition:opacity .6s ease;}
+  .cat-overlay.revealed{opacity:1;pointer-events:auto;}
+
+  .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;}
+  .cat-btn{border:none;border-radius:6px;padding:clamp(8px,4vw,12px) 4px;text-align:center;cursor:pointer;transition:.25s;font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(9px,2.6vw,11px);line-height:1.2;box-shadow:0 6px 16px rgba(0,0,0,.3);}
+  .cat-btn:hover{transform:translateY(-2px);}
+  .cat-btn.active{outline:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.45);}
+
+  /* Colores por categoría */
+  .cat-btn[data-cat="Nuevos Comienzos"]{background:#F5C518;color:#1d1d1b;}
+  .cat-btn[data-cat="Conocer Gente Nueva"]{background:#3FA34D;color:#fff;}
+  .cat-btn[data-cat="Abierto al Amor"]{background:#E4572E;color:#fff;}
+  .cat-btn[data-cat="Negocios"]{background:#1B5FAE;color:#fff;}
+
+  /* ===== OPCIONES DE MESA YA CREADAS ===== */
+  .booking-panel{display:none;margin-top:24px;background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:24px 20px;max-width:none;}
+  .booking-panel.visible{display:block;}
+  .booking-cat-label{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:18px;}
+
+  .table-options{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
+  .table-option{display:flex;flex-direction:column;gap:4px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:16px 18px;cursor:pointer;text-align:left;font-family:'Montserrat',sans-serif;transition:.2s;}
+  .table-option:hover{border-color:var(--red);}
+  .table-option.selected{background:var(--dark);border-color:var(--dark);}
+  .table-option.selected .to-day,.table-option.selected .to-time{color:#fff;}
+  .table-option.selected .to-note{color:#ccc;}
+  .to-row{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .to-day{font-family:'Playfair Display',serif;font-weight:700;font-size:16px;color:var(--dark);}
+  .to-time{font-size:14px;font-weight:600;color:var(--red);}
+  .table-option.selected .to-time{color:var(--orange);}
+  .to-note{font-size:12px;font-weight:400;color:var(--gray);}
+
+  .btn-apuntate{display:none;width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:2px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .2s;}
+  .btn-apuntate.visible{display:block;}
+  .btn-apuntate:hover{background:#001f52;}
+
+  /* ===== SIGNUP FORM ===== */
+  .signup-form{display:none;margin-top:22px;padding-top:22px;border-top:1px solid var(--border);}
+  .signup-form.visible{display:block;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .field input{width:100%;padding:13px 14px;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--dark);background:#fff;border:1px solid var(--border);border-radius:2px;outline:none;}
+  .field input:focus{border-color:var(--red);}
+  .signup-note{font-size:13px;font-weight:300;color:var(--gray);margin-bottom:16px;}
+  .btn-submit-final{width:100%;padding:16px;background:var(--dark);color:#fff;border:none;border-radius:2px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .2s;}
+  .btn-submit-final:hover{background:var(--red);}
+  .form-success{display:none;text-align:center;padding:24px;}
+  .form-success.visible{display:block;}
+  .form-success .icon{font-size:44px;display:block;margin-bottom:12px;}
+  .form-success .title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;}
+  .form-success .msg{font-size:15px;font-weight:300;color:var(--gray);}
+
+  /* ===== FRANJA INFERIOR: vídeo de prueba social (ya hay gente apuntándose) ===== */
+  .social-strip{opacity:0;max-height:0;overflow:hidden;transition:opacity .7s ease, max-height .9s ease;margin-top:32px;}
+  .social-strip.revealed{opacity:1;max-height:700px;}
+  .social-strip-label{font-family:'Playfair Display',serif;font-weight:700;font-size:15px;color:var(--dark);text-align:center;margin-bottom:10px;}
+  .social-video-wrap{width:100%;max-width:420px;margin:0 auto;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:var(--dark);}
+  .social-video-wrap video{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* Mejora para pantallas más anchas (tablet/escritorio) — los botones de categoría
+     siempre van en 2x2 dentro del cuadro del vídeo, solo cambia el panel de reserva */
+  @media (min-width:700px){
+    .booking-panel{max-width:460px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="sam-fav-banner">★ Samantha's Favourite ★</div>
+
+<div class="topbar">
+  <a href="https://flambao.com"><img src="https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png" alt="Flambao" /></a>
+</div>
+
+<div class="page">
+
+  <!-- ===== HERO: nombre del restaurante ===== -->
+  <div class="hero-row">
+    <div class="hero-left">
+      <span class="rest-eyebrow">Mesa Flambao · Centro de Madrid</span>
+      <h1 class="rest-title">Pabblo <em>Madrid</em></h1>
+      <p class="rest-location">📍 Plaza de Pablo Ruiz Picasso, 1, 28020 Madrid</p>
+    </div>
+  </div>
+
+  <p class="rest-tagline">Explora las categorías de mesas para conocer a gente nueva</p>
+
+  <!-- ===== Vídeo (arranca solo, categorías se superponen al acabar) + fotos ===== -->
+  <div class="hero-media">
+    <div class="video-wrap">
+      <video id="samVideo" src="samantha-mesa.mp4" autoplay muted playsinline></video>
+      <button class="video-mute-btn" id="muteBtn" title="Activar sonido">🔇</button>
+
+      <div class="cat-overlay" id="catOverlay">
+        <div class="cat-grid" id="catGrid">
+          <button class="cat-btn" data-cat="Nuevos Comienzos">Nuevos<br>Comienzos</button>
+          <button class="cat-btn" data-cat="Conocer Gente Nueva">Conocer Gente<br>Nueva</button>
+          <button class="cat-btn" data-cat="Abierto al Amor">Abierto<br>al Amor</button>
+          <button class="cat-btn" data-cat="Negocios">Negocios</button>
+        </div>
+      </div>
+    </div>
+    <div class="photos-row">
+      <img src="https://glhrestaurants.com/c/wp-content/uploads/sites/3/2025/10/pabblo-hero-202510.jpg" alt="Pabblo Madrid" />
+      <img src="https://glhrestaurants.com/c/wp-content/uploads/sites/3/2026/09/pabblo-43.jpg" alt="Pabblo Madrid" />
+    </div>
+  </div>
+
+  <!-- ===== Panel de reserva (aparece al elegir una categoría) ===== -->
+  <div class="cats-section" id="catsSection">
+
+    <div class="booking-panel" id="bookingPanel">
+      <span class="booking-cat-label" id="bookingCatLabel"></span>
+
+      <div class="table-options" id="tableOptions"></div>
+
+      <button class="btn-apuntate" id="btnApuntate">Apúntate a la mesa</button>
+
+      <form class="signup-form" id="signupForm">
+        <div class="field">
+          <label for="sfNombreCompleto">Nombre y apellidos</label>
+          <input type="text" id="sfNombreCompleto" required />
+        </div>
+        <div class="field">
+          <label for="sfTelefono">Teléfono</label>
+          <input type="tel" id="sfTelefono" required />
+        </div>
+        <p class="signup-note">Te contactaremos para confirmarte la mesa.</p>
+        <button type="submit" class="btn-submit-final">Enviar</button>
+      </form>
+
+      <div class="form-success" id="formSuccess">
+        <span class="icon">✅</span>
+        <div class="title">¡Ya casi estás en la mesa!</div>
+        <p class="msg">Te contactaremos para confirmarte la mesa.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== FRANJA INFERIOR: vídeo de prueba social, sale a la vez que las categorías ===== -->
+  <div class="social-strip" id="socialStrip">
+    <p class="social-strip-label">🔥 Ya hay gente apuntándose</p>
+    <div class="social-video-wrap">
+      <video id="socialVideo" src="mesa-llena.mp4" muted loop autoplay playsinline></video>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const RESTAURANTE = 'Pabblo';
+
+  // ── Opciones de mesa ya creadas por categoría ──
+  const TABLE_OPTIONS = {
+    'Nuevos Comienzos': [
+      { day: '7 de octubre', time: '20:00' },
+      { day: '14 de octubre', time: '20:00' },
+    ],
+    'Conocer Gente Nueva': [
+      { day: '6 de octubre', time: '20:00' },
+      { day: '8 de octubre', time: '14:00' },
+    ],
+    'Abierto al Amor': [
+      { day: '8 de octubre', time: '20:00' },
+      { day: '15 de octubre', time: '20:00' },
+    ],
+    'Negocios': [
+      { day: '6 de octubre', time: '14:00', note: '(Consultores junior/Senior Deloitte)' },
+      { day: '7 de octubre', time: '14:00', note: '(Emprendedores de patio campus)' },
+    ],
+  };
+
+  // ── Vídeo de Samantha: autoplay al entrar, categorías encima al terminar ──
+  const samVideo = document.getElementById('samVideo');
+  const muteBtn = document.getElementById('muteBtn');
+  const catOverlay = document.getElementById('catOverlay');
+
+  // ── Franja inferior de prueba social (vídeo "ya hay gente apuntándose") ──
+  const socialStrip = document.getElementById('socialStrip');
+  const socialVideo = document.getElementById('socialVideo');
+
+  samVideo.addEventListener('ended', () => {
+    samVideo.classList.add('blurred');
+    catOverlay.classList.add('revealed');
+    socialStrip.classList.add('revealed');
+    socialVideo.play().catch(() => {});
+  });
+
+  muteBtn.addEventListener('click', () => {
+    samVideo.muted = !samVideo.muted;
+    muteBtn.textContent = samVideo.muted ? '🔇' : '🔊';
+  });
+
+  // Si el autoplay con sonido falla (política del navegador), forzamos el muted y reproducimos igualmente.
+  samVideo.play().catch(() => {
+    samVideo.muted = true;
+    samVideo.play();
+  });
+
+  // ── Categorías → opciones de mesa → apuntarse ──
+  let selectedCat = null;
+  let selectedOption = null;
+
+  const catGrid = document.getElementById('catGrid');
+  const bookingPanel = document.getElementById('bookingPanel');
+  const bookingCatLabel = document.getElementById('bookingCatLabel');
+  const tableOptionsEl = document.getElementById('tableOptions');
+  const btnApuntate = document.getElementById('btnApuntate');
+  const signupForm = document.getElementById('signupForm');
+  const formSuccess = document.getElementById('formSuccess');
+
+  catGrid.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      catGrid.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedCat = btn.dataset.cat;
+      selectedOption = null;
+
+      bookingCatLabel.textContent = 'Mesa · ' + selectedCat;
+      bookingPanel.classList.add('visible');
+      btnApuntate.classList.remove('visible');
+      signupForm.classList.remove('visible');
+      formSuccess.classList.remove('visible');
+
+      tableOptionsEl.innerHTML = '';
+      (TABLE_OPTIONS[selectedCat] || []).forEach((opt, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'table-option';
+        b.innerHTML = '<div class="to-row"><span class="to-day">' + opt.day + '</span><span class="to-time">' + opt.time + '</span></div>' + (opt.note ? '<div class="to-note">' + opt.note + '</div>' : '');
+        b.addEventListener('click', () => {
+          tableOptionsEl.querySelectorAll('.table-option').forEach(o => o.classList.remove('selected'));
+          b.classList.add('selected');
+          selectedOption = opt;
+          btnApuntate.classList.add('visible');
+        });
+        tableOptionsEl.appendChild(b);
+      });
+
+      bookingPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  });
+
+  btnApuntate.addEventListener('click', () => {
+    if(!selectedOption){
+      alert('Elige primero un día y hora de mesa.');
+      return;
+    }
+    signupForm.classList.add('visible');
+  });
+
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombreCompleto = document.getElementById('sfNombreCompleto').value.trim();
+    const telefono = document.getElementById('sfTelefono').value.trim();
+    if(!nombreCompleto || !telefono){
+      alert('Rellena nombre y apellidos y teléfono.');
+      return;
+    }
+
+    // ── Envío al Google Form de Flambao (Pabblo) ──
+    // El formulario solo tiene 2 campos (Nombre y Apellidos, Teléfono), así que
+    // metemos el restaurante/categoría/día/hora dentro del campo de nombre.
+    const FORM_ID = '1FAIpQLSdf3JTLrrp08NsWkbxORkNGMS5Vu7YMtF4BBfia8NoQAGtiKw';
+    const mesaInfo = selectedCat + (selectedOption ? (', ' + selectedOption.day + ' ' + selectedOption.time) : '');
+    const nombreParaForm = nombreCompleto + ' — ' + RESTAURANTE + ' · ' + mesaInfo;
+
+    const params = new URLSearchParams();
+    params.append('entry.2016620008', nombreParaForm);
+    params.append('entry.1993107579', telefono);
+
+    try{
+      await fetch('https://docs.google.com/forms/d/e/' + FORM_ID + '/formResponse', {
+        method: 'POST', body: params, mode: 'no-cors'
+      });
+    }catch(err){
+      console.log('[Flambao] Error enviando al Google Form:', err);
+    }
+    console.log('[Flambao] Inscripción enviada:', {nombreCompleto, telefono, restaurante: RESTAURANTE, categoria: selectedCat, opcion: selectedOption});
+
+    signupForm.classList.remove('visible');
+    formSuccess.classList.add('visible');
+  });
+</script>
+
+</body>
+</html>
