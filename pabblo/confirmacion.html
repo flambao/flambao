@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flambao · Tu mesa</title>
+<meta name="description" content="Ya tienes tu sitio en la mesa Flambao." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --cat:#002d74; --cat-ink:#fff; --cat-dark:#002d74; --mint:#98FB98; --mint-hover:#7de07d; --blue-dark:#002d74; --blue-light:#1B5FAE; --orange:#d0b787; --dark:#1d1d1b; --cream:#FFFFFF; --gray:#6B6B6B; --border:#E8E8E8;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{max-width:100%;overflow-x:hidden;}
+  body{font-family:'Montserrat',sans-serif;background:var(--cream);color:var(--dark);line-height:1.5;}
+
+  .topbar{display:flex;align-items:center;justify-content:center;padding:22px 24px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.97);}
+  .topbar img{height:40px;width:auto;}
+
+  .page{max-width:460px;margin:0 auto;padding:32px 20px 60px;}
+
+  .hello{text-align:center;margin-bottom:22px;position:relative;}
+  .hello .big{font-family:'Playfair Display',serif;font-size:clamp(24px,7vw,30px);font-weight:900;line-height:1.2;margin-bottom:8px;}
+  .hello .big em{font-style:italic;color:var(--blue-dark);}
+  .hello .sub{font-size:14px;color:var(--gray);}
+
+  .share-toast{position:absolute;top:-44px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;font-size:11px;font-weight:600;padding:7px 12px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:2;box-shadow:0 4px 12px rgba(0,0,0,.25);}
+  .share-toast.visible{opacity:1;}
+
+  .actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px;}
+  .btn-action{display:flex;align-items:center;justify-content:center;padding:20px 10px;border-radius:12px;background:var(--blue-dark);color:#fff;font-family:'Playfair Display',serif;font-weight:700;font-size:17px;letter-spacing:.01em;cursor:pointer;text-align:center;text-decoration:none;transition:background .2s, border-color .2s, opacity .2s;border:1.5px solid var(--blue-dark);position:relative;}
+  .btn-action:hover{background:var(--blue-light);border-color:var(--blue-light);}
+  .btn-action.loading{opacity:.7;pointer-events:none;}
+  /* Compartir: mismo verde menta que los asientos libres (texto oscuro para que se lea) */
+  .btn-action.mint{background:var(--mint);border-color:var(--mint);color:var(--blue-dark);}
+  .btn-action.mint:hover{background:var(--mint-hover);border-color:var(--mint-hover);}
+
+  /* "Descarga Flambao" + botón "i" de información al lado */
+  .btn-wrap{position:relative;display:flex;}
+  .btn-wrap .btn-action{flex:1;}
+  .info-mini{position:absolute;top:-9px;right:-9px;z-index:2;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--blue-dark);background:#fff;color:var(--blue-dark);font-family:'Playfair Display',serif;font-style:italic;font-weight:700;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;box-shadow:0 2px 6px rgba(0,0,0,.18);transition:background .2s,color .2s;}
+  .info-mini:hover,.info-mini:focus-visible{background:var(--blue-dark);color:#fff;outline:none;}
+  .info-mini.plus-mini{font-family:'Montserrat',sans-serif;font-style:normal;font-weight:600;font-size:20px;padding-bottom:1px;}
+
+  /* Sangría de categoría, restaurante y ubicación: parte de donde empieza el primer círculo
+     ((ancho de columna - 54px del círculo) / 2, con 4 columnas y 3 huecos de 8px) y se le resta --seat-nudge
+     para moverlo hacia la izquierda. Para moverlo más o menos, cambia solo --seat-nudge (0px = justo en el círculo) */
+  .table-card{--seat-nudge:7px;--seat-inset:max(0px, calc(((100% - 24px) / 4 - 54px) / 2 - var(--seat-nudge)));position:relative;border:2px solid var(--blue-dark);border-radius:16px;padding:20px 16px 26px;background:#fff;box-shadow:0 10px 30px rgba(0,45,116,.1);}
+
+  /* Etiqueta colgante (el color cambia según la categoría) */
+  .cat-tag{position:absolute;top:-2px;right:22px;width:40px;height:86px;pointer-events:none;filter:drop-shadow(0 3px 4px rgba(0,0,0,.2));}
+  .cat-tag::before{content:'';position:absolute;inset:0;background:var(--cat);clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 12px),0 100%);}
+
+  .cat-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-right:80px;padding-left:var(--seat-inset);}
+  .cat-pill{display:inline-block;background:var(--cat);color:var(--cat-ink);font-family:'Playfair Display',serif;font-weight:700;font-size:13px;padding:6px 16px;border-radius:999px;}
+  .info-btn{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--cat-dark);background:#fff;color:var(--cat-dark);font-family:'Playfair Display',serif;font-style:italic;font-weight:700;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .2s,color .2s;}
+  .info-btn:hover,.info-btn:focus-visible{background:var(--cat);border-color:var(--cat);color:var(--cat-ink);outline:none;}
+
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;}
+  .modal[hidden]{display:none;}
+  .modal-box{background:#fff;border-radius:16px;max-width:380px;width:100%;padding:26px 22px 22px;border-top:6px solid var(--cat);box-shadow:0 20px 50px rgba(0,0,0,.3);}
+  .modal-box h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--cat-dark);margin-bottom:10px;}
+  .modal-box p{font-size:14px;color:var(--dark);margin-bottom:10px;}
+  .modal-box .modal-note{font-size:12px;color:var(--gray);}
+  .modal-close{margin-top:8px;width:100%;padding:14px;border:none;border-radius:12px;background:var(--cat);color:var(--cat-ink);font-family:'Playfair Display',serif;font-weight:700;font-size:16px;cursor:pointer;}
+
+  a.modal-close{display:block;text-align:center;text-decoration:none;}
+  .modal-alt{margin-top:8px;width:100%;padding:13px;border:1.5px solid var(--cat-dark);border-radius:12px;background:#fff;color:var(--cat-dark);font-family:'Playfair Display',serif;font-weight:700;font-size:15px;cursor:pointer;transition:background .2s;}
+  .modal-alt:hover{background:#f3fff3;}
+  .modal-link{margin-top:6px;width:100%;padding:10px;border:none;background:none;color:var(--gray);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+  /* Pop-ups propios (no usan el color de la categoría) */
+  .modal-box.mint{--cat:var(--mint);--cat-ink:var(--blue-dark);--cat-dark:#1E8E4E;}
+  .modal-box.blue{--cat:var(--blue-dark);--cat-ink:#fff;--cat-dark:var(--blue-dark);}
+
+  .meta-rest{font-size:15px;font-weight:700;font-family:'Playfair Display',serif;color:var(--dark);margin-bottom:4px;padding-left:var(--seat-inset);}
+  .meta-loc{font-size:12px;color:var(--gray);margin-bottom:16px;padding-left:var(--seat-inset);}
+
+  .seats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 8px;}
+  .seat{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .seat-avatar{position:relative;width:54px;height:54px;border-radius:50%;background:#dcdcdc;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid transparent;}
+  .seat-avatar.empty{background:var(--mint);transition:background .2s;}
+  .seat-avatar.empty:hover{background:var(--mint-hover);}
+  /* "+" en los asientos libres: abre el pop-up para invitar a gente */
+  .invite-btn{position:absolute;inset:0;width:100%;height:100%;border:none;background:transparent;color:var(--blue-dark);font-family:'Montserrat',sans-serif;font-size:32px;font-weight:300;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+  .seat-avatar.filled{background:var(--blue-dark) url('https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png') center/112% no-repeat;background-origin:border-box;}
+  .seat.user .seat-avatar{border-color:var(--blue-dark);box-shadow:0 0 0 3px rgba(0,45,116,.12), 0 4px 10px rgba(0,0,0,.18);}
+  .seat-label{font-size:10px;font-weight:600;color:var(--gray);text-align:center;max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .seat.user .seat-label{color:var(--dark);font-weight:700;}
+
+  /* Asiento del usuario: logo difuminado de fondo + "+" en el centro para añadir foto */
+  .seat.user .seat-avatar.filled{background:var(--blue-dark);}
+  .seat.user .seat-avatar.filled::before{content:'';position:absolute;inset:0;background:url('https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png') center/122% no-repeat;filter:blur(1.6px);opacity:.45;}
+  .seat.user .seat-avatar.has-photo::before{display:none;}
+  .add-photo-btn{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:none;background:transparent;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:'Montserrat',sans-serif;}
+  .add-photo-btn .plus{font-size:28px;font-weight:300;line-height:.9;}
+  .add-photo-btn .foto-txt{font-size:8px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.8;margin-top:1px;}
+  .add-photo-btn:hover .plus,.add-photo-btn:focus-visible .plus{transform:scale(1.15);}
+  .seat-avatar.has-photo .add-photo-btn{inset:auto;right:0;bottom:0;width:20px;height:20px;border-radius:50%;background:var(--blue-dark);}
+  .seat-avatar.has-photo .add-photo-btn .plus{font-size:16px;font-weight:700;}
+  .seat-avatar.has-photo .add-photo-btn .foto-txt{display:none;}
+
+  .table-bar{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));color:#fff;border-radius:999px;padding:14px 18px;margin:18px 0;font-size:13px;font-weight:700;}
+  .table-bar .tb-item{display:flex;align-items:center;gap:6px;white-space:nowrap;}
+
+  .confirm-msg{margin-top:20px;text-align:center;padding-top:18px;border-top:1px solid var(--border);}
+  .confirm-msg .check{font-size:32px;display:block;margin-bottom:8px;}
+  .confirm-msg .line1{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:6px;}
+  .confirm-msg .line2{font-size:13px;color:var(--gray);}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="https://flambao.com"><img src="https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png" alt="Flambao" /></a>
+</div>
+
+<div class="page">
+
+  <div class="hello">
+    <h1 class="big" id="helloTitle">¡Ya tienes tu sitio en la <em>mesa</em>!</h1>
+    <p class="sub">Este es tu sitio en Pabblo Madrid</p>
+  </div>
+
+  <div class="table-card">
+    <div class="cat-tag" aria-hidden="true"></div>
+
+    <div class="cat-row">
+      <span class="cat-pill" id="catPill">Categoría</span>
+      <button class="info-btn" id="infoBtn" type="button" aria-label="¿Qué es esta categoría?">i</button>
+    </div>
+    <div class="meta-rest">Pabblo Madrid</div>
+    <div class="meta-loc"> Plaza de Pablo Ruiz Picasso, 1, Madrid</div>
+
+    <div class="seats-grid" id="seatsGridTop"></div>
+
+    <div class="table-bar">
+      <span class="tb-item">📅 <span id="metaDia">—</span></span>
+      <span class="tb-item">🕗 <span id="metaHora">—</span></span>
+    </div>
+
+    <div class="seats-grid" id="seatsGridBottom"></div>
+
+    <div class="confirm-msg">
+      
+      <div class="line1" id="confirmLine1">¡Ya casi estás en la mesa!</div>
+      <p class="line2">Tu mesa está confirmada. Te mandaremos recordatorios por whatsapp.</p>
+    </div>
+  </div>
+
+  <div class="actions-grid">
+    <button class="btn-action" id="btnRefresh" type="button">Refrescar mesa</button>
+    <div class="btn-wrap">
+      <button class="btn-action mint" id="btnShare" type="button">
+        <span class="share-toast" id="shareToast">Enlace copiado · pégalo como pie de foto</span>
+        Compartir amigos 
+      </button>
+      <button class="info-mini plus-mini" id="sharePlusBtn" type="button" aria-label="Invitar a más gente">+</button>
+    </div>
+    <a href="index.html" class="btn-action">Explora mesas</a>
+    <div class="btn-wrap">
+      <a href="https://flambao.com/descargas" class="btn-action">Descarga Flambao</a>
+      <button class="info-mini" id="downloadInfoBtn" type="button" aria-label="¿Por qué descargar Flambao?">i</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal" id="infoModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <h2 id="infoTitle">Categoría</h2>
+    <p id="infoText"></p>
+    <p class="modal-note">En Flambao cada mesa tiene una intención: eliges la que encaja con lo que buscas hoy.</p>
+    <button class="modal-close" id="infoClose" type="button">Entendido</button>
+  </div>
+</div>
+
+<div class="modal" id="inviteModal" hidden>
+  <div class="modal-box mint" role="dialog" aria-modal="true" aria-labelledby="inviteTitle">
+    <h2 id="inviteTitle">Invita a la gente a unirse a la mesa</h2>
+    <p>Comparte esta mesa con tus amigos o conocidos y ocupad juntos los asientos libres.</p>
+    <p class="modal-note">Al pulsar el enlace, irán directos a apuntarse con su nombre, apellidos y teléfono, sin pasar por el vídeo.</p>
+    <button class="modal-close" id="inviteShare" type="button">Compartir invitación</button>
+    <button class="modal-alt" id="inviteLinkOnly" type="button">Enviar solo el enlace</button>
+    <button class="modal-link" type="button" data-close>Ahora no</button>
+  </div>
+</div>
+
+<div class="modal" id="downloadModal" hidden>
+  <div class="modal-box blue" role="dialog" aria-modal="true" aria-labelledby="downloadTitle">
+    <h2 id="downloadTitle">Descarga Flambao</h2>
+    <p>Llega a tu mesa sabiendo con quién vas a cenar: mira las fotos y los perfiles de los demás comensales, entra en el chat de la mesa y descubre más planes cerca de ti.</p>
+    <p class="modal-note">Es gratis y está disponible en iOS y Android.</p>
+    <a class="modal-close" href="https://flambao.com/descargas">Descargar la app</a>
+    <button class="modal-link" type="button" data-close>Ahora no</button>
+  </div>
+</div>
+
+<input type="file" id="photoInput" accept="image/*" hidden />
+
+<script>
+  const RESTAURANTE = 'Pabblo';
+  // CSV publicado (Archivo → Compartir → Publicar en la Web) de la pestaña "Publicar"
+  // del Google Sheet de respuestas de este restaurante.
+  const RESPUESTAS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaWHc0tYkpG0iCSKW3vkHQydKcJPm2npMpNlr6v8CURkNl2Fq7gvmwGOZC3rU3PU8-q3MWmIZnU7uD/pub?gid=186365477&single=true&output=csv';
+
+  const params = new URLSearchParams(window.location.search);
+  const nombreRaw = (params.get('nombre') || '').trim();
+  const categoria = params.get('categoria') || 'Conocer Gente Nueva';
+  const dia = params.get('dia') || '';
+  const hora = params.get('hora') || '';
+
+  const primerNombre = nombreRaw ? nombreRaw.split(' ')[0] : '';
+  const tieneNombre = !!primerNombre;
+
+  document.getElementById('helloTitle').innerHTML = tieneNombre
+    ? '¡Ya estás en la <em>mesa</em>, ' + primerNombre + '!'
+    : '¡Ya tienes tu sitio en la <em>mesa</em>!';
+  document.getElementById('catPill').textContent = categoria;
+
+  // ── Color e info de cada categoría (para cambiar un color, toca solo el "color" de aquí) ──
+  const CATEGORIAS = {
+    'conocer gente nueva': { color:'#2E9E5B', texto:'Sin expectativas concretas: personas que no se conocen de antes se sientan juntas y la conversación fluye de forma natural. Es la categoría más popular y la mejor para empezar.' },
+    'abierto al amor':     { color:'#D62828', texto:'Para quienes quieren abrirse al amor. Una mesa con la intención de conocer a alguien especial alrededor de una buena cena.' },
+    'negocios':            { color:'#2563C9', texto:'Para hacer contactos profesionales. Networking cara a cara y alrededor de una mesa, mucho más natural que un evento de negocios.' },
+    'nuevos comienzos':    { color:'#F2B705', ink:'#1d1d1b', dark:'#A67C00', texto:'Para empezar de cero: una nueva ciudad, una nueva etapa. Una mesa para encontrar gente con la que arrancar con buen pie.' },
+    'mi agenda':           { color:'#6B6B6B', texto:'Tu espacio personal para compartir planes con tus propios contactos.' }
+  };
+  const catKey = categoria.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  const catInfo = CATEGORIAS[catKey] || { color:'#002d74', texto:'Cada mesa de Flambao tiene una intención. Esta es la que has elegido.' };
+  document.documentElement.style.setProperty('--cat', catInfo.color);
+  document.documentElement.style.setProperty('--cat-ink', catInfo.ink || '#fff');     // color del texto sobre el color de la categoría
+  document.documentElement.style.setProperty('--cat-dark', catInfo.dark || catInfo.color); // versión más oscura para texto/bordes sobre blanco
+
+  // La etiqueta cuelga hasta la línea del nombre del restaurante y queda centrada con el asiento de debajo (el 4º de la fila de arriba)
+  function ajustarEtiqueta(){
+    const tag = document.querySelector('.cat-tag');
+    const ref = document.querySelector('.meta-rest');
+    if(!tag || !ref) return;
+    const card = tag.parentElement;
+    const cardRect = card.getBoundingClientRect();
+    tag.style.height = Math.round(ref.getBoundingClientRect().bottom - cardRect.top) + 'px';
+
+    const seat = document.querySelectorAll('#seatsGridTop .seat-avatar')[3];
+    if(seat){
+      const r = seat.getBoundingClientRect();
+      const centro = r.left + r.width / 2;
+      tag.style.right = 'auto';
+      tag.style.left = Math.round(centro - cardRect.left - card.clientLeft - tag.offsetWidth / 2) + 'px';
+    }
+  }
+  ajustarEtiqueta();
+  window.addEventListener('load', ajustarEtiqueta);
+  window.addEventListener('resize', ajustarEtiqueta);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarEtiqueta);
+
+  const infoModal = document.getElementById('infoModal');
+  document.getElementById('infoTitle').textContent = categoria;
+  document.getElementById('infoText').textContent = catInfo.texto;
+  document.getElementById('infoBtn').addEventListener('click', () => { infoModal.hidden = false; });
+  document.getElementById('infoClose').addEventListener('click', () => { infoModal.hidden = true; });
+  infoModal.addEventListener('click', (e) => { if(e.target === infoModal) infoModal.hidden = true; });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') document.querySelectorAll('.modal').forEach(m => m.hidden = true); });
+
+  // ── Pop-up "invitar" (el "+" de los asientos libres) y pop-up de "Descarga Flambao" ──
+  const inviteModal = document.getElementById('inviteModal');
+  const downloadModal = document.getElementById('downloadModal');
+  document.addEventListener('click', (e) => { if(e.target.closest('.invite-btn')) inviteModal.hidden = false; });
+  document.getElementById('downloadInfoBtn').addEventListener('click', () => { downloadModal.hidden = false; });
+  document.getElementById('sharePlusBtn').addEventListener('click', () => { inviteModal.hidden = false; });
+  // "Compartir invitación" lanza el mismo flujo que el botón Compartir
+  document.getElementById('inviteShare').addEventListener('click', () => {
+    inviteModal.hidden = true;
+    document.getElementById('btnShare').click();
+  });
+  [inviteModal, downloadModal].forEach(m => m.addEventListener('click', (e) => {
+    if(e.target === m || e.target.closest('[data-close]')) m.hidden = true;
+  }));
+  document.getElementById('metaDia').textContent = dia || 'Por confirmar';
+  document.getElementById('metaHora').textContent = hora ? (hora + ' h') : 'Por confirmar';
+  document.getElementById('confirmLine1').textContent = '¡Nos vemos ' + (dia ? ('el ' + dia) : 'pronto') + '!';
+
+  // ── 8 asientos: 4 arriba, 4 abajo. El usuario ocupa el primero de arriba ──
+  const gridTop = document.getElementById('seatsGridTop');
+  const gridBottom = document.getElementById('seatsGridBottom');
+  const otrosSeatEls = []; // los 7 asientos "libres" que se pueden rellenar con gente real
+
+  function buildSeat(isUser){
+    const seat = document.createElement('div');
+    seat.className = 'seat' + (isUser ? ' user' : '');
+
+    const avatar = document.createElement('div');
+    avatar.className = 'seat-avatar ' + (isUser ? 'filled' : 'empty');
+
+    const label = document.createElement('span');
+    label.className = 'seat-label';
+
+    if(isUser){
+      label.textContent = tieneNombre ? primerNombre : 'Tú';
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'add-photo-btn';
+      addBtn.innerHTML = '<span class="plus">+</span><span class="foto-txt">foto</span>';
+      addBtn.title = 'Añade tu foto';
+      addBtn.addEventListener('click', () => document.getElementById('photoInput').click());
+      avatar.appendChild(addBtn);
+      avatar.dataset.userSeat = '1';
+    }else{
+      label.textContent = 'Libre';
+      const inviteBtn = document.createElement('button');
+      inviteBtn.type = 'button';
+      inviteBtn.className = 'invite-btn';
+      inviteBtn.textContent = '+';
+      inviteBtn.title = 'Invita a alguien a esta mesa';
+      inviteBtn.setAttribute('aria-label', 'Invita a alguien a esta mesa');
+      avatar.appendChild(inviteBtn);
+    }
+
+    seat.appendChild(avatar);
+    seat.appendChild(label);
+    return seat;
+  }
+
+  gridTop.appendChild(buildSeat(true));
+  for(let i = 0; i < 3; i++){ const s = buildSeat(false); gridTop.appendChild(s); otrosSeatEls.push(s); }
+  for(let i = 0; i < 4; i++){ const s = buildSeat(false); gridBottom.appendChild(s); otrosSeatEls.push(s); }
+  ajustarEtiqueta(); // ya existen los asientos: recolocamos la etiqueta sobre el 4º
+
+  // ── Subir foto propia (se queda solo en este navegador, no se envía a ningún sitio) ──
+  document.getElementById('photoInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const userAvatar = document.querySelector('.seat-avatar[data-user-seat="1"]');
+      if(userAvatar){
+        userAvatar.classList.add('has-photo');
+        userAvatar.style.backgroundImage = "url('" + ev.target.result + "')";
+        userAvatar.style.backgroundSize = 'cover';
+        userAvatar.style.backgroundPosition = 'center';
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ── Parsea el CSV (una sola columna "nombre_mesa" con cada inscripción) ──
+  function parseCsv(text){
+    return text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(line => {
+      let v = line;
+      if(v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1).replace(/""/g, '"');
+      return v;
+    });
+  }
+
+  // ── Extrae {nombre, restaurante, categoria, dia, hora} de una línea tipo:
+  //    "Nombre Apellidos — Restaurante · Categoria, Dia 20:00" ──
+  function parseEntry(line){
+    const dashIdx = line.indexOf(' — ');
+    if(dashIdx === -1) return null;
+    const nombre = line.slice(0, dashIdx).trim();
+    const resto = line.slice(dashIdx + 3);
+    const dotIdx = resto.indexOf(' · ');
+    if(dotIdx === -1) return null;
+    const restaurante = resto.slice(0, dotIdx).trim();
+    const mesaInfo = resto.slice(dotIdx + 3).trim();
+    const firstComma = mesaInfo.indexOf(',');
+    if(firstComma === -1) return { nombre, restaurante, categoria: mesaInfo, dia: '', hora: '' };
+    const cat = mesaInfo.slice(0, firstComma).trim();
+    const diaHora = mesaInfo.slice(firstComma + 1).trim();
+    const timeMatch = diaHora.match(/(\d{1,2}:\d{2})\s*$/);
+    let h = '', d = diaHora;
+    if(timeMatch){ h = timeMatch[1]; d = diaHora.slice(0, timeMatch.index).trim().replace(/,\s*$/, ''); }
+    return { nombre, restaurante, categoria: cat, dia: d, hora: h };
+  }
+
+  // ── Rellena los asientos "Libre" con la gente real que ya se ha apuntado a esta mesa ──
+  function pintarAsientos(entries){
+    let usados = 0;
+    let yaConté = false; // para no duplicar al propio usuario si aparece en el CSV
+    for(const entry of entries){
+      if(usados >= otrosSeatEls.length) break;
+      if(entry.restaurante !== RESTAURANTE) continue;
+      if(entry.categoria !== categoria) continue;
+      if(dia && entry.dia !== dia) continue;
+      if(hora && entry.hora !== hora) continue;
+      if(!yaConté && tieneNombre && entry.nombre === nombreRaw){ yaConté = true; continue; }
+
+      const seatEl = otrosSeatEls[usados];
+      const avatar = seatEl.querySelector('.seat-avatar');
+      const label = seatEl.querySelector('.seat-label');
+      avatar.classList.remove('empty');
+      const invBtn = avatar.querySelector('.invite-btn');
+      if(invBtn) invBtn.remove(); // un asiento ocupado ya no muestra el "+"
+      avatar.classList.add('filled');
+      label.textContent = (entry.nombre.split(' ')[0] || 'Invitado');
+      usados++;
+    }
+  }
+
+  // ── Refrescar: vuelve a comprobar si hay más gente apuntada a esta mesa ──
+  function cargarAsistentes(){
+    if(!RESPUESTAS_CSV_URL) return Promise.resolve();
+    return fetch(RESPUESTAS_CSV_URL + (RESPUESTAS_CSV_URL.includes('?') ? '&' : '?') + '_=' + Date.now())
+      .then(res => res.ok ? res.text() : Promise.reject(res.status))
+      .then(text => {
+        const lines = parseCsv(text);
+        lines.shift(); // quita la cabecera "nombre_mesa"
+        const entries = lines.map(parseEntry).filter(Boolean);
+        pintarAsientos(entries);
+      })
+      .catch(err => console.log('[Flambao] No se pudieron cargar los asistentes:', err));
+  }
+
+  cargarAsistentes();
+
+  document.getElementById('btnRefresh').addEventListener('click', function(){
+    const btn = this;
+    btn.classList.add('loading');
+    btn.textContent = 'Actualizando…';
+    cargarAsistentes().finally(() => {
+      setTimeout(() => { btn.classList.remove('loading'); btn.textContent = 'Refrescar'; }, 500);
+    });
+  });
+
+  // ── Genera una imagen (tarjeta de invitación) con el nombre, categoría, día y hora ──
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+    const words = text.split(' ');
+    let line = '';
+    const lines = [];
+    for(const w of words){
+      const test = line ? (line + ' ' + w) : w;
+      if(ctx.measureText(test).width > maxWidth && line){
+        lines.push(line);
+        line = w;
+      }else{
+        line = test;
+      }
+    }
+    if(line) lines.push(line);
+    const startY = y - ((lines.length - 1) * lineHeight) / 2;
+    lines.forEach((l, i) => ctx.fillText(l, x, startY + i * lineHeight));
+    return lines.length;
+  }
+
+  async function buildInviteImage(){
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+
+    const W = 1080, H = 1350;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#002d74');
+    grad.addColorStop(1, '#1B5FAE');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = 'center';
+
+    // Eyebrow
+    ctx.fillStyle = 'rgba(255,255,255,.8)';
+    ctx.font = '700 28px Montserrat, sans-serif';
+    ctx.fillText('F L A M B A O', W / 2, 120);
+
+    // Titular de invitación
+    ctx.fillStyle = '#fff';
+    ctx.font = '900 66px "Playfair Display", serif';
+    const inviteText = (tieneNombre ? primerNombre : 'Alguien') + ' te ha invitado a unirte a esta mesa';
+    wrapText(ctx, inviteText, W / 2, 330, 880, 78);
+
+    // Píldora de categoría
+    ctx.font = '700 32px "Playfair Display", serif';
+    const catText = categoria;
+    const catPadX = 36;
+    const catWidth = ctx.measureText(catText).width + catPadX * 2;
+    const catH = 64;
+    const catX = W / 2 - catWidth / 2, catY = 560;
+    ctx.fillStyle = 'rgba(255,255,255,.16)';
+    ctx.beginPath();
+    ctx.roundRect(catX, catY, catWidth, catH, catH / 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText(catText, W / 2, catY + catH / 2 + 11);
+
+    // Restaurante
+    ctx.font = '700 36px "Playfair Display", serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('🍽️ ' + RESTAURANTE_DISPLAY, W / 2, 700);
+    ctx.font = '400 26px Montserrat, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,.75)';
+    ctx.fillText(RESTAURANTE_LOC, W / 2, 740);
+
+    // Barra de día/hora
+    const barY = 800, barH = 90;
+    ctx.fillStyle = 'rgba(255,255,255,.14)';
+    ctx.beginPath();
+    ctx.roundRect(W / 2 - 420, barY, 840, barH, barH / 2);
+    ctx.fill();
+    ctx.font = '700 32px Montserrat, sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('📅 ' + (dia || 'Por confirmar') + '   🕗 ' + (hora ? (hora + ' h') : 'Por confirmar'), W / 2, barY + barH / 2 + 12);
+
+    // Fila de 8 asientos (decorativa)
+    const seatsY = 1000, seatR = 34, gap = 108, totalW = gap * 7;
+    const startX = W / 2 - totalW / 2;
+    for(let i = 0; i < 8; i++){
+      const cx = startX + i * gap;
+      ctx.beginPath();
+      ctx.arc(cx, seatsY, seatR, 0, Math.PI * 2);
+      if(i === 0){
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.fillStyle = '#002d74';
+        ctx.font = '700 26px Montserrat, sans-serif';
+        ctx.fillText((tieneNombre ? primerNombre[0] : '★'), cx, seatsY + 9);
+      }else{
+        ctx.fillStyle = 'rgba(255,255,255,.18)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.5)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
+
+    // Pie
+    ctx.font = '600 24px Montserrat, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,.7)';
+    ctx.fillText('Conoce gente nueva en mesas compartidas', W / 2, 1180);
+    ctx.font = '700 30px "Playfair Display", serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('flambao.com', W / 2, 1230);
+
+    return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+  }
+
+  // ── Compartir: genera la tarjeta de invitación y la comparte (o la descarga + copia el enlace) ──
+  const RESTAURANTE_DISPLAY = 'Pabblo Madrid';
+  const RESTAURANTE_LOC = 'Plaza de Pablo Ruiz Picasso, 1, Madrid';
+
+  // Enlace de invitación: lleva directo a la landing del restaurante, a esta categoría/día/hora,
+  // con el formulario de nombre, apellidos y teléfono ya abierto (sin pasar por el vídeo)
+  function buildInviteUrl(){
+    const inviteParams = new URLSearchParams();
+    inviteParams.set('categoria', categoria);
+    if(dia) inviteParams.set('dia', dia);
+    if(hora) inviteParams.set('hora', hora);
+    if(tieneNombre) inviteParams.set('invita', primerNombre);
+    return new URL('index.html', window.location.href).toString() + '?' + inviteParams.toString();
+  }
+  function buildShareText(url){
+    return (tieneNombre ? primerNombre : 'Alguien') + ' te ha invitado a unirte a esta mesa en ' + RESTAURANTE_DISPLAY + '. Apúntate aquí 👇\n' + url;
+  }
+
+  // Enviar SOLO el enlace (sin imagen): así viaja siempre, también en apps que descartan el texto cuando se comparte una foto
+  document.getElementById('inviteLinkOnly').addEventListener('click', async function(){
+    const btn = this;
+    const url = buildInviteUrl();
+    const text = buildShareText(url);
+    try{ await navigator.clipboard.writeText(url); }catch(e0){ /* seguimos igualmente */ }
+    try{
+      if(navigator.share){
+        await navigator.share({ title: 'Flambao · Mesa', text });
+        inviteModal.hidden = true;
+      }else{
+        btn.textContent = '¡Enlace copiado!';
+        setTimeout(() => { btn.textContent = 'Enviar solo el enlace'; }, 2200);
+      }
+    }catch(err){ /* si cancela, el enlace ya quedó copiado */ }
+  });
+
+  document.getElementById('btnShare').addEventListener('click', async function(){
+    const toast = document.getElementById('shareToast');
+
+    const inviteUrl = buildInviteUrl();
+    const shareText = buildShareText(inviteUrl);
+
+    // Copiamos el enlace SIEMPRE, antes de nada: así, si la app a la que compartes
+    // (p.ej. un Estado de WhatsApp) no admite pie de foto automático, puedes
+    // pegarlo tú a mano como pie de foto y queda como link pinchable.
+    try{ await navigator.clipboard.writeText(inviteUrl); }catch(e0){ /* algunos navegadores piden gesto del usuario; seguimos igualmente */ }
+
+    try{
+      const blob = await buildInviteImage();
+      const file = new File([blob], 'flambao-mesa.png', { type: 'image/png' });
+
+      if(navigator.canShare && navigator.canShare({ files: [file] })){
+        await navigator.share({ files: [file], title: 'Flambao · Mesa', text: shareText, url: inviteUrl });
+      }else if(navigator.share){
+        await navigator.share({ title: 'Flambao · Mesa', text: shareText, url: inviteUrl });
+      }else{
+        // Escritorio u otros navegadores sin Web Share: descarga la imagen (el enlace ya está copiado)
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'flambao-mesa.png';
+        a.click();
+      }
+    }catch(err){ /* si cancela el share o falla, el enlace ya quedó copiado */ }
+
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 2400);
+  });
+</script>
+
+</body>
+</html>

@@ -328,6 +328,18 @@
 
     signupForm.classList.remove('visible');
     formSuccess.classList.add('visible');
+
+    // ── Redirige a la página de confirmación con la mesa ya "ocupada" ──
+    const confirmParams = new URLSearchParams();
+    confirmParams.set('nombre', nombreCompleto);
+    confirmParams.set('categoria', selectedCat);
+    if(selectedOption){
+      confirmParams.set('dia', selectedOption.day);
+      confirmParams.set('hora', selectedOption.time);
+    }
+    setTimeout(() => {
+      window.location.href = 'confirmacion.html?' + confirmParams.toString();
+    }, 1400);
   });
 </script>
 
