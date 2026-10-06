@@ -108,6 +108,17 @@
   .social-video-wrap{width:100%;max-width:420px;margin:0 auto;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:var(--dark);}
   .social-video-wrap video{width:100%;height:100%;object-fit:cover;display:block;}
 
+  /* ===== POP-UP DE INVITACIÓN: se abre al entrar por un enlace de invitación ===== */
+  .invite-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100;overflow-y:auto;}
+  .invite-overlay[hidden]{display:none;}
+  .invite-box{background:#fff;border-radius:16px;width:100%;max-width:400px;padding:26px 22px 22px;border-top:6px solid var(--red);box-shadow:0 20px 50px rgba(0,0,0,.35);margin:auto;}
+  .invite-from{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
+  .invite-box h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1.2;margin-bottom:14px;}
+  .invite-mesa{display:flex;flex-direction:column;gap:2px;background:#f2f6fc;border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:var(--dark);}
+  .invite-mesa strong{font-family:'Playfair Display',serif;font-size:16px;}
+  .invite-skip{display:block;width:100%;margin-top:8px;padding:10px;border:none;background:none;color:var(--gray);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+  .btn-submit-final:disabled{opacity:.6;cursor:default;}
+
   /* Mejora para pantallas más anchas (tablet/escritorio) — los botones de categoría
      siempre van en 2x2 dentro del cuadro del vídeo, solo cambia el panel de reserva */
   @media (min-width:700px){
@@ -199,6 +210,36 @@
 
 </div>
 
+<!-- ===== POP-UP DE INVITACIÓN (solo se abre si se entra por un enlace de invitación) ===== -->
+<div class="invite-overlay" id="inviteOverlay" hidden>
+  <div class="invite-box" role="dialog" aria-modal="true" aria-labelledby="inviteTitle">
+    <form id="inviteForm">
+      <p class="invite-from">✉️ Invitación a una mesa Flambao</p>
+      <h2 id="inviteTitle">Te han invitado a unirte a esta mesa</h2>
+      <div class="invite-mesa">
+        <strong id="inviteMesaCat"></strong>
+        <span id="inviteMesaWhen"></span>
+        <span>📍 Pabblo Madrid</span>
+      </div>
+      <div class="field">
+        <label for="invNombre">Nombre y apellidos</label>
+        <input type="text" id="invNombre" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label for="invTelefono">Teléfono</label>
+        <input type="tel" id="invTelefono" autocomplete="tel" required />
+      </div>
+      <p class="signup-note">Te contactaremos para confirmarte la mesa.</p>
+      <button type="submit" class="btn-submit-final">Unirme a la mesa</button>
+      <button type="button" class="invite-skip" id="inviteSkip">Ver la mesa primero</button>
+    </form>
+    <div class="form-success" id="inviteSuccess">
+      <div class="title">¡Ya casi estás en la mesa!</div>
+      <p class="msg">Te contactaremos para confirmarte la mesa.</p>
+    </div>
+  </div>
+</div>
+
 <script>
   const RESTAURANTE = 'Pabblo';
 
@@ -244,11 +285,21 @@
     muteBtn.textContent = samVideo.muted ? '🔇' : '🔊';
   });
 
-  // Si el autoplay con sonido falla (política del navegador), forzamos el muted y reproducimos igualmente.
-  samVideo.play().catch(() => {
-    samVideo.muted = true;
-    samVideo.play();
-  });
+  // ── Entrada por enlace de invitación (…?categoria=…&dia=…&hora=…&invita=…) ──
+  // Si el enlace trae una categoría válida, la persona no tiene que ver el vídeo: va directa a la mesa.
+  const URL_PARAMS = new URLSearchParams(window.location.search);
+  const INVITE_CAT = Object.keys(TABLE_OPTIONS).find(c => c.toLowerCase() === (URL_PARAMS.get('categoria') || '').trim().toLowerCase()) || '';
+
+  if(INVITE_CAT){
+    samVideo.removeAttribute('autoplay');
+    samVideo.pause();
+  }else{
+    // Si el autoplay con sonido falla (política del navegador), forzamos el muted y reproducimos igualmente.
+    samVideo.play().catch(() => {
+      samVideo.muted = true;
+      samVideo.play();
+    });
+  }
 
   // ── Categorías → opciones de mesa → apuntarse ──
   let selectedCat = null;
@@ -297,18 +348,10 @@
     btn.addEventListener('click', () => selectCategory(btn.dataset.cat, true));
   });
 
-  signupForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nombreCompleto = document.getElementById('sfNombreCompleto').value.trim();
-    const telefono = document.getElementById('sfTelefono').value.trim();
-    if(!nombreCompleto || !telefono){
-      alert('Rellena nombre y apellidos y teléfono.');
-      return;
-    }
-
-    // ── Envío al Google Form de Flambao (Pabblo) ──
-    // El formulario solo tiene 2 campos (Nombre y Apellidos, Teléfono), así que
-    // metemos el restaurante/categoría/día/hora dentro del campo de nombre.
+  // ── Envío al Google Form de Flambao (Pabblo) ──
+  // El formulario solo tiene 2 campos (Nombre y Apellidos, Teléfono), así que
+  // metemos el restaurante/categoría/día/hora dentro del campo de nombre.
+  async function enviarInscripcion(nombreCompleto, telefono){
     const FORM_ID = '1FAIpQLSdf3JTLrrp08NsWkbxORkNGMS5Vu7YMtF4BBfia8NoQAGtiKw';
     const mesaInfo = selectedCat + (selectedOption ? (', ' + selectedOption.day + ' ' + selectedOption.time) : '');
     const nombreParaForm = nombreCompleto + ' — ' + RESTAURANTE + ' · ' + mesaInfo;
@@ -325,11 +368,10 @@
       console.log('[Flambao] Error enviando al Google Form:', err);
     }
     console.log('[Flambao] Inscripción enviada:', {nombreCompleto, telefono, restaurante: RESTAURANTE, categoria: selectedCat, opcion: selectedOption});
+  }
 
-    signupForm.classList.remove('visible');
-    formSuccess.classList.add('visible');
-
-    // ── Redirige a la página de confirmación con la mesa ya "ocupada" ──
+  // Tras apuntarse: a la página de la mesa (confirmacion.html), con los datos que ella lee
+  function irAConfirmacion(nombreCompleto){
     const confirmParams = new URLSearchParams();
     confirmParams.set('nombre', nombreCompleto);
     confirmParams.set('categoria', selectedCat);
@@ -340,7 +382,95 @@
     setTimeout(() => {
       window.location.href = 'confirmacion.html?' + confirmParams.toString();
     }, 1400);
+  }
+
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombreCompleto = document.getElementById('sfNombreCompleto').value.trim();
+    const telefono = document.getElementById('sfTelefono').value.trim();
+    if(!nombreCompleto || !telefono){
+      alert('Rellena nombre y apellidos y teléfono.');
+      return;
+    }
+    if(e.submitter) e.submitter.disabled = true; // evita inscribirse dos veces
+
+    await enviarInscripcion(nombreCompleto, telefono);
+
+    signupForm.classList.remove('visible');
+    formSuccess.classList.add('visible');
+    irAConfirmacion(nombreCompleto);
   });
+
+  // ── Pop-up de invitación: nombre, apellidos y teléfono, con la mesa ya elegida ──
+  const inviteOverlay = document.getElementById('inviteOverlay');
+  const inviteForm = document.getElementById('inviteForm');
+  const inviteSuccess = document.getElementById('inviteSuccess');
+
+  function cerrarInvitacion(){
+    inviteOverlay.hidden = true;
+    document.body.style.overflow = '';
+    // Si no se apunta ahora, se queda en la landing con la mesa elegida y el formulario normal a la vista
+    if(selectedOption && !formSuccess.classList.contains('visible') && !inviteSuccess.classList.contains('visible')){
+      signupForm.classList.add('visible');
+    }
+    bookingPanel.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  document.getElementById('inviteSkip').addEventListener('click', cerrarInvitacion);
+  inviteOverlay.addEventListener('click', (e) => { if(e.target === inviteOverlay) cerrarInvitacion(); });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && !inviteOverlay.hidden) cerrarInvitacion(); });
+
+  inviteForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombreCompleto = document.getElementById('invNombre').value.trim();
+    const telefono = document.getElementById('invTelefono').value.trim();
+    if(!nombreCompleto || !telefono){
+      alert('Rellena nombre y apellidos y teléfono.');
+      return;
+    }
+    if(e.submitter) e.submitter.disabled = true;
+
+    await enviarInscripcion(nombreCompleto, telefono);
+
+    inviteForm.style.display = 'none';
+    inviteSuccess.classList.add('visible');
+    irAConfirmacion(nombreCompleto);
+  });
+
+  (function entradaPorInvitacion(){
+    if(!INVITE_CAT) return;
+
+    // Sin esperar al vídeo: categorías y franja de prueba social ya visibles, y la categoría de la invitación elegida
+    samVideo.classList.add('blurred');
+    catOverlay.classList.add('revealed');
+    socialStrip.classList.add('revealed');
+    socialVideo.play().catch(() => {});
+    selectCategory(INVITE_CAT, false);
+
+    const diaInv = (URL_PARAMS.get('dia') || '').trim();
+    const horaInv = (URL_PARAMS.get('hora') || '').trim();
+    const idx = (TABLE_OPTIONS[INVITE_CAT] || []).findIndex(o => o.day === diaInv && o.time === horaInv);
+
+    // Si el día/hora ya no existe, se queda en la landing con la categoría elegida
+    if(idx === -1){
+      bookingPanel.scrollIntoView({behavior:'smooth', block:'start'});
+      return;
+    }
+
+    // Deja marcada la mesa de la invitación y abre el pop-up
+    const opt = TABLE_OPTIONS[INVITE_CAT][idx];
+    tableOptionsEl.querySelectorAll('.table-option')[idx].classList.add('selected');
+    selectedOption = opt;
+
+    const quien = (URL_PARAMS.get('invita') || '').trim();
+    document.getElementById('inviteTitle').textContent = quien
+      ? quien + ' te ha invitado a unirte a esta mesa'
+      : 'Te han invitado a unirte a esta mesa';
+    document.getElementById('inviteMesaCat').textContent = INVITE_CAT;
+    document.getElementById('inviteMesaWhen').textContent = '📅 ' + opt.day + ' · 🕗 ' + opt.time + ' h' + (opt.note ? ' ' + opt.note : '');
+
+    inviteOverlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+  })();
 </script>
 
 </body>
