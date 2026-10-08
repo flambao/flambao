@@ -125,6 +125,7 @@
     .booking-panel{max-width:460px;}
   }
 </style>
+<link rel="prefetch" href="confirmacion.html">
 </head>
 <body>
 
@@ -362,7 +363,7 @@
 
     try{
       await fetch('https://docs.google.com/forms/d/e/' + FORM_ID + '/formResponse', {
-        method: 'POST', body: params, mode: 'no-cors'
+        method: 'POST', body: params, mode: 'no-cors', keepalive: true
       });
     }catch(err){
       console.log('[Flambao] Error enviando al Google Form:', err);
@@ -381,7 +382,7 @@
     }
     setTimeout(() => {
       window.location.href = 'confirmacion.html?' + confirmParams.toString();
-    }, 1400);
+    }, 500);
   }
 
   signupForm.addEventListener('submit', async (e) => {
@@ -394,7 +395,7 @@
     }
     if(e.submitter) e.submitter.disabled = true; // evita inscribirse dos veces
 
-    await enviarInscripcion(nombreCompleto, telefono);
+    enviarInscripcion(nombreCompleto, telefono);
 
     signupForm.classList.remove('visible');
     formSuccess.classList.add('visible');
@@ -429,7 +430,7 @@
     }
     if(e.submitter) e.submitter.disabled = true;
 
-    await enviarInscripcion(nombreCompleto, telefono);
+    enviarInscripcion(nombreCompleto, telefono);
 
     inviteForm.style.display = 'none';
     inviteSuccess.classList.add('visible');
