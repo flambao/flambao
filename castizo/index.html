@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flambao · Castizo</title>
+<meta name="description" content="Apúntate a una mesa Flambao en Castizo." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --red:#002d74; --orange:#d0b787; --dark:#1d1d1b; --cream:#FFFFFF; --gray:#6B6B6B; --border:#E8E8E8;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{max-width:100%;overflow-x:hidden;}
+  body{font-family:'Montserrat',sans-serif;background:var(--cream);color:var(--dark);line-height:1.5;}
+
+  /* ===== SAMANTHA'S FAVOURITE BANNER ===== */
+  .sam-fav-banner{background:linear-gradient(135deg,#c9a227,#f0c040);color:var(--dark);text-align:center;padding:9px 12px;font-family:'Playfair Display',serif;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;}
+
+  /* ===== NAV ===== */
+  .topbar{display:flex;align-items:center;justify-content:center;padding:22px 24px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.97);}
+  .topbar img{height:40px;width:auto;}
+
+  /* ===== LAYOUT ===== */
+  .page{max-width:1180px;margin:0 auto;padding:48px 24px 100px;}
+
+  /* ===== HERO ROW: nombre a la izquierda, fotos+vídeo a la derecha ===== */
+  .hero-row{display:block;margin-bottom:16px;}
+  .rest-eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:10px;}
+  h1.rest-title{font-family:'Playfair Display',serif;font-size:clamp(30px,4vw,46px);font-weight:900;line-height:1.05;letter-spacing:-.02em;margin-bottom:14px;}
+  h1.rest-title em{font-style:italic;color:var(--red);}
+  .rest-location{font-size:14px;font-weight:600;color:var(--dark);max-width:100%;overflow-wrap:break-word;}
+
+  /* Vídeo + fotos: pensado mobile-first (el usuario solo abre esto en el móvil) */
+  .hero-media{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px;margin-top:24px;}
+  .video-wrap{position:relative;width:100%;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:var(--dark);}
+  .video-wrap video{width:100%;height:100%;object-fit:cover;display:block;filter:blur(0px);transition:filter .8s ease, opacity .8s ease;}
+  .video-wrap video.blurred{filter:blur(7px);opacity:.75;}
+  .video-mute-btn{position:absolute;bottom:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);border:none;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);z-index:4;}
+  .photos-row{display:flex;gap:8px;}
+  .photos-row img{flex:1;width:0;aspect-ratio:1/1;object-fit:cover;border-radius:10px;display:block;}
+
+  /* ===== TAGLINE (sustituye al texto del restaurante) ===== */
+  .rest-tagline{font-family:'Playfair Display',serif;font-size:clamp(20px,2.6vw,28px);font-weight:700;font-style:italic;color:var(--dark);margin:22px 0 4px;max-width:640px;}
+
+  /* ===== CATEGORÍAS: superpuestas sobre el vídeo, aparecen cuando acaba ===== */
+  .cat-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px;z-index:3;opacity:0;pointer-events:none;transition:opacity .6s ease;}
+  .cat-overlay.revealed{opacity:1;pointer-events:auto;}
+  .cat-hint{font-family:'Montserrat',sans-serif;font-weight:700;font-size:clamp(10px,3vw,12px);letter-spacing:.06em;text-transform:uppercase;color:#fff;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.7);animation:catHintPulse 1.8s ease-in-out infinite;}
+  @keyframes catHintPulse{0%,100%{opacity:.75;}50%{opacity:1;}}
+
+  .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+  .cat-btn{border:none;border-radius:8px;padding:clamp(16px,8vw,24px) 6px;text-align:center;cursor:pointer;transition:.25s;font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(14px,5vw,18px);line-height:1.25;box-shadow:0 6px 16px rgba(0,0,0,.3);}
+  .cat-btn:hover{transform:translateY(-2px);}
+  .cat-btn.active{outline:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.45);}
+
+  /* Colores por categoría */
+  .cat-btn[data-cat="Nuevos Comienzos"]{background:#F5C518;color:#1d1d1b;}
+  .cat-btn[data-cat="Conocer Gente Nueva"]{background:#3FA34D;color:#fff;}
+  .cat-btn[data-cat="Abierto al Amor"]{background:#E4572E;color:#fff;}
+  .cat-btn[data-cat="Negocios"]{background:#1B5FAE;color:#fff;}
+
+  /* ===== OPCIONES DE MESA YA CREADAS ===== */
+  .booking-panel{display:none;margin-top:24px;background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:24px 20px;max-width:none;}
+  .booking-panel.visible{display:block;}
+  .booking-cat-label{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:18px;}
+
+  .to-hint{font-size:13px;font-weight:700;color:var(--red);text-align:center;margin-bottom:12px;animation:toHintPulse 1.8s ease-in-out infinite;}
+  @keyframes toHintPulse{0%,100%{opacity:.7;}50%{opacity:1;}}
+  .table-options{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
+  .table-option{display:flex;flex-direction:column;gap:4px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:16px 18px;cursor:pointer;text-align:left;font-family:'Montserrat',sans-serif;transition:.2s;}
+  .table-option:hover{border-color:var(--red);}
+  .table-option.selected{background:var(--dark);border-color:var(--dark);}
+  .table-option.selected .to-day,.table-option.selected .to-time{color:#fff;}
+  .table-option.selected .to-note{color:#ccc;}
+  .to-row{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .to-day{font-family:'Playfair Display',serif;font-weight:700;font-size:16px;color:var(--dark);}
+  .to-time{font-size:14px;font-weight:600;color:var(--red);}
+  .table-option.selected .to-time{color:var(--orange);}
+  .to-note{font-size:12px;font-weight:400;color:var(--gray);}
+
+  .btn-apuntate{display:none;width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:2px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .2s;}
+  .btn-apuntate.visible{display:block;}
+  .btn-apuntate:hover{background:#001f52;}
+
+  /* ===== SIGNUP FORM ===== */
+  .signup-form{display:none;margin-top:22px;padding-top:22px;border-top:1px solid var(--border);}
+  .signup-form.visible{display:block;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .field input{width:100%;padding:13px 14px;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--dark);background:#fff;border:1px solid var(--border);border-radius:2px;outline:none;}
+  .field input:focus{border-color:var(--red);}
+  .signup-note{font-size:13px;font-weight:300;color:var(--gray);margin-bottom:16px;}
+  .btn-submit-final{width:100%;padding:16px;background:var(--dark);color:#fff;border:none;border-radius:2px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .2s;}
+  .btn-submit-final:hover{background:var(--red);}
+  .form-success{display:none;text-align:center;padding:24px;}
+  .form-success.visible{display:block;}
+  .form-success .icon{font-size:44px;display:block;margin-bottom:12px;}
+  .form-success .title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;}
+  .form-success .msg{font-size:15px;font-weight:300;color:var(--gray);}
+
+  /* ===== FRANJA INFERIOR: vídeo de prueba social (ya hay gente apuntándose) ===== */
+  .social-strip{opacity:0;max-height:0;overflow:hidden;transition:opacity .7s ease, max-height .9s ease;margin-top:8px;}
+  .social-strip.revealed{opacity:1;max-height:800px;}
+  .social-strip-label{font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(18px,5vw,24px);color:var(--dark);text-align:center;margin-top:0;margin-bottom:6px;}
+  .social-video-wrap{width:100%;max-width:420px;margin:0 auto;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:var(--dark);}
+  .social-video-wrap video{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* ===== POP-UP DE INVITACIÓN: se abre al entrar por un enlace de invitación ===== */
+  .invite-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100;overflow-y:auto;}
+  .invite-overlay[hidden]{display:none;}
+  .invite-box{background:#fff;border-radius:16px;width:100%;max-width:400px;padding:26px 22px 22px;border-top:6px solid var(--red);box-shadow:0 20px 50px rgba(0,0,0,.35);margin:auto;}
+  .invite-from{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
+  .invite-box h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1.2;margin-bottom:14px;}
+  .invite-mesa{display:flex;flex-direction:column;gap:2px;background:#f2f6fc;border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:var(--dark);}
+  .invite-mesa strong{font-family:'Playfair Display',serif;font-size:16px;}
+  .invite-skip{display:block;width:100%;margin-top:8px;padding:10px;border:none;background:none;color:var(--gray);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+  .btn-submit-final:disabled{opacity:.6;cursor:default;}
+
+  /* Mejora para pantallas más anchas (tablet/escritorio) — los botones de categoría
+     siempre van en 2x2 dentro del cuadro del vídeo, solo cambia el panel de reserva */
+  @media (min-width:700px){
+    .booking-panel{max-width:460px;}
+  }
+
+  /* ===== UNIT TABLE COMO POP-UP: ocupa todo el vídeo de Samantha (no el logo ni el banner de arriba) ===== */
+  .mesa-sheet{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;background:#fff;border-radius:14px;overflow:hidden;
+    transform:translateY(105%);visibility:hidden;transition:transform .35s ease, visibility 0s linear .35s;}
+  .mesa-sheet.open{transform:translateY(0);visibility:visible;transition:transform .35s ease;}
+  .mesa-sheet-handle{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border:none;background:var(--red);color:#fff;
+    font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer;touch-action:pan-x;}
+  .mesa-sheet-handle::before{content:'';position:absolute;top:5px;left:50%;width:36px;height:3px;margin-left:-18px;border-radius:2px;background:rgba(255,255,255,.55);}
+  .mesa-sheet iframe{flex:1 1 auto;width:100%;border:0;background:#fff;}
+  .mesa-reopen{display:none;position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:9;padding:11px 22px;border:none;border-radius:999px;
+    background:var(--red);color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35);white-space:nowrap;}
+  .mesa-reopen.visible{display:block;}
+  .sound-hint{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:4;padding:8px 14px;border:none;border-radius:999px;background:rgba(0,0,0,.65);
+    color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;backdrop-filter:blur(4px);animation:catHintPulse 1.8s ease-in-out infinite;}
+  .sound-hint[hidden]{display:none;}
+</style>
+<link rel="prefetch" href="confirmacion.html">
+</head>
+<body>
+
+<div class="sam-fav-banner">★ Samantha's Favourite ★</div>
+
+<div class="topbar">
+  <a href="https://flambao.com"><img src="https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png" alt="Flambao" /></a>
+</div>
+
+<div class="page">
+
+  <!-- ===== HERO: nombre del restaurante ===== -->
+  <div class="hero-row">
+    <div class="hero-left">
+      <span class="rest-eyebrow">Mesa Flambao · Aravaca, Madrid</span>
+      <h1 class="rest-title">Castizo <em>Madrid</em></h1>
+      <p class="rest-location">📍 Camino de la Zarzuela, 23, 28023 Madrid</p>
+    </div>
+  </div>
+
+  <p class="rest-tagline">¿Quieres conocer a gente nueva de Madrid?</p>
+
+  <!-- ===== Vídeo (arranca solo, categorías se superponen al acabar) + fotos ===== -->
+  <div class="hero-media">
+    <div class="video-wrap">
+      <video id="samVideo" src="samantha-mesa.mp4" muted autoplay playsinline></video>
+      <button class="video-mute-btn" id="muteBtn" title="Sonido">🔊</button>
+      <button class="sound-hint" id="soundHint" type="button" hidden>🔊 Toca para activar el sonido</button>
+
+      <div class="cat-overlay" id="catOverlay">
+        <p class="cat-hint">¿Qué tipo de mesa quieres?</p>
+        <div class="cat-grid" id="catGrid">
+          <button class="cat-btn" data-cat="Nuevos Comienzos">Nuevos<br>Comienzos</button>
+          <button class="cat-btn" data-cat="Conocer Gente Nueva">Conocer Gente<br>Nueva</button>
+          <button class="cat-btn" data-cat="Abierto al Amor">Abierto<br>al Amor</button>
+          <button class="cat-btn" data-cat="Negocios">Negocios</button>
+        </div>
+      </div>
+
+      <!-- Unit Table como pop-up: se puede bajar para volver a ver el vídeo -->
+      <div class="mesa-sheet" id="mesaSheet" aria-hidden="true">
+        <button class="mesa-sheet-handle" id="mesaSheetClose" type="button" aria-label="Bajar la mesa y ver el vídeo">⌄&nbsp; Bajar y ver el vídeo</button>
+        <iframe id="mesaFrame" title="Tu mesa Flambao" allow="payment *"></iframe>
+      </div>
+      <button class="mesa-reopen" id="mesaReopen" type="button">Ver mi mesa ↑</button>
+    </div>
+    <!-- FOTOS del restaurante: añade aquí 2 imágenes (quita el style para mostrar la fila) -->
+    <div class="photos-row" style="display:none">
+      <img src="" alt="Castizo" />
+      <img src="" alt="Castizo" />
+    </div>
+  </div>
+
+  <!-- ===== Panel de reserva (aparece al elegir una categoría) ===== -->
+  <div class="cats-section" id="catsSection">
+
+    <div class="booking-panel" id="bookingPanel">
+      <span class="booking-cat-label" id="bookingCatLabel"></span>
+
+      <p class="to-hint">Elige un día y hora para apuntarte</p>
+      <div class="table-options" id="tableOptions"></div>
+
+    </div>
+
+  </div>
+
+  <!-- ===== FRANJA INFERIOR: vídeo de prueba social, sale a la vez que las categorías ===== -->
+  <div class="social-strip" id="socialStrip">
+    <p class="social-strip-label">¡Ya hay gente apuntándose!</p>
+    <div class="social-video-wrap">
+      <video id="socialVideo" src="mesa-llena.mp4" muted loop autoplay playsinline></video>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const RESTAURANTE = 'Castizo';
+
+  // ── Opciones de mesa ya creadas por categoría ──
+  const TABLE_OPTIONS = {
+    'Nuevos Comienzos': [
+      { day: 'Miércoles, 4 de noviembre', time: '20:00' },
+      { day: 'Viernes, 6 de noviembre', time: '20:00' },
+    ],
+    'Conocer Gente Nueva': [
+      { day: 'Miércoles, 4 de noviembre', time: '20:00' },
+      { day: 'Jueves, 5 de noviembre', time: '14:00' },
+    ],
+    'Abierto al Amor': [
+      { day: 'Jueves, 5 de noviembre', time: '20:00' },
+      { day: 'Viernes, 6 de noviembre', time: '20:00' },
+    ],
+    'Negocios': [
+      { day: 'Miércoles, 4 de noviembre', time: '14:00' },
+      { day: 'Jueves, 5 de noviembre', time: '14:00', note: '(Emprendedores)' },
+    ],
+  };
+
+  // ── Vídeo de Samantha: arranca solo CON SONIDO; las categorías salen encima al terminar ──
+  const samVideo = document.getElementById('samVideo');
+  const muteBtn = document.getElementById('muteBtn');
+  const soundHint = document.getElementById('soundHint');
+  const catOverlay = document.getElementById('catOverlay');
+  const videoWrap = samVideo.parentElement;
+
+  // ── Franja inferior de prueba social (vídeo "ya hay gente apuntándose") ──
+  const socialStrip = document.getElementById('socialStrip');
+  const socialVideo = document.getElementById('socialVideo');
+
+  function activarSonido(){
+    samVideo.muted = false;
+    muteBtn.textContent = '🔊';
+    soundHint.hidden = true;
+    if(samVideo.paused && !samVideo.ended) samVideo.play().catch(() => {});
+  }
+  // Arranca SIEMPRE (primero en mudo, que los navegadores permiten) y después intenta activar el sonido.
+  // Si el navegador no deja el sonido hasta que la persona toque la pantalla, muestra el aviso y lo activa en el primer toque.
+  function esperarToque(){
+    samVideo.muted = true;
+    muteBtn.textContent = '🔇';
+    if(samVideo.paused && !samVideo.ended) samVideo.play().catch(() => {});
+    soundHint.hidden = false;
+    const eventos = ['pointerup', 'touchend', 'click', 'keydown'];
+    const alPrimerToque = () => {
+      eventos.forEach(ev => document.removeEventListener(ev, alPrimerToque, true));
+      if(!samVideo.ended) activarSonido(); else soundHint.hidden = true;
+    };
+    eventos.forEach(ev => document.addEventListener(ev, alPrimerToque, true));
+  }
+  function arrancarVideo(){
+    samVideo.muted = true;
+    // Vigilante: si en cualquier momento el vídeo se para sin haber acabado (iOS lo pausa al quitar el mudo sin toque,
+    // o se queda congelado), lo reanudamos en mudo y mostramos el aviso para activar el sonido con un toque.
+    let alertado = false;
+    const alPausar = () => { if(samVideo.ended) return; if(!alertado){ alertado = true; esperarToque(); }else{ samVideo.muted = true; muteBtn.textContent = '🔇'; samVideo.play().catch(() => {}); } };
+    samVideo.addEventListener('pause', alPausar);
+    let ultimo = -1, quieto = 0;
+    const vigia = setInterval(() => {
+      if(samVideo.ended){ clearInterval(vigia); return; }
+      if(!samVideo.paused && samVideo.currentTime === ultimo){
+        if(++quieto >= 3){ quieto = 0; samVideo.muted = true; samVideo.play().catch(() => {}); if(!alertado){ alertado = true; esperarToque(); } }
+      }else{ quieto = 0; }
+      ultimo = samVideo.currentTime;
+    }, 700);
+    const p = samVideo.play();
+    const intentarSonido = () => {
+      samVideo.muted = false;
+      muteBtn.textContent = '🔊';
+    };
+    if(p && p.then) p.then(intentarSonido).catch(esperarToque); else intentarSonido();
+  }
+
+  samVideo.addEventListener('ended', () => {
+    samVideo.classList.add('blurred');
+    soundHint.hidden = true;
+    catOverlay.classList.add('revealed');
+    socialStrip.classList.add('revealed');
+    socialVideo.play().catch(() => {});
+    selectCategory('Conocer Gente Nueva', false);
+  });
+
+  muteBtn.addEventListener('click', () => {
+    samVideo.muted = !samVideo.muted;
+    muteBtn.textContent = samVideo.muted ? '🔇' : '🔊';
+    if(!samVideo.muted) soundHint.hidden = true;
+  });
+  soundHint.addEventListener('click', activarSonido);
+
+  // ── Entrada por enlace de invitación (…?categoria=…&dia=…&hora=…&invita=…) ──
+  const URL_PARAMS = new URLSearchParams(window.location.search);
+  const INVITE_CAT = Object.keys(TABLE_OPTIONS).find(c => c.toLowerCase() === (URL_PARAMS.get('categoria') || '').trim().toLowerCase()) || '';
+
+  if(INVITE_CAT){
+    samVideo.removeAttribute('autoplay');
+    samVideo.pause();
+  }else{
+    arrancarVideo();
+  }
+
+  // ── Categorías → días → Unit Table (pop-up sobre el vídeo) ──
+  let selectedCat = null;
+  let selectedOption = null;
+
+  const catGrid = document.getElementById('catGrid');
+  const bookingPanel = document.getElementById('bookingPanel');
+  const bookingCatLabel = document.getElementById('bookingCatLabel');
+  const tableOptionsEl = document.getElementById('tableOptions');
+  const mesaSheet = document.getElementById('mesaSheet');
+  const mesaFrame = document.getElementById('mesaFrame');
+  const mesaClose = document.getElementById('mesaSheetClose');
+  const mesaReopen = document.getElementById('mesaReopen');
+
+  function urlMesa(extra){
+    const q = new URLSearchParams();
+    q.set('embed', '1');
+    q.set('categoria', selectedCat);
+    if(selectedOption){ q.set('dia', selectedOption.day); q.set('hora', selectedOption.time); }
+    if(extra) Object.keys(extra).forEach(k => { if(extra[k]) q.set(k, extra[k]); });
+    return 'confirmacion.html?' + q.toString();
+  }
+  function abrirMesa(extra){
+    const url = urlMesa(extra);
+    if(mesaFrame.getAttribute('src') !== url) mesaFrame.setAttribute('src', url);
+    mesaSheet.classList.add('open');
+    mesaSheet.setAttribute('aria-hidden', 'false');
+    mesaReopen.classList.remove('visible');
+    videoWrap.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  function cerrarMesa(){
+    mesaSheet.classList.remove('open');
+    mesaSheet.setAttribute('aria-hidden', 'true');
+    if(selectedOption) mesaReopen.classList.add('visible');
+  }
+  mesaClose.addEventListener('click', cerrarMesa);
+  mesaReopen.addEventListener('click', () => abrirMesa());
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && mesaSheet.classList.contains('open')) cerrarMesa(); });
+  // Deslizar hacia abajo desde la barra de arriba también lo baja
+  let toqueY = null;
+  mesaClose.addEventListener('touchstart', (e) => { toqueY = e.touches[0].clientY; }, {passive:true});
+  mesaClose.addEventListener('touchend', (e) => {
+    if(toqueY !== null && e.changedTouches[0].clientY - toqueY > 30){ cerrarMesa(); e.preventDefault(); }
+    toqueY = null;
+  });
+  // "Explora mesas" dentro de la Unit Table también lo cierra
+  window.addEventListener('message', (e) => {
+    if(e.origin === location.origin && e.data && e.data.flambao === 'cerrar-mesa') cerrarMesa();
+  });
+
+  function selectCategory(catName, scrollTo){
+    const btn = catGrid.querySelector('.cat-btn[data-cat="' + catName + '"]');
+    if(!btn) return;
+    catGrid.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedCat = catName;
+    selectedOption = null;
+    cerrarMesa();
+    mesaReopen.classList.remove('visible');
+
+    bookingCatLabel.textContent = 'Mesa · ' + selectedCat;
+    bookingPanel.classList.add('visible');
+
+    tableOptionsEl.innerHTML = '';
+    (TABLE_OPTIONS[selectedCat] || []).forEach((opt) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'table-option';
+      b.innerHTML = '<div class="to-row"><span class="to-day">' + opt.day + '</span><span class="to-time">' + opt.time + '</span></div>' + (opt.note ? '<div class="to-note">' + opt.note + '</div>' : '');
+      b.addEventListener('click', () => {
+        tableOptionsEl.querySelectorAll('.table-option').forEach(o => o.classList.remove('selected'));
+        b.classList.add('selected');
+        selectedOption = opt;
+        abrirMesa();   // al elegir día: sale la Unit Table encima del vídeo
+      });
+      tableOptionsEl.appendChild(b);
+    });
+
+    if(scrollTo) bookingPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  catGrid.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => selectCategory(btn.dataset.cat, true));
+  });
+
+  // Enlace de invitación antiguo al index: salta a la categoría y abre la mesa en modo invitado
+  (function entradaPorInvitacion(){
+    if(!INVITE_CAT) return;
+    samVideo.classList.add('blurred');
+    catOverlay.classList.add('revealed');
+    socialStrip.classList.add('revealed');
+    socialVideo.play().catch(() => {});
+    selectCategory(INVITE_CAT, false);
+
+    const diaInv = (URL_PARAMS.get('dia') || '').trim();
+    const horaInv = (URL_PARAMS.get('hora') || '').trim();
+    const idx = (TABLE_OPTIONS[INVITE_CAT] || []).findIndex(o => o.day === diaInv && o.time === horaInv);
+    if(idx === -1){
+      bookingPanel.scrollIntoView({behavior:'smooth', block:'start'});
+      return;
+    }
+    tableOptionsEl.querySelectorAll('.table-option')[idx].classList.add('selected');
+    selectedOption = TABLE_OPTIONS[INVITE_CAT][idx];
+    abrirMesa({ invitado: '1', invita: (URL_PARAMS.get('invita') || '').trim() });
+  })();
+</script>
+
+</body>
+</html>
