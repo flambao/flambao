@@ -166,7 +166,7 @@
   <!-- ===== Vídeo (arranca solo, categorías se superponen al acabar) + fotos ===== -->
   <div class="hero-media">
     <div class="video-wrap">
-      <video id="samVideo" src="samantha-mesa.mp4" autoplay playsinline></video>
+      <video id="samVideo" src="samantha-mesa.mp4" muted autoplay playsinline></video>
       <button class="video-mute-btn" id="muteBtn" title="Sonido">🔊</button>
       <button class="sound-hint" id="soundHint" type="button" hidden>🔊 Toca para activar el sonido</button>
 
@@ -254,26 +254,34 @@
     samVideo.muted = false;
     muteBtn.textContent = '🔊';
     soundHint.hidden = true;
+    if(samVideo.paused && !samVideo.ended) samVideo.play().catch(() => {});
   }
-  // Intenta reproducir con sonido. Si el navegador lo bloquea (iPhone y Chrome lo hacen hasta que la persona toca la pantalla),
-  // arranca en mudo y activa el sonido en el primer toque.
+  // Arranca SIEMPRE (primero en mudo, que los navegadores permiten) y después intenta activar el sonido.
+  // Si el navegador no deja el sonido hasta que la persona toque la pantalla, muestra el aviso y lo activa en el primer toque.
+  function esperarToque(){
+    samVideo.muted = true;
+    muteBtn.textContent = '🔇';
+    if(samVideo.paused && !samVideo.ended) samVideo.play().catch(() => {});
+    soundHint.hidden = false;
+    const eventos = ['pointerup', 'touchend', 'click', 'keydown'];
+    const alPrimerToque = () => {
+      eventos.forEach(ev => document.removeEventListener(ev, alPrimerToque, true));
+      if(!samVideo.ended) activarSonido(); else soundHint.hidden = true;
+    };
+    eventos.forEach(ev => document.addEventListener(ev, alPrimerToque, true));
+  }
   function arrancarVideo(){
-    samVideo.muted = false;
+    samVideo.muted = true;
     const p = samVideo.play();
-    if(p && p.catch){
-      p.catch(() => {
-        samVideo.muted = true;
-        muteBtn.textContent = '🔇';
-        samVideo.play().catch(() => {});
-        soundHint.hidden = false;
-        const eventos = ['pointerup', 'touchend', 'click', 'keydown'];
-        const alPrimerToque = () => {
-          eventos.forEach(ev => document.removeEventListener(ev, alPrimerToque, true));
-          if(!samVideo.ended) activarSonido(); else soundHint.hidden = true;
-        };
-        eventos.forEach(ev => document.addEventListener(ev, alPrimerToque, true));
-      });
-    }
+    const intentarSonido = () => {
+      samVideo.muted = false;
+      muteBtn.textContent = '🔊';
+      setTimeout(() => {
+        // si el navegador lo ha pausado al quitar el mudo, volvemos a mudo y esperamos al primer toque
+        if(samVideo.paused && !samVideo.ended) esperarToque();
+      }, 250);
+    };
+    if(p && p.then) p.then(intentarSonido).catch(esperarToque); else intentarSonido();
   }
 
   samVideo.addEventListener('ended', () => {
