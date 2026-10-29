@@ -272,14 +272,23 @@
   }
   function arrancarVideo(){
     samVideo.muted = true;
+    // Vigilante: si en cualquier momento el vídeo se para sin haber acabado (iOS lo pausa al quitar el mudo sin toque,
+    // o se queda congelado), lo reanudamos en mudo y mostramos el aviso para activar el sonido con un toque.
+    let alertado = false;
+    const alPausar = () => { if(samVideo.ended) return; if(!alertado){ alertado = true; esperarToque(); }else{ samVideo.muted = true; muteBtn.textContent = '🔇'; samVideo.play().catch(() => {}); } };
+    samVideo.addEventListener('pause', alPausar);
+    let ultimo = -1, quieto = 0;
+    const vigia = setInterval(() => {
+      if(samVideo.ended){ clearInterval(vigia); return; }
+      if(!samVideo.paused && samVideo.currentTime === ultimo){
+        if(++quieto >= 3){ quieto = 0; samVideo.muted = true; samVideo.play().catch(() => {}); if(!alertado){ alertado = true; esperarToque(); } }
+      }else{ quieto = 0; }
+      ultimo = samVideo.currentTime;
+    }, 700);
     const p = samVideo.play();
     const intentarSonido = () => {
       samVideo.muted = false;
       muteBtn.textContent = '🔊';
-      setTimeout(() => {
-        // si el navegador lo ha pausado al quitar el mudo, volvemos a mudo y esperamos al primer toque
-        if(samVideo.paused && !samVideo.ended) esperarToque();
-      }, 250);
     };
     if(p && p.then) p.then(intentarSonido).catch(esperarToque); else intentarSonido();
   }
