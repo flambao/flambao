@@ -102,9 +102,9 @@
   .form-success .msg{font-size:15px;font-weight:300;color:var(--gray);}
 
   /* ===== FRANJA INFERIOR: vídeo de prueba social (ya hay gente apuntándose) ===== */
-  .social-strip{opacity:0;max-height:0;overflow:hidden;transition:opacity .7s ease, max-height .9s ease;margin-top:32px;}
+  .social-strip{opacity:0;max-height:0;overflow:hidden;transition:opacity .7s ease, max-height .9s ease;margin-top:8px;}
   .social-strip.revealed{opacity:1;max-height:800px;}
-  .social-strip-label{font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(18px,5vw,24px);color:var(--dark);text-align:center;margin-top:28px;margin-bottom:18px;}
+  .social-strip-label{font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(18px,5vw,24px);color:var(--dark);text-align:center;margin-top:0;margin-bottom:6px;}
   .social-video-wrap{width:100%;max-width:420px;margin:0 auto;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:var(--dark);}
   .social-video-wrap video{width:100%;height:100%;object-fit:cover;display:block;}
 
@@ -124,6 +124,21 @@
   @media (min-width:700px){
     .booking-panel{max-width:460px;}
   }
+
+  /* ===== UNIT TABLE COMO POP-UP: ocupa todo el vídeo de Samantha (no el logo ni el banner de arriba) ===== */
+  .mesa-sheet{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;background:#fff;border-radius:14px;overflow:hidden;
+    transform:translateY(105%);visibility:hidden;transition:transform .35s ease, visibility 0s linear .35s;}
+  .mesa-sheet.open{transform:translateY(0);visibility:visible;transition:transform .35s ease;}
+  .mesa-sheet-handle{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border:none;background:var(--red);color:#fff;
+    font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer;touch-action:pan-x;}
+  .mesa-sheet-handle::before{content:'';position:absolute;top:5px;left:50%;width:36px;height:3px;margin-left:-18px;border-radius:2px;background:rgba(255,255,255,.55);}
+  .mesa-sheet iframe{flex:1 1 auto;width:100%;border:0;background:#fff;}
+  .mesa-reopen{display:none;position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:9;padding:11px 22px;border:none;border-radius:999px;
+    background:var(--red);color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35);white-space:nowrap;}
+  .mesa-reopen.visible{display:block;}
+  .sound-hint{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:4;padding:8px 14px;border:none;border-radius:999px;background:rgba(0,0,0,.65);
+    color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;backdrop-filter:blur(4px);animation:catHintPulse 1.8s ease-in-out infinite;}
+  .sound-hint[hidden]{display:none;}
 </style>
 <link rel="prefetch" href="confirmacion.html">
 </head>
@@ -146,16 +161,17 @@
     </div>
   </div>
 
-  <p class="rest-tagline">Explora las categorías de mesas para conocer a gente nueva</p>
+  <p class="rest-tagline">¿Quieres conocer a gente nueva de Majadahonda?</p>
 
   <!-- ===== Vídeo (arranca solo, categorías se superponen al acabar) + fotos ===== -->
   <div class="hero-media">
     <div class="video-wrap">
-      <video id="samVideo" src="samantha-mesa.mp4" autoplay muted playsinline></video>
-      <button class="video-mute-btn" id="muteBtn" title="Activar sonido">🔇</button>
+      <video id="samVideo" src="samantha-mesa.mp4" autoplay playsinline></video>
+      <button class="video-mute-btn" id="muteBtn" title="Sonido">🔊</button>
+      <button class="sound-hint" id="soundHint" type="button" hidden>🔊 Toca para activar el sonido</button>
 
       <div class="cat-overlay" id="catOverlay">
-        <p class="cat-hint">👆 Puedes elegir otra categoría</p>
+        <p class="cat-hint">¿Qué tipo de mesa quieres?</p>
         <div class="cat-grid" id="catGrid">
           <button class="cat-btn" data-cat="Nuevos Comienzos">Nuevos<br>Comienzos</button>
           <button class="cat-btn" data-cat="Conocer Gente Nueva">Conocer Gente<br>Nueva</button>
@@ -163,6 +179,13 @@
           <button class="cat-btn" data-cat="Negocios">Negocios</button>
         </div>
       </div>
+
+      <!-- Unit Table como pop-up: se puede bajar para volver a ver el vídeo -->
+      <div class="mesa-sheet" id="mesaSheet" aria-hidden="true">
+        <button class="mesa-sheet-handle" id="mesaSheetClose" type="button" aria-label="Bajar la mesa y ver el vídeo">⌄&nbsp; Bajar y ver el vídeo</button>
+        <iframe id="mesaFrame" title="Tu mesa Flambao" allow="payment *"></iframe>
+      </div>
+      <button class="mesa-reopen" id="mesaReopen" type="button">Ver mi mesa ↑</button>
     </div>
     <div class="photos-row">
       <img src="https://rutaculinaria.com/assets/img/posts/b/2024/06/07/61504/brickell-majadahonda-the-original-burger-hamburgueseria.webp" alt="Brickell Majadahonda" />
@@ -179,24 +202,6 @@
       <p class="to-hint">Elige un día y hora para apuntarte</p>
       <div class="table-options" id="tableOptions"></div>
 
-      <form class="signup-form" id="signupForm">
-        <div class="field">
-          <label for="sfNombreCompleto">Nombre y apellidos</label>
-          <input type="text" id="sfNombreCompleto" required />
-        </div>
-        <div class="field">
-          <label for="sfTelefono">Teléfono</label>
-          <input type="tel" id="sfTelefono" required />
-        </div>
-        <p class="signup-note">Te contactaremos para confirmarte la mesa.</p>
-        <button type="submit" class="btn-submit-final">Apúntate a la mesa</button>
-      </form>
-
-      <div class="form-success" id="formSuccess">
-
-        <div class="title">¡Ya casi estás en la mesa!</div>
-        <p class="msg">Te contactaremos para confirmarte la mesa.</p>
-      </div>
     </div>
 
   </div>
@@ -209,36 +214,6 @@
     </div>
   </div>
 
-</div>
-
-<!-- ===== POP-UP DE INVITACIÓN (solo se abre si se entra por un enlace de invitación) ===== -->
-<div class="invite-overlay" id="inviteOverlay" hidden>
-  <div class="invite-box" role="dialog" aria-modal="true" aria-labelledby="inviteTitle">
-    <form id="inviteForm">
-      <p class="invite-from">✉️ Invitación a una mesa Flambao</p>
-      <h2 id="inviteTitle">Te han invitado a unirte a esta mesa</h2>
-      <div class="invite-mesa">
-        <strong id="inviteMesaCat"></strong>
-        <span id="inviteMesaWhen"></span>
-        <span>📍 Brickell Majadahonda</span>
-      </div>
-      <div class="field">
-        <label for="invNombre">Nombre y apellidos</label>
-        <input type="text" id="invNombre" autocomplete="name" required />
-      </div>
-      <div class="field">
-        <label for="invTelefono">Teléfono</label>
-        <input type="tel" id="invTelefono" autocomplete="tel" required />
-      </div>
-      <p class="signup-note">Te contactaremos para confirmarte la mesa.</p>
-      <button type="submit" class="btn-submit-final">Unirme a la mesa</button>
-      <button type="button" class="invite-skip" id="inviteSkip">Ver la mesa primero</button>
-    </form>
-    <div class="form-success" id="inviteSuccess">
-      <div class="title">¡Ya casi estás en la mesa!</div>
-      <p class="msg">Te contactaremos para confirmarte la mesa.</p>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -264,17 +239,46 @@
     ],
   };
 
-  // ── Vídeo de Samantha: autoplay al entrar, categorías encima al terminar ──
+  // ── Vídeo de Samantha: arranca solo CON SONIDO; las categorías salen encima al terminar ──
   const samVideo = document.getElementById('samVideo');
   const muteBtn = document.getElementById('muteBtn');
+  const soundHint = document.getElementById('soundHint');
   const catOverlay = document.getElementById('catOverlay');
+  const videoWrap = samVideo.parentElement;
 
   // ── Franja inferior de prueba social (vídeo "ya hay gente apuntándose") ──
   const socialStrip = document.getElementById('socialStrip');
   const socialVideo = document.getElementById('socialVideo');
 
+  function activarSonido(){
+    samVideo.muted = false;
+    muteBtn.textContent = '🔊';
+    soundHint.hidden = true;
+  }
+  // Intenta reproducir con sonido. Si el navegador lo bloquea (iPhone y Chrome lo hacen hasta que la persona toca la pantalla),
+  // arranca en mudo y activa el sonido en el primer toque.
+  function arrancarVideo(){
+    samVideo.muted = false;
+    const p = samVideo.play();
+    if(p && p.catch){
+      p.catch(() => {
+        samVideo.muted = true;
+        muteBtn.textContent = '🔇';
+        samVideo.play().catch(() => {});
+        soundHint.hidden = false;
+        const eventos = ['pointerup', 'touchend', 'click', 'keydown'];
+        const alPrimerToque = () => {
+          eventos.forEach(ev => document.removeEventListener(ev, alPrimerToque, true));
+          if(!samVideo.ended) activarSonido(); else soundHint.hidden = true;
+        };
+        eventos.forEach(ev => document.addEventListener(ev, alPrimerToque, true));
+      });
+    }
+  }
+
   samVideo.addEventListener('ended', () => {
     samVideo.classList.add('blurred');
+    soundHint.hidden = true;
     catOverlay.classList.add('revealed');
     socialStrip.classList.add('revealed');
     socialVideo.play().catch(() => {});
@@ -284,10 +288,11 @@
   muteBtn.addEventListener('click', () => {
     samVideo.muted = !samVideo.muted;
     muteBtn.textContent = samVideo.muted ? '🔇' : '🔊';
+    if(!samVideo.muted) soundHint.hidden = true;
   });
+  soundHint.addEventListener('click', activarSonido);
 
   // ── Entrada por enlace de invitación (…?categoria=…&dia=…&hora=…&invita=…) ──
-  // Si el enlace trae una categoría válida, la persona no tiene que ver el vídeo: va directa a la mesa.
   const URL_PARAMS = new URLSearchParams(window.location.search);
   const INVITE_CAT = Object.keys(TABLE_OPTIONS).find(c => c.toLowerCase() === (URL_PARAMS.get('categoria') || '').trim().toLowerCase()) || '';
 
@@ -295,14 +300,10 @@
     samVideo.removeAttribute('autoplay');
     samVideo.pause();
   }else{
-    // Si el autoplay con sonido falla (política del navegador), forzamos el muted y reproducimos igualmente.
-    samVideo.play().catch(() => {
-      samVideo.muted = true;
-      samVideo.play();
-    });
+    arrancarVideo();
   }
 
-  // ── Categorías → opciones de mesa → apuntarse ──
+  // ── Categorías → días → Unit Table (pop-up sobre el vídeo) ──
   let selectedCat = null;
   let selectedOption = null;
 
@@ -310,8 +311,46 @@
   const bookingPanel = document.getElementById('bookingPanel');
   const bookingCatLabel = document.getElementById('bookingCatLabel');
   const tableOptionsEl = document.getElementById('tableOptions');
-  const signupForm = document.getElementById('signupForm');
-  const formSuccess = document.getElementById('formSuccess');
+  const mesaSheet = document.getElementById('mesaSheet');
+  const mesaFrame = document.getElementById('mesaFrame');
+  const mesaClose = document.getElementById('mesaSheetClose');
+  const mesaReopen = document.getElementById('mesaReopen');
+
+  function urlMesa(extra){
+    const q = new URLSearchParams();
+    q.set('embed', '1');
+    q.set('categoria', selectedCat);
+    if(selectedOption){ q.set('dia', selectedOption.day); q.set('hora', selectedOption.time); }
+    if(extra) Object.keys(extra).forEach(k => { if(extra[k]) q.set(k, extra[k]); });
+    return 'confirmacion.html?' + q.toString();
+  }
+  function abrirMesa(extra){
+    const url = urlMesa(extra);
+    if(mesaFrame.getAttribute('src') !== url) mesaFrame.setAttribute('src', url);
+    mesaSheet.classList.add('open');
+    mesaSheet.setAttribute('aria-hidden', 'false');
+    mesaReopen.classList.remove('visible');
+    videoWrap.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  function cerrarMesa(){
+    mesaSheet.classList.remove('open');
+    mesaSheet.setAttribute('aria-hidden', 'true');
+    if(selectedOption) mesaReopen.classList.add('visible');
+  }
+  mesaClose.addEventListener('click', cerrarMesa);
+  mesaReopen.addEventListener('click', () => abrirMesa());
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && mesaSheet.classList.contains('open')) cerrarMesa(); });
+  // Deslizar hacia abajo desde la barra de arriba también lo baja
+  let toqueY = null;
+  mesaClose.addEventListener('touchstart', (e) => { toqueY = e.touches[0].clientY; }, {passive:true});
+  mesaClose.addEventListener('touchend', (e) => {
+    if(toqueY !== null && e.changedTouches[0].clientY - toqueY > 30){ cerrarMesa(); e.preventDefault(); }
+    toqueY = null;
+  });
+  // "Explora mesas" dentro de la Unit Table también lo cierra
+  window.addEventListener('message', (e) => {
+    if(e.origin === location.origin && e.data && e.data.flambao === 'cerrar-mesa') cerrarMesa();
+  });
 
   function selectCategory(catName, scrollTo){
     const btn = catGrid.querySelector('.cat-btn[data-cat="' + catName + '"]');
@@ -320,11 +359,11 @@
     btn.classList.add('active');
     selectedCat = catName;
     selectedOption = null;
+    cerrarMesa();
+    mesaReopen.classList.remove('visible');
 
     bookingCatLabel.textContent = 'Mesa · ' + selectedCat;
     bookingPanel.classList.add('visible');
-    signupForm.classList.remove('visible');
-    formSuccess.classList.remove('visible');
 
     tableOptionsEl.innerHTML = '';
     (TABLE_OPTIONS[selectedCat] || []).forEach((opt) => {
@@ -336,8 +375,7 @@
         tableOptionsEl.querySelectorAll('.table-option').forEach(o => o.classList.remove('selected'));
         b.classList.add('selected');
         selectedOption = opt;
-        signupForm.classList.add('visible');
-        signupForm.scrollIntoView({behavior:'smooth', block:'nearest'});
+        abrirMesa();   // al elegir día: sale la Unit Table encima del vídeo
       });
       tableOptionsEl.appendChild(b);
     });
@@ -349,98 +387,9 @@
     btn.addEventListener('click', () => selectCategory(btn.dataset.cat, true));
   });
 
-  // ── Envío al Google Form de Flambao (Brickell) ──
-  // El formulario solo tiene 2 campos (Nombre y Apellidos, Teléfono), así que
-  // metemos el restaurante/categoría/día/hora dentro del campo de nombre.
-  async function enviarInscripcion(nombreCompleto, telefono){
-    const FORM_ID = '1FAIpQLSe4Ow8OZAicCwjp9HxcS7I4ULNrFpSYqF4OUxdg-wjxOR6i5w';
-    const mesaInfo = selectedCat + (selectedOption ? (', ' + selectedOption.day + ' ' + selectedOption.time) : '');
-    const nombreParaForm = nombreCompleto + ' — ' + RESTAURANTE + ' · ' + mesaInfo;
-
-    const params = new URLSearchParams();
-    params.append('entry.1456603012', nombreParaForm);
-    params.append('entry.2112397426', telefono);
-
-    try{
-      await fetch('https://docs.google.com/forms/d/e/' + FORM_ID + '/formResponse', {
-        method: 'POST', body: params, mode: 'no-cors', keepalive: true
-      });
-    }catch(err){
-      console.log('[Flambao] Error enviando al Google Form:', err);
-    }
-    console.log('[Flambao] Inscripción enviada:', {nombreCompleto, telefono, restaurante: RESTAURANTE, categoria: selectedCat, opcion: selectedOption});
-  }
-
-  // Tras apuntarse: a la página de la mesa (confirmacion.html), con los datos que ella lee
-  function irAConfirmacion(nombreCompleto){
-    const confirmParams = new URLSearchParams();
-    confirmParams.set('nombre', nombreCompleto);
-    confirmParams.set('categoria', selectedCat);
-    if(selectedOption){
-      confirmParams.set('dia', selectedOption.day);
-      confirmParams.set('hora', selectedOption.time);
-    }
-    setTimeout(() => {
-      window.location.href = 'confirmacion.html?' + confirmParams.toString();
-    }, 500);
-  }
-
-  signupForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nombreCompleto = document.getElementById('sfNombreCompleto').value.trim();
-    const telefono = document.getElementById('sfTelefono').value.trim();
-    if(!nombreCompleto || !telefono){
-      alert('Rellena nombre y apellidos y teléfono.');
-      return;
-    }
-    if(e.submitter) e.submitter.disabled = true; // evita inscribirse dos veces
-
-    enviarInscripcion(nombreCompleto, telefono);
-
-    signupForm.classList.remove('visible');
-    formSuccess.classList.add('visible');
-    irAConfirmacion(nombreCompleto);
-  });
-
-  // ── Pop-up de invitación: nombre, apellidos y teléfono, con la mesa ya elegida ──
-  const inviteOverlay = document.getElementById('inviteOverlay');
-  const inviteForm = document.getElementById('inviteForm');
-  const inviteSuccess = document.getElementById('inviteSuccess');
-
-  function cerrarInvitacion(){
-    inviteOverlay.hidden = true;
-    document.body.style.overflow = '';
-    // Si no se apunta ahora, se queda en la landing con la mesa elegida y el formulario normal a la vista
-    if(selectedOption && !formSuccess.classList.contains('visible') && !inviteSuccess.classList.contains('visible')){
-      signupForm.classList.add('visible');
-    }
-    bookingPanel.scrollIntoView({behavior:'smooth', block:'start'});
-  }
-  document.getElementById('inviteSkip').addEventListener('click', cerrarInvitacion);
-  inviteOverlay.addEventListener('click', (e) => { if(e.target === inviteOverlay) cerrarInvitacion(); });
-  document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && !inviteOverlay.hidden) cerrarInvitacion(); });
-
-  inviteForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nombreCompleto = document.getElementById('invNombre').value.trim();
-    const telefono = document.getElementById('invTelefono').value.trim();
-    if(!nombreCompleto || !telefono){
-      alert('Rellena nombre y apellidos y teléfono.');
-      return;
-    }
-    if(e.submitter) e.submitter.disabled = true;
-
-    enviarInscripcion(nombreCompleto, telefono);
-
-    inviteForm.style.display = 'none';
-    inviteSuccess.classList.add('visible');
-    irAConfirmacion(nombreCompleto);
-  });
-
+  // Enlace de invitación antiguo al index: salta a la categoría y abre la mesa en modo invitado
   (function entradaPorInvitacion(){
     if(!INVITE_CAT) return;
-
-    // Sin esperar al vídeo: categorías y franja de prueba social ya visibles, y la categoría de la invitación elegida
     samVideo.classList.add('blurred');
     catOverlay.classList.add('revealed');
     socialStrip.classList.add('revealed');
@@ -450,27 +399,13 @@
     const diaInv = (URL_PARAMS.get('dia') || '').trim();
     const horaInv = (URL_PARAMS.get('hora') || '').trim();
     const idx = (TABLE_OPTIONS[INVITE_CAT] || []).findIndex(o => o.day === diaInv && o.time === horaInv);
-
-    // Si el día/hora ya no existe, se queda en la landing con la categoría elegida
     if(idx === -1){
       bookingPanel.scrollIntoView({behavior:'smooth', block:'start'});
       return;
     }
-
-    // Deja marcada la mesa de la invitación y abre el pop-up
-    const opt = TABLE_OPTIONS[INVITE_CAT][idx];
     tableOptionsEl.querySelectorAll('.table-option')[idx].classList.add('selected');
-    selectedOption = opt;
-
-    const quien = (URL_PARAMS.get('invita') || '').trim();
-    document.getElementById('inviteTitle').textContent = quien
-      ? quien + ' te ha invitado a unirte a esta mesa'
-      : 'Te han invitado a unirte a esta mesa';
-    document.getElementById('inviteMesaCat').textContent = INVITE_CAT;
-    document.getElementById('inviteMesaWhen').textContent = '📅 ' + opt.day + ' · 🕗 ' + opt.time + ' h' + (opt.note ? ' ' + opt.note : '');
-
-    inviteOverlay.hidden = false;
-    document.body.style.overflow = 'hidden';
+    selectedOption = TABLE_OPTIONS[INVITE_CAT][idx];
+    abrirMesa({ invitado: '1', invita: (URL_PARAMS.get('invita') || '').trim() });
   })();
 </script>
 
