@@ -43,7 +43,7 @@
   .photos-row img{flex:1;width:0;aspect-ratio:1/1;object-fit:cover;border-radius:10px;display:block;}
 
   /* ===== TAGLINE (sustituye al texto del restaurante) ===== */
-  .rest-tagline{font-family:'Playfair Display',serif;font-size:clamp(20px,2.6vw,28px);font-weight:700;font-style:italic;color:var(--dark);margin:22px 0 4px;max-width:640px;}
+  .rest-tagline{font-family:'Montserrat',sans-serif;font-size:clamp(18px,2.4vw,24px);font-weight:700;font-style:normal;line-height:1.3;color:var(--dark);margin:22px 0 4px;max-width:640px;}
 
   /* ===== CATEGORÍAS: superpuestas sobre el vídeo, aparecen cuando acaba ===== */
   .cat-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px;z-index:3;opacity:0;pointer-events:none;transition:opacity .6s ease;}
@@ -125,20 +125,35 @@
     .booking-panel{max-width:460px;}
   }
 
-  /* ===== UNIT TABLE COMO POP-UP: ocupa todo el vídeo de Samantha (no el logo ni el banner de arriba) ===== */
-  .mesa-sheet{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;background:#fff;border-radius:14px;overflow:hidden;
-    transform:translateY(105%);visibility:hidden;transition:transform .35s ease, visibility 0s linear .35s;}
-  .mesa-sheet.open{transform:translateY(0);visibility:visible;transition:transform .35s ease;}
-  .mesa-sheet-handle{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border:none;background:var(--red);color:#fff;
+  /* ===== UNIT TABLE COMO POP-UP GRANDE: tapa título, vídeo y fotos; solo se ve el banner y el logo ===== */
+  .hero-block{position:relative;}
+  .hero-block.mesa-open .hero-stack{display:none;}
+  .mesa-sheet{display:none;position:relative;flex-direction:column;width:100%;max-width:460px;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,45,116,.18);}
+  .hero-block.mesa-open .mesa-sheet{display:flex;animation:sheetIn .35s ease;}
+  @keyframes sheetIn{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:none;}}
+  body.mesa-open .cats-section{display:none;}
+  .mesa-sheet-handle{flex:0 0 auto;position:relative;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 10px;border:none;background:var(--red);color:#fff;
     font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer;touch-action:pan-x;}
   .mesa-sheet-handle::before{content:'';position:absolute;top:5px;left:50%;width:36px;height:3px;margin-left:-18px;border-radius:2px;background:rgba(255,255,255,.55);}
-  .mesa-sheet iframe{flex:1 1 auto;width:100%;border:0;background:#fff;}
+  .mesa-sheet iframe{flex:0 0 auto;width:100%;height:780px;border:0;background:#fff;display:block;}
   .mesa-reopen{display:none;position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:9;padding:11px 22px;border:none;border-radius:999px;
     background:var(--red);color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35);white-space:nowrap;}
   .mesa-reopen.visible{display:block;}
   .sound-hint{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:4;padding:8px 14px;border:none;border-radius:999px;background:rgba(0,0,0,.65);
     color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;backdrop-filter:blur(4px);animation:catHintPulse 1.8s ease-in-out infinite;}
   .sound-hint[hidden]{display:none;}
+
+  /* Cambiar de categoría / de día, debajo de la Unit Table */
+  .sheet-switch{flex:0 0 auto;padding:4px 16px 22px;background:#fff;border-top:1px solid var(--border);}
+  .ss-title{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin:16px 0 9px;}
+  .ss-cats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .ss-cats .cat-btn{padding:14px 6px;font-size:15px;box-shadow:none;}
+  .ss-cats .cat-btn.active{outline:3px solid var(--dark);box-shadow:none;}
+  .ss-days{display:flex;flex-direction:column;gap:8px;}
+
+  /* Botón "Volver a ver el vídeo" (sale cuando acaba el vídeo) */
+  .replay-btn{margin-bottom:6px;padding:8px 16px;border:1.5px solid rgba(255,255,255,.85);border-radius:999px;background:rgba(0,0,0,.45);color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px);}
+  .replay-btn:hover{background:rgba(0,0,0,.65);}
 </style>
 <link rel="prefetch" href="confirmacion.html">
 </head>
@@ -151,6 +166,9 @@
 </div>
 
 <div class="page">
+
+  <div class="hero-block" id="heroBlock">
+  <div class="hero-stack" id="heroStack">
 
   <!-- ===== HERO: nombre del restaurante ===== -->
   <div class="hero-row">
@@ -171,6 +189,7 @@
       <button class="sound-hint" id="soundHint" type="button" hidden>🔊 Toca para activar el sonido</button>
 
       <div class="cat-overlay" id="catOverlay">
+        <button class="replay-btn" id="replayBtn" type="button">↻ Volver a ver el vídeo</button>
         <p class="cat-hint">¿Qué tipo de mesa quieres?</p>
         <div class="cat-grid" id="catGrid">
           <button class="cat-btn" data-cat="Nuevos Comienzos">Nuevos<br>Comienzos</button>
@@ -180,11 +199,6 @@
         </div>
       </div>
 
-      <!-- Unit Table como pop-up: se puede bajar para volver a ver el vídeo -->
-      <div class="mesa-sheet" id="mesaSheet" aria-hidden="true">
-        <button class="mesa-sheet-handle" id="mesaSheetClose" type="button" aria-label="Bajar la mesa y ver el vídeo">⌄&nbsp; Bajar y ver el vídeo</button>
-        <iframe id="mesaFrame" title="Tu mesa Flambao" allow="payment *"></iframe>
-      </div>
       <button class="mesa-reopen" id="mesaReopen" type="button">Ver mi mesa ↑</button>
     </div>
     <div class="photos-row">
@@ -192,6 +206,21 @@
       <img src="https://glhrestaurants.com/c/wp-content/uploads/sites/3/2026/09/pabblo-43.jpg" alt="Pabblo Madrid" />
     </div>
   </div>
+
+  </div><!-- /hero-stack -->
+
+  <!-- ===== UNIT TABLE: pop-up grande (tapa título, vídeo y fotos; debajo, cambiar categoría / día) ===== -->
+  <div class="mesa-sheet" id="mesaSheet" aria-hidden="true">
+    <button class="mesa-sheet-handle" id="mesaSheetClose" type="button" aria-label="Bajar la mesa y ver el vídeo">⌄&nbsp; Bajar y ver el vídeo</button>
+    <iframe id="mesaFrame" title="Tu mesa Flambao" allow="payment *; web-share *"></iframe>
+    <div class="sheet-switch" id="sheetSwitch">
+      <p class="ss-title">Cambiar de categoría</p>
+      <div class="ss-cats" id="ssCats"></div>
+      <p class="ss-title">Cambiar de día</p>
+      <div class="ss-days" id="ssDays"></div>
+    </div>
+  </div>
+  </div><!-- /hero-block -->
 
   <!-- ===== Panel de reserva (aparece al elegir una categoría) ===== -->
   <div class="cats-section" id="catsSection">
@@ -222,20 +251,20 @@
   // ── Opciones de mesa ya creadas por categoría ──
   const TABLE_OPTIONS = {
     'Nuevos Comienzos': [
-      { day: 'Miércoles, 4 de noviembre', time: '20:00' },
-      { day: 'Viernes, 6 de noviembre', time: '20:00' },
+      { day: 'Miércoles, 11 de noviembre', time: '20:00' },
+      { day: 'Viernes, 13 de noviembre', time: '20:00' },
     ],
     'Conocer Gente Nueva': [
-      { day: 'Miércoles, 4 de noviembre', time: '20:00' },
-      { day: 'Jueves, 5 de noviembre', time: '14:00' },
+      { day: 'Viernes, 13 de noviembre', time: '14:00' },
+      { day: 'Miércoles, 18 de noviembre', time: '20:00' },
     ],
     'Abierto al Amor': [
-      { day: 'Jueves, 5 de noviembre', time: '20:00' },
-      { day: 'Viernes, 6 de noviembre', time: '20:00' },
+      { day: 'Jueves, 12 de noviembre', time: '20:00' },
+      { day: 'Viernes, 20 de noviembre', time: '20:00' },
     ],
     'Negocios': [
-      { day: 'Miércoles, 4 de noviembre', time: '14:00', note: '(Consultores junior/Senior Deloitte)' },
-      { day: 'Jueves, 5 de noviembre', time: '14:00', note: '(Emprendedores de patio campus)' },
+      { day: 'Miércoles, 11 de noviembre', time: '14:00', note: '(Consultores junior/Senior Deloitte)' },
+      { day: 'Jueves, 19 de noviembre', time: '14:00', note: '(Emprendedores de patio campus)' },
     ],
   };
 
@@ -299,7 +328,19 @@
     catOverlay.classList.add('revealed');
     socialStrip.classList.add('revealed');
     socialVideo.play().catch(() => {});
-    selectCategory('Conocer Gente Nueva', false);
+    if(!selectedCat) selectCategory('Conocer Gente Nueva', false);
+  });
+
+  // Volver a ver el vídeo sin refrescar la página
+  document.getElementById('replayBtn').addEventListener('click', () => {
+    catOverlay.classList.remove('revealed');
+    samVideo.classList.remove('blurred');
+    soundHint.hidden = true;
+    samVideo.currentTime = 0;
+    samVideo.muted = false;
+    muteBtn.textContent = '🔊';
+    const p = samVideo.play();
+    if(p && p.catch) p.catch(() => { samVideo.muted = true; muteBtn.textContent = '🔇'; samVideo.play().catch(() => {}); });
   });
 
   muteBtn.addEventListener('click', () => {
@@ -332,6 +373,10 @@
   const mesaFrame = document.getElementById('mesaFrame');
   const mesaClose = document.getElementById('mesaSheetClose');
   const mesaReopen = document.getElementById('mesaReopen');
+  const heroBlock = document.getElementById('heroBlock');
+  const heroStack = document.getElementById('heroStack');
+  const ssCats = document.getElementById('ssCats');
+  const ssDays = document.getElementById('ssDays');
 
   function urlMesa(extra){
     const q = new URLSearchParams();
@@ -341,22 +386,53 @@
     if(extra) Object.keys(extra).forEach(k => { if(extra[k]) q.set(k, extra[k]); });
     return 'confirmacion.html?' + q.toString();
   }
+  // Debajo de la Unit Table: cambiar de categoría y de día
+  function pintarCambiador(){
+    ssCats.innerHTML = '';
+    Object.keys(TABLE_OPTIONS).forEach(cat => {
+      const orig = catGrid.querySelector('.cat-btn[data-cat="' + cat + '"]');
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'cat-btn' + (cat === selectedCat ? ' active' : '');
+      b.dataset.cat = cat;
+      b.innerHTML = orig ? orig.innerHTML : cat;
+      b.addEventListener('click', () => { if(cat !== selectedCat) selectCategory(cat, false, true); });
+      ssCats.appendChild(b);
+    });
+    ssDays.innerHTML = '';
+    (TABLE_OPTIONS[selectedCat] || []).forEach((opt, idx) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'table-option' + (opt === selectedOption ? ' selected' : '');
+      b.innerHTML = '<div class="to-row"><span class="to-day">' + opt.day + '</span><span class="to-time">' + opt.time + '</span></div>' + (opt.note ? '<div class="to-note">' + opt.note + '</div>' : '');
+      b.addEventListener('click', () => { if(opt !== selectedOption) elegirOpcion(idx); });
+      ssDays.appendChild(b);
+    });
+  }
   function abrirMesa(extra){
     const url = urlMesa(extra);
     if(mesaFrame.getAttribute('src') !== url) mesaFrame.setAttribute('src', url);
-    mesaSheet.classList.add('open');
+    if(!heroBlock.classList.contains('mesa-open')){
+      heroBlock.style.minHeight = heroStack.offsetHeight + 'px';   // para que la página no pegue un salto
+    }
+    heroBlock.classList.add('mesa-open');
+    document.body.classList.add('mesa-open');
     mesaSheet.setAttribute('aria-hidden', 'false');
     mesaReopen.classList.remove('visible');
-    videoWrap.scrollIntoView({behavior:'smooth', block:'start'});
+    pintarCambiador();
+    window.scrollTo({top: 0, behavior: 'smooth'});   // arriba del todo: solo se ve el banner y el logo
+    setTimeout(enviarVisible, 450);
   }
   function cerrarMesa(){
-    mesaSheet.classList.remove('open');
+    heroBlock.classList.remove('mesa-open');
+    document.body.classList.remove('mesa-open');
+    heroBlock.style.minHeight = '';
     mesaSheet.setAttribute('aria-hidden', 'true');
     if(selectedOption) mesaReopen.classList.add('visible');
   }
   mesaClose.addEventListener('click', cerrarMesa);
   mesaReopen.addEventListener('click', () => abrirMesa());
-  document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && mesaSheet.classList.contains('open')) cerrarMesa(); });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && heroBlock.classList.contains('mesa-open')) cerrarMesa(); });
   // Deslizar hacia abajo desde la barra de arriba también lo baja
   let toqueY = null;
   mesaClose.addEventListener('touchstart', (e) => { toqueY = e.touches[0].clientY; }, {passive:true});
@@ -364,38 +440,57 @@
     if(toqueY !== null && e.changedTouches[0].clientY - toqueY > 30){ cerrarMesa(); e.preventDefault(); }
     toqueY = null;
   });
-  // "Explora mesas" dentro de la Unit Table también lo cierra
+
+  // La Unit Table (iframe) nos dice cuánto mide, y nosotros le decimos qué trozo suyo se está viendo
+  // (para que sus ventanas y el confeti salgan donde está mirando la persona)
+  function enviarVisible(){
+    if(!heroBlock.classList.contains('mesa-open') || !mesaFrame.contentWindow) return;
+    const r = mesaFrame.getBoundingClientRect();
+    const top = Math.max(0, -r.top);
+    const bottom = Math.min(r.height, window.innerHeight - r.top);
+    mesaFrame.contentWindow.postMessage({ flambao: 'visible', top: Math.round(top), height: Math.max(0, Math.round(bottom - top)) }, location.origin);
+  }
+  let pendienteVisible = false;
+  function pedirVisible(){ if(pendienteVisible) return; pendienteVisible = true; requestAnimationFrame(() => { pendienteVisible = false; enviarVisible(); }); }
+  window.addEventListener('scroll', pedirVisible, {passive:true});
+  window.addEventListener('resize', pedirVisible);
+  mesaFrame.addEventListener('load', enviarVisible);
   window.addEventListener('message', (e) => {
-    if(e.origin === location.origin && e.data && e.data.flambao === 'cerrar-mesa') cerrarMesa();
+    if(e.origin !== location.origin || !e.data) return;
+    if(e.data.flambao === 'cerrar-mesa') cerrarMesa();                       // "Explora mesas" dentro de la Unit Table
+    if(e.data.flambao === 'altura' && e.data.h > 200){ mesaFrame.style.height = Math.ceil(e.data.h) + 'px'; pedirVisible(); }
   });
 
-  function selectCategory(catName, scrollTo){
+  function elegirOpcion(idx){
+    const opts = TABLE_OPTIONS[selectedCat] || [];
+    if(!opts[idx]) return;
+    tableOptionsEl.querySelectorAll('.table-option').forEach((o, i) => o.classList.toggle('selected', i === idx));
+    selectedOption = opts[idx];
+    abrirMesa();   // al elegir día: sale la Unit Table
+  }
+
+  function selectCategory(catName, scrollTo, mantenerAbierta){
     const btn = catGrid.querySelector('.cat-btn[data-cat="' + catName + '"]');
     if(!btn) return;
     catGrid.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedCat = catName;
     selectedOption = null;
-    cerrarMesa();
-    mesaReopen.classList.remove('visible');
+    if(!mantenerAbierta){ cerrarMesa(); mesaReopen.classList.remove('visible'); }
 
     bookingCatLabel.textContent = 'Mesa · ' + selectedCat;
     bookingPanel.classList.add('visible');
 
     tableOptionsEl.innerHTML = '';
-    (TABLE_OPTIONS[selectedCat] || []).forEach((opt) => {
+    (TABLE_OPTIONS[selectedCat] || []).forEach((opt, idx) => {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'table-option';
       b.innerHTML = '<div class="to-row"><span class="to-day">' + opt.day + '</span><span class="to-time">' + opt.time + '</span></div>' + (opt.note ? '<div class="to-note">' + opt.note + '</div>' : '');
-      b.addEventListener('click', () => {
-        tableOptionsEl.querySelectorAll('.table-option').forEach(o => o.classList.remove('selected'));
-        b.classList.add('selected');
-        selectedOption = opt;
-        abrirMesa();   // al elegir día: sale la Unit Table encima del vídeo
-      });
+      b.addEventListener('click', () => elegirOpcion(idx));   // al elegir día: sale la Unit Table
       tableOptionsEl.appendChild(b);
     });
+    if(mantenerAbierta) elegirOpcion(0);   // cambias de categoría con la mesa abierta: te enseña su primer día
 
     if(scrollTo) bookingPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
   }
