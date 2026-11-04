@@ -132,7 +132,7 @@
   @media (max-width:370px){.table-bar{font-size:14px;padding-left:16px;gap:4px 8px;}}
   .chat-mini{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.75);background:rgba(255,255,255,.18);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .2s;}
   .chat-mini:hover,.chat-mini:focus-visible{background:rgba(255,255,255,.35);outline:none;}
-  .chat-mini svg{width:14px;height:14px;display:block;}
+  .chat-mini svg{width:17px;height:17px;display:block;}
 
   .confirm-msg{margin-top:0;text-align:center;padding-top:clamp(8px,1.6dvh,18px);border-top:1px solid var(--border);}
   .confirm-msg[hidden]{display:none;}
@@ -178,6 +178,46 @@
   /* Dentro del pop-up del index (Unit Table embebida) */
   body.embed .topbar{display:none;}
   body.embed .page{padding-top:12px;}
+
+  /* ── Teléfono con prefijo ── */
+  .phone-row{display:flex;gap:8px;align-items:stretch;}
+  .phone-row input{flex:1 1 auto;width:auto;min-width:0;}
+  .prefix-wrap{position:relative;flex:0 0 auto;}
+  .prefix-btn{height:100%;min-height:46px;display:flex;align-items:center;gap:6px;padding:0 10px;border:1px solid var(--border);border-radius:2px;background:#fff;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--dark);cursor:pointer;white-space:nowrap;}
+  .prefix-btn:focus-visible,.prefix-btn[aria-expanded="true"]{border-color:var(--blue-dark);outline:none;}
+  .prefix-btn .caret{font-size:11px;color:var(--gray);}
+  #prefixFlag{font-size:20px;line-height:1;}
+  .prefix-list{position:absolute;z-index:60;top:calc(100% + 4px);left:0;width:min(290px,78vw);background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.22);padding:8px;}
+  .prefix-list[hidden]{display:none;}
+  .field .prefix-search{padding:10px 12px;margin-bottom:6px;font-size:16px;}
+  #prefixItems{list-style:none;max-height:210px;overflow-y:auto;overscroll-behavior:contain;}
+  #prefixItems li{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:6px;font-size:14px;cursor:pointer;}
+  #prefixItems li:hover,#prefixItems li[aria-selected="true"]{background:#eef3fb;}
+  #prefixItems .pi-flag{font-size:20px;line-height:1;}
+  #prefixItems .pi-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #prefixItems .pi-code{color:var(--gray);font-weight:600;font-size:13px;}
+  #prefixItems .pi-vacio{color:var(--gray);cursor:default;}
+
+  /* ── Casilla de consentimiento ── */
+  .field .check-label{display:flex;align-items:flex-start;gap:10px;margin:0;font-size:12.5px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--dark);line-height:1.4;cursor:pointer;}
+  .field .check-label input{flex:0 0 auto;width:20px;height:20px;margin-top:1px;padding:0;accent-color:var(--blue-dark);}
+  .form-error{color:#c0182d;font-size:13px;font-weight:600;margin:0 0 10px;}
+  .form-error:empty{display:none;}
+
+  /* ── Vista previa de la imagen que se comparte ── */
+  .invite-preview{display:block;width:100%;max-height:230px;object-fit:contain;border-radius:10px;margin:6px 0 10px;border:1px solid var(--border);background:#f7f9ff;}
+  .invite-preview[hidden]{display:none;}
+
+  /* ── Gracias por confirmar + confeti ── */
+  .gracias-emoji{font-size:44px;line-height:1;text-align:center;margin-bottom:6px;}
+  #graciasModal h2{text-align:center;}
+  #graciasModal p{text-align:center;}
+  .confeti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:200;}
+
+  /* ── Dentro del pop-up del index: la página mide lo que mide su contenido, y las ventanas salen donde mira la persona ── */
+  body.embed{min-height:0;}
+  body.embed .modal{position:absolute;inset:auto;left:0;right:0;top:var(--vis-top,0px);height:var(--vis-h,100vh);}
+  body.embed .confeti{position:absolute;inset:auto;left:0;top:var(--vis-top,0px);width:100%;height:var(--vis-h,100vh);}
 </style>
 </head>
 <body>
@@ -189,6 +229,7 @@
 <div class="page">
 
   <div class="hello">
+    <span class="share-toast" id="shareToast">Enlace copiado</span>
     <h1 class="big" id="helloTitle">¡Ya tienes tu sitio en la <em>mesa</em>!</h1>
     <p class="sub" id="helloSub"></p>
   </div>
@@ -211,7 +252,7 @@
       <span class="tb-item">📅 <span id="metaDia">—</span></span>
       <span class="tb-item">🕗 <span id="metaHora">—</span></span>
       <button class="chat-mini" id="chatBtn" type="button" aria-label="Chatea con la gente de la mesa" title="Chatea con la gente de la mesa">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 9 9 0 0 1-3.6-.8L3 21l1.9-5A8.4 8.4 0 1 1 21 11.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5c3.6 0 6.5 2.5 6.5 5.6s-2.9 5.6-6.5 5.6c-.9 0-1.7-.2-2.5-.4L4 16.3l.9-2.8C3.8 12.5 3 10.9 3 9.1 3 6 5.9 3.5 9.5 3.5z"/><path d="M17 8.4c2.5.8 4 2.7 4 5 0 1.3-.5 2.4-1.4 3.3l.9 2.7-3-1.2c-.6.2-1.3.3-2 .3-1.5 0-2.9-.5-3.9-1.3"/></svg>
       </button>
     </div>
 
@@ -228,7 +269,7 @@
     <button class="btn-action" id="btnRefresh" type="button">Refrescar mesa</button>
     <div class="btn-wrap">
       <button class="btn-action mint" id="btnShare" type="button">
-        <span class="share-toast" id="shareToast">Enlace copiado · pégalo como pie de foto</span>
+        
         Compartir amigos 
       </button>
       <button class="info-mini plus-mini" id="sharePlusBtn" type="button" aria-label="Invitar a más gente">+</button>
@@ -257,8 +298,9 @@
     <h2 id="inviteTitle">Invita a la gente a unirse a la mesa</h2>
     <p>Comparte esta mesa con tus amigos o conocidos y ocupad juntos los asientos libres.</p>
     <p class="modal-note">Al pulsar el enlace, verán la mesa con la gente ya sentada y podrán apuntarse dejando su nombre, apellidos y teléfono.</p>
+    <img id="invitePreview" class="invite-preview" alt="Así verán tu invitación" hidden />
     <button class="modal-close" id="inviteShare" type="button">Compartir invitación</button>
-    <button class="modal-alt" id="inviteLinkOnly" type="button">Enviar solo el enlace</button>
+
     <button class="modal-link" type="button" data-close>Ahora no</button>
   </div>
 </div>
@@ -282,10 +324,30 @@
         <input type="text" id="seatApellidos" autocomplete="family-name" required />
       </div>
       <div class="field">
+        <label for="seatTelefono">Teléfono</label>
+        <div class="phone-row">
+          <div class="prefix-wrap" id="prefixWrap">
+            <button type="button" class="prefix-btn" id="prefixBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Prefijo del país"><span id="prefixFlag">🇪🇸</span><span id="prefixCode">+34</span><span class="caret">▾</span></button>
+            <div class="prefix-list" id="prefixList" hidden>
+              <input type="search" id="prefixSearch" class="prefix-search" placeholder="Buscar país o prefijo" autocomplete="off" />
+              <ul id="prefixItems" role="listbox"></ul>
+            </div>
+          </div>
+          <input type="tel" id="seatTelefono" inputmode="tel" autocomplete="tel-national" placeholder="600 000 000" required />
+        </div>
+      </div>
+      <div class="field">
         <label for="seatEmail">Email</label>
         <input type="email" id="seatEmail" autocomplete="email" required />
       </div>
-      <p class="modal-note">Te escribiremos a este email con los detalles de tu mesa.</p>
+      <div class="field">
+        <label class="check-label" for="seatAcepto">
+          <input type="checkbox" id="seatAcepto" required />
+          <span>Consiento los términos y condiciones y comunicaciones vía WhatsApp</span>
+        </label>
+      </div>
+      <p class="form-error" id="seatError" role="alert"></p>
+      <p class="modal-note">Te escribiremos con los detalles de tu mesa.</p>
       <button class="modal-close" id="seatSubmit" type="submit">Siguiente</button>
       <button class="modal-link" type="button" data-close>Ahora no</button>
     </form>
@@ -318,6 +380,19 @@
     <button class="modal-link" type="button" data-close>Ahora no</button>
   </div>
 </div>
+
+<div class="modal" id="graciasModal" hidden>
+  <div class="modal-box blue" role="dialog" aria-modal="true" aria-labelledby="graciasTitle">
+    <div class="gracias-emoji">🎉</div>
+    <h2 id="graciasTitle">¡Gracias por confirmar tu asiento!</h2>
+    <p><strong>Carga 1 foto</strong> para que te vean los demás usuarios.</p>
+    <p>Recuerda descargarte Flambao.</p>
+    <button class="modal-close" id="graciasFoto" type="button">Cargar mi foto</button>
+    <a class="modal-alt" href="https://flambao.com/descargas" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;">Descargar Flambao</a>
+    <button class="modal-link" type="button" data-close>Ahora no</button>
+  </div>
+</div>
+<canvas id="confeti" class="confeti" aria-hidden="true"></canvas>
 
 <input type="file" id="photoInput" accept="image/*" hidden />
 
@@ -393,7 +468,7 @@
     // ┌──────────────────────────────────────────────────────────┐
     // │ CONOCER GENTE NUEVA · MESA 1                             │
     // └──────────────────────────────────────────────────────────┘
-    { categoria: 'Conocer Gente Nueva', dia: 'Miércoles, 4 de noviembre', hora: '20:00', sentados: [
+    { categoria: 'Conocer Gente Nueva', dia: 'Viernes, 13 de noviembre', hora: '14:00', sentados: [
         { nombre: 'Fran', foto: '' },
         { nombre: 'Anina', foto: '' },
         { nombre: 'José Luis', foto: '' },
@@ -403,7 +478,7 @@
     // ┌──────────────────────────────────────────────────────────┐
     // │ CONOCER GENTE NUEVA · MESA 2                             │
     // └──────────────────────────────────────────────────────────┘
-    { categoria: 'Conocer Gente Nueva', dia: 'Jueves, 5 de noviembre', hora: '14:00', sentados: [
+    { categoria: 'Conocer Gente Nueva', dia: 'Miércoles, 18 de noviembre', hora: '20:00', sentados: [
         { nombre: 'Olga', foto: '' },
         { nombre: 'Joaquín', foto: '' },
         { nombre: 'Bea', foto: '' },
@@ -413,7 +488,7 @@
     // ┌──────────────────────────────────────────────────────────┐
     // │ NEGOCIOS · MESA 1                                        │
     // └──────────────────────────────────────────────────────────┘
-    { categoria: 'Negocios', dia: 'Miércoles, 4 de noviembre', hora: '14:00', sentados: [
+    { categoria: 'Negocios', dia: 'Miércoles, 11 de noviembre', hora: '14:00', sentados: [
         { nombre: 'Fran', foto: '' },
         { nombre: 'Olga', foto: '' },
         { nombre: 'Oscar', foto: '' },
@@ -423,7 +498,7 @@
     // ┌──────────────────────────────────────────────────────────┐
     // │ NEGOCIOS · MESA 2                                        │
     // └──────────────────────────────────────────────────────────┘
-    { categoria: 'Negocios', dia: 'Jueves, 5 de noviembre', hora: '14:00', sentados: [
+    { categoria: 'Negocios', dia: 'Jueves, 19 de noviembre', hora: '14:00', sentados: [
         { nombre: 'Anina', foto: '' },
         { nombre: 'Joaquín', foto: '' },
         { nombre: 'Magali', foto: '' },
@@ -433,7 +508,7 @@
     // ┌──────────────────────────────────────────────────────────┐
     // │ ABIERTO AL AMOR · MESA 1                                 │
     // └──────────────────────────────────────────────────────────┘
-    { categoria: 'Abierto al Amor', dia: 'Jueves, 5 de noviembre', hora: '20:00', sentados: [
+    { categoria: 'Abierto al Amor', dia: 'Jueves, 12 de noviembre', hora: '20:00', sentados: [
         { nombre: 'José Luis', foto: '' },
         { nombre: 'Bea', foto: '' },
         { nombre: 'Benja', foto: '' },
@@ -443,7 +518,7 @@
     // ┌──────────────────────────────────────────────────────────┐
     // │ ABIERTO AL AMOR · MESA 2                                 │
     // └──────────────────────────────────────────────────────────┘
-    { categoria: 'Abierto al Amor', dia: 'Viernes, 6 de noviembre', hora: '20:00', sentados: [
+    { categoria: 'Abierto al Amor', dia: 'Viernes, 20 de noviembre', hora: '20:00', sentados: [
         { nombre: 'Ana', foto: '' },
         { nombre: 'Carlos272', foto: '' },
         { nombre: 'Adriana', foto: '' },
@@ -453,7 +528,7 @@
     // ┌──────────────────────────────────────────────────────────┐
     // │ NUEVOS COMIENZOS · MESA 1                                │
     // └──────────────────────────────────────────────────────────┘
-    { categoria: 'Nuevos Comienzos', dia: 'Miércoles, 4 de noviembre', hora: '20:00', sentados: [
+    { categoria: 'Nuevos Comienzos', dia: 'Miércoles, 11 de noviembre', hora: '20:00', sentados: [
         { nombre: 'Oscar', foto: '' },
         { nombre: 'Magali', foto: '' },
         { nombre: 'Benja', foto: '' },
@@ -463,7 +538,7 @@
     // ┌──────────────────────────────────────────────────────────┐
     // │ NUEVOS COMIENZOS · MESA 2                                │
     // └──────────────────────────────────────────────────────────┘
-    { categoria: 'Nuevos Comienzos', dia: 'Viernes, 6 de noviembre', hora: '20:00', sentados: [
+    { categoria: 'Nuevos Comienzos', dia: 'Viernes, 13 de noviembre', hora: '20:00', sentados: [
         { nombre: 'María', foto: '' },
         { nombre: 'Julio', foto: '' },
         { nombre: 'Angeles', foto: '' },
@@ -606,7 +681,7 @@
   const profileModal = document.getElementById('profileModal');
   const chatModal = document.getElementById('chatModal');
   document.getElementById('chatBtn').addEventListener('click', () => { chatModal.hidden = false; });
-  [inviteModal, downloadModal, seatModal, profileModal, chatModal].forEach(m => m.addEventListener('click', (e) => {
+  [inviteModal, downloadModal, seatModal, profileModal, chatModal, document.getElementById('graciasModal')].forEach(m => m.addEventListener('click', (e) => {
     if(e.target === m || e.target.closest('[data-close]')) m.hidden = true;
   }));
 
@@ -721,7 +796,13 @@
     const nFalsos = Math.max(0, SENTADOS.length - realesCSV.length - (usuarioPagado ? 1 : 0));
     let i = 0;
     SENTADOS.slice(0, nFalsos).forEach(p => { ocuparAsiento(otrosSeatEls[i++], p.nombre, p.foto, true); });
-    realesCSV.forEach(n => { if(i < otrosSeatEls.length) ocuparAsiento(otrosSeatEls[i++], n, null, false); });
+    realesCSV.forEach(r => {
+      if(i >= otrosSeatEls.length) return;
+      const seat = otrosSeatEls[i++];
+      ocuparAsiento(seat, r.nombre, r.foto || null, false);
+      if(r.buscar) seat.dataset.buscar = '1';
+    });
+    if(typeof invalidarImagenInvitacion === 'function') invalidarImagenInvitacion();
   }
   renderOtros();
 
@@ -735,6 +816,7 @@
     avatar.style.backgroundSize = 'cover';
     avatar.style.backgroundPosition = 'center';
     avatar.style.backgroundRepeat = 'no-repeat';
+    if(typeof invalidarImagenInvitacion === 'function') invalidarImagenInvitacion();
   }
 
   // Recorta al centro y reduce a 256 px para que pese poco
@@ -786,7 +868,7 @@
     if(tieneNombre) nombres.push(nombreRaw);
     seatNombres.forEach((nombre, seatEl) => {
       const av = seatEl.querySelector('.seat-avatar');
-      if(seatEl.dataset.falso !== '1' && av && !av.style.backgroundImage) nombres.push(nombre);
+      if(seatEl.dataset.falso !== '1' && seatEl.dataset.buscar === '1' && av && !av.style.backgroundImage) nombres.push(nombre);
     });
     if(!nombres.length) return;
     try{
@@ -801,20 +883,20 @@
       if(tieneNombre && fotos[nombreRaw]) ponerFoto(document.querySelector('.seat-avatar[data-user-seat="1"]'), fotos[nombreRaw]);
       seatNombres.forEach((nombre, seatEl) => {
         const av = seatEl.querySelector('.seat-avatar');
-        if(seatEl.dataset.falso !== '1' && av && !av.style.backgroundImage && fotos[nombre]) ponerFoto(av, fotos[nombre]);
+        if(seatEl.dataset.falso !== '1' && seatEl.dataset.buscar === '1' && av && !av.style.backgroundImage && fotos[nombre]) ponerFoto(av, fotos[nombre]);
       });
     }catch(err){ console.log('[Flambao] No se pudieron cargar las fotos:', err); }
   }
 
   // ── Google Form (solo cuando ya ha pagado: sin pago no hay asiento) ──
   //    El Form no tiene campo de email: va en el campo del teléfono.
-  async function enviarInscripcion(nombreCompleto, email){
+  async function enviarInscripcion(nombreCompleto, email, telefono){
     const mesaInfo = categoria + (dia ? (', ' + dia + (hora ? (' ' + hora) : '')) : '');
     const nombreParaForm = nombreCompleto + ' — ' + RESTAURANTE + ' · ' + mesaInfo;
     if(!FORM_ID || !FORM_ENTRY_NOMBRE || !FORM_ENTRY_TELEFONO) return;
     const body = new URLSearchParams();
     body.append(FORM_ENTRY_NOMBRE, nombreParaForm);
-    body.append(FORM_ENTRY_TELEFONO, email);
+    body.append(FORM_ENTRY_TELEFONO, (telefono ? (telefono + ' · ') : '') + email);   // el Form no tiene campo de email: va junto al teléfono
     try{
       await fetch('https://docs.google.com/forms/d/e/' + FORM_ID + '/formResponse', {
         method: 'POST', body: body, mode: 'no-cors', keepalive: true
@@ -826,29 +908,112 @@
 
   var abrirPago = function(){};   // lo define el bloque de Stripe, más abajo
 
+  // ── Teléfono con prefijo (por defecto +34, y se puede elegir cualquier otro) ──
+  const PAISES_TXT = 'ES:34,PT:351,FR:33,IT:39,DE:49,GB:44,US:1,MX:52,AR:54,CO:57,CL:56,PE:51,VE:58,EC:593,UY:598,MA:212,' +
+    'AD:376,AL:355,AM:374,AO:244,AT:43,AU:61,AZ:994,BA:387,BD:880,BE:32,BG:359,BO:591,BR:55,BS:1,BY:375,BZ:501,CA:1,CD:243,CH:41,CI:225,CM:237,CN:86,CR:506,CU:53,CY:357,CZ:420,' +
+    'DK:45,DO:1,DZ:213,EE:372,EG:20,ET:251,FI:358,GE:995,GH:233,GQ:240,GR:30,GT:502,GY:592,HK:852,HN:504,HR:385,HT:509,HU:36,ID:62,IE:353,IL:972,IN:91,IQ:964,IR:98,IS:354,' +
+    'JM:1,JO:962,JP:81,KE:254,KH:855,KR:82,KW:965,KZ:7,LB:961,LK:94,LT:370,LU:352,LV:371,LY:218,MC:377,MD:373,ME:382,MK:389,MT:356,MU:230,MY:60,MZ:258,NG:234,NI:505,NL:31,NO:47,NP:977,NZ:64,' +
+    'OM:968,PA:507,PH:63,PK:92,PL:48,PR:1,PS:970,PY:595,QA:974,RO:40,RS:381,RU:7,SA:966,SE:46,SG:65,SI:386,SK:421,SN:221,SV:503,SY:963,TH:66,TN:216,TR:90,TT:1,TW:886,TZ:255,UA:380,UG:256,UZ:998,VN:84,ZA:27,ZM:260,ZW:263';
+  const PAISES_PRIMEROS = ['ES','PT','FR','IT','DE','GB','US','MX','AR','CO','CL','PE','VE','EC','UY','MA'];
+  let _nombresPais = null;
+  try{ _nombresPais = new Intl.DisplayNames(['es'], { type: 'region' }); }catch(e){}
+  const banderaDe = iso => String.fromCodePoint.apply(null, iso.toUpperCase().split('').map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+  const PAISES = PAISES_TXT.split(',').map(x => {
+    const par = x.split(':'); let nombre = par[0];
+    try{ nombre = (_nombresPais && _nombresPais.of(par[0])) || par[0]; }catch(e){}
+    return { iso: par[0], cod: par[1], nombre: nombre, bandera: banderaDe(par[0]) };
+  }).sort((a, b) => {
+    const ia = PAISES_PRIMEROS.indexOf(a.iso), ib = PAISES_PRIMEROS.indexOf(b.iso);
+    if(ia !== -1 || ib !== -1) return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    return a.nombre.localeCompare(b.nombre, 'es');
+  });
+  let prefijoActual = PAISES.find(p => p.iso === 'ES');
+
+  const prefixBtn = document.getElementById('prefixBtn');
+  const prefixList = document.getElementById('prefixList');
+  const prefixSearch = document.getElementById('prefixSearch');
+  const prefixItems = document.getElementById('prefixItems');
+  function elegirPrefijo(iso){
+    prefijoActual = PAISES.find(p => p.iso === iso) || PAISES[0];
+    document.getElementById('prefixFlag').textContent = prefijoActual.bandera;
+    document.getElementById('prefixCode').textContent = '+' + prefijoActual.cod;
+  }
+  function pintarPrefijos(filtro){
+    const f = normaliza(filtro || '').replace(/^\+/, '');
+    prefixItems.innerHTML = '';
+    const lista = PAISES.filter(p => !f || normaliza(p.nombre).includes(f) || p.cod.startsWith(f));
+    if(!lista.length){ const li = document.createElement('li'); li.className = 'pi-vacio'; li.textContent = 'Sin resultados'; prefixItems.appendChild(li); return; }
+    lista.forEach(p => {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.setAttribute('aria-selected', p.iso === prefijoActual.iso ? 'true' : 'false');
+      li.dataset.iso = p.iso;
+      li.innerHTML = '<span class="pi-flag">' + p.bandera + '</span><span class="pi-name">' + esc(p.nombre) + '</span><span class="pi-code">+' + p.cod + '</span>';
+      prefixItems.appendChild(li);
+    });
+  }
+  function cerrarPrefijos(){ prefixList.hidden = true; prefixBtn.setAttribute('aria-expanded', 'false'); }
+  prefixBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if(!prefixList.hidden){ cerrarPrefijos(); return; }
+    prefixSearch.value = '';
+    pintarPrefijos('');
+    prefixList.hidden = false;
+    prefixBtn.setAttribute('aria-expanded', 'true');
+    const sel = prefixItems.querySelector('[aria-selected="true"]');
+    if(sel) prefixItems.scrollTop = Math.max(0, sel.offsetTop - 60);
+    if(window.matchMedia && matchMedia('(hover:hover)').matches) prefixSearch.focus();   // en el móvil no, para que no tape la lista el teclado
+  });
+  prefixSearch.addEventListener('input', () => pintarPrefijos(prefixSearch.value));
+  prefixList.addEventListener('click', (e) => e.stopPropagation());
+  prefixItems.addEventListener('click', (e) => {
+    const li = e.target.closest('li[data-iso]');
+    if(!li) return;
+    elegirPrefijo(li.dataset.iso);
+    cerrarPrefijos();
+    document.getElementById('seatTelefono').focus();
+  });
+  document.addEventListener('click', cerrarPrefijos);
+
   function abrirFormulario(){
     const partes = nombreRaw.split(' ');
-    const d = datosUsuario || { nombre: partes[0] || '', apellidos: partes.slice(1).join(' '), email: '' };
-    document.getElementById('seatNombre').value = d.nombre;
-    document.getElementById('seatApellidos').value = d.apellidos;
-    document.getElementById('seatEmail').value = d.email;
+    let ultimo = null;
+    try{ ultimo = JSON.parse(localStorage.getItem('flb_ultimo') || 'null'); }catch(e){}
+    const d = datosUsuario || ultimo || { nombre: partes[0] || '', apellidos: partes.slice(1).join(' '), email: '' };
+    document.getElementById('seatNombre').value = d.nombre || '';
+    document.getElementById('seatApellidos').value = d.apellidos || '';
+    document.getElementById('seatEmail').value = d.email || '';
+    document.getElementById('seatTelefono').value = d.telefonoLocal || '';
+    document.getElementById('seatAcepto').checked = !!d.acepto;
+    document.getElementById('seatError').textContent = '';
+    elegirPrefijo(d.prefijoIso || 'ES');
+    cerrarPrefijos();
     seatModal.hidden = false;
     setTimeout(() => document.getElementById('seatNombre').focus(), 50);
   }
 
   document.getElementById('seatForm').addEventListener('submit', (e) => {
     e.preventDefault();
+    const err = document.getElementById('seatError');
     const nom = document.getElementById('seatNombre').value.trim();
     const ape = document.getElementById('seatApellidos').value.trim();
     const email = document.getElementById('seatEmail').value.trim();
-    if(!nom || !ape || !email){
-      alert('Rellena nombre, apellidos y email.');
-      return;
-    }
-    datosUsuario = { nombre: nom, apellidos: ape, email: email };
+    const telLocal = document.getElementById('seatTelefono').value.replace(/\D/g, '').replace(/^0+/, '');
+    const acepto = document.getElementById('seatAcepto').checked;
+    err.textContent = '';
+    if(!nom || !ape || !email){ err.textContent = 'Rellena nombre, apellidos y email.'; return; }
+    const telOk = prefijoActual.cod === '34' ? /^[6-9]\d{8}$/.test(telLocal) : (telLocal.length >= 6 && telLocal.length <= 14);
+    if(!telOk){ err.textContent = 'Revisa el teléfono: ' + (prefijoActual.cod === '34' ? 'en España tiene 9 cifras.' : 'no parece válido.'); return; }
+    if(!acepto){ err.textContent = 'Para continuar tienes que consentir los términos y condiciones.'; return; }
+    datosUsuario = {
+      nombre: nom, apellidos: ape, email: email,
+      prefijoIso: prefijoActual.iso, telefonoLocal: telLocal, telefono: '+' + prefijoActual.cod + telLocal,
+      acepto: true
+    };
     usuarioPagado = false;
     aplicarDatos();
     guardarMesa();
+    try{ localStorage.setItem('flb_ultimo', JSON.stringify(datosUsuario)); }catch(e2){}
 
     if(esInvitado){
       // Entra por invitación: pasa a su propia mesa (sin modo invitado) y allí se abre el pago
@@ -901,14 +1066,14 @@
       if(dia && entry.dia !== dia) continue;
       if(hora && entry.hora !== hora) continue;
       if(tieneNombre && entry.nombre === nombreRaw) continue;   // tú ya tienes tu propio asiento
-      nuevos.push(entry.nombre);
+      nuevos.push({ nombre: entry.nombre, foto: '', buscar: true });
     }
     realesCSV = nuevos;
     renderOtros();
   }
 
   // ── Refrescar: vuelve a comprobar si hay más gente apuntada a esta mesa ──
-  function cargarAsistentes(){
+  function cargarAsistentesCSV(){
     if(!RESPUESTAS_CSV_URL) return Promise.resolve();
     return fetch(RESPUESTAS_CSV_URL + (RESPUESTAS_CSV_URL.includes('?') ? '&' : '?') + '_=' + Date.now())
       .then(res => res.ok ? res.text() : Promise.reject(res.status))
@@ -918,11 +1083,32 @@
         const entries = lines.map(parseEntry).filter(Boolean);
         pintarAsientos(entries);
       })
-      .catch(err => console.log('[Flambao] No se pudieron cargar los asistentes:', err))
+      .catch(err => console.log('[Flambao] No se pudieron cargar los asistentes:', err));
+  }
+
+  // Gente REAL sentada en esta mesa (ya ha pagado) con su foto: se lee de Firebase, no del Google Sheet
+  let firmaReales = '';
+  async function cargarMesaServidor(){
+    const resp = await fetch(FOTOS_API + '/obtenerMesa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurante: RESTAURANTE, categoria: categoria, dia: dia || '', hora: hora || '', excluir: tieneNombre ? nombreRaw : '' })
+    });
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const lista = (data.personas || []).map(p => ({ nombre: p.nombre, foto: p.foto || '' }));
+    const firma = JSON.stringify(lista.map(p => [p.nombre, (p.foto || '').length]));
+    if(firma !== firmaReales){ firmaReales = firma; realesCSV = lista; renderOtros(); }
+  }
+  function cargarAsistentes(){
+    return cargarMesaServidor()
+      .catch(err => { console.log('[Flambao] No se pudo leer la mesa de Firebase, uso el Sheet:', err); return cargarAsistentesCSV(); })
       .then(() => cargarFotos());
   }
 
   cargarAsistentes();
+  // Cada 20 s mira si se ha sentado alguien más (y si ha subido su foto)
+  setInterval(() => { const pm = document.getElementById('payModal'); if(!document.hidden && !(pm && !pm.hidden)) cargarAsistentes(); }, 20000);
 
   document.getElementById('btnRefresh').addEventListener('click', function(){
     const btn = this;
@@ -967,31 +1153,55 @@
   }
 
   async function buildInviteImage(){
+    // La imagen es una "captura" de la mesa REAL: mismos asientos, nombres, fotos, categoría, restaurante y día/hora que se ven en pantalla
     if(document.fonts){
       await Promise.all([
         document.fonts.load('800 58px Montserrat'),
         document.fonts.load('700 26px Montserrat'),
-        document.fonts.load('700 36px Montserrat'),
-        document.fonts.load('600 26px Montserrat')
+        document.fonts.load('600 24px Montserrat'),
+        document.fonts.load('700 34px "Playfair Display"'),
+        document.fonts.load('700 30px "Playfair Display"')
       ]).catch(() => {});
       await document.fonts.ready;
     }
     const logoImg = await cargarImagen(LOGO_URL, true);
 
+    // Lee los asientos tal y como están ahora en la página
+    const leerAsientos = (gridId) => Array.from(document.querySelectorAll('#' + gridId + ' .seat')).map(seat => {
+      const av = seat.querySelector('.seat-avatar');
+      const fotoEl = av.querySelector('.seat-photo');
+      const bg = (fotoEl ? fotoEl.style.backgroundImage : av.style.backgroundImage) || '';
+      const m = bg.match(/url\(["']?(.*?)["']?\)$/);
+      return {
+        etiqueta: (seat.querySelector('.seat-label') || {}).textContent || '',
+        libre: av.classList.contains('empty'),
+        usuario: seat.classList.contains('user') || seat.classList.contains('guest'),
+        pendiente: seat.classList.contains('pago-pendiente'),
+        blur: !!fotoEl,
+        src: m ? m[1] : ''
+      };
+    });
+    const arriba = leerAsientos('seatsGridTop'), abajo = leerAsientos('seatsGridBottom');
+    const todos = arriba.concat(abajo);
+    await Promise.all(todos.map(async a => { a.img = a.src ? await cargarImagen(a.src, false) : null; }));
+
     const W = 1080, H = 1350;
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
-    const NAVY = '#13286b', INK = '#0f1a3a', GRIS = '#7b8499';
-    const FONT = 'Montserrat, sans-serif';
+    const css = getComputedStyle(document.documentElement);
+    const CAT = (css.getPropertyValue('--cat') || '#002d74').trim() || '#002d74';
+    const CAT_INK = (css.getPropertyValue('--cat-ink') || '#fff').trim() || '#fff';
+    const NAVY = '#002d74', INK = '#0f1a3a', GRIS = '#6B6B6B', MENTA = '#98FB98';
+    const SANS = 'Montserrat, sans-serif', SERIF = '"Playfair Display", serif';
 
-    // Fondo claro con degradado suave
+    // Fondo
     const bg = ctx.createLinearGradient(0, 0, 0, H);
     bg.addColorStop(0, '#f7f9ff'); bg.addColorStop(0.35, '#ffffff'); bg.addColorStop(1, '#f1f4fb');
     ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
     // Logo de Flambao
-    const logoS = 100, logoX = W / 2 - logoS / 2, logoY = 64;
+    const logoS = 100, logoX = W / 2 - logoS / 2, logoY = 56;
     ctx.save();
     ctx.shadowColor = 'rgba(19,40,107,.25)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
     ctx.fillStyle = '#1c3366';
@@ -1009,102 +1219,123 @@
     // Titular
     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = INK;
-    ctx.font = '800 58px ' + FONT;
-    ctx.fillText('Te han invitado a su mesa', W / 2, 330);
+    ctx.font = '800 56px ' + SANS;
+    ctx.fillText(tieneNombre ? (primerNombre + ' te invita a su mesa') : 'Te han invitado a su mesa', W / 2, 255);
+    ctx.fillStyle = GRIS; ctx.font = '600 28px ' + SANS;
+    ctx.fillText('Mira quién está sentado y apúntate', W / 2, 308);
 
     // Tarjeta de la mesa
-    const cx0 = 70, cy0 = 452, cw = W - 140, ch = 590;
+    const cx0 = 60, cy0 = 345, cw = W - 120, ch = 812;
     ctx.save();
-    ctx.shadowColor = 'rgba(19,40,107,.16)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 20;
+    ctx.shadowColor = 'rgba(0,45,116,.16)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 20;
     ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.roundRect(cx0, cy0, cw, ch, 50); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(cx0, cy0, cw, ch, 44); ctx.fill();
     ctx.restore();
     ctx.lineWidth = 5; ctx.strokeStyle = NAVY;
-    ctx.beginPath(); ctx.roundRect(cx0, cy0, cw, ch, 50); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(cx0, cy0, cw, ch, 44); ctx.stroke();
 
-    const R = 64;
-    const xs = [216, 433, 648, 864];
-    const rowTop = 567, rowBot = 883;
+    const R = 66;
+    const innerL = cx0 + 30, colW = (cw - 60) / 4;
+    const xs = [0, 1, 2, 3].map(i => innerL + colW * (i + 0.5));
+    const headL = xs[0] - R;   // la cabecera arranca justo en el borde del primer círculo
 
-    function persona(cx, cy, fondo, color){
+    // Etiqueta colgante (color de la categoría) sobre el 4º asiento
+    const tagW = 62, tagX = xs[3] - tagW / 2, tagH = 175;
+    ctx.fillStyle = CAT;
+    ctx.beginPath();
+    ctx.moveTo(tagX, cy0); ctx.lineTo(tagX + tagW, cy0); ctx.lineTo(tagX + tagW, cy0 + tagH);
+    ctx.lineTo(tagX + tagW / 2, cy0 + tagH - 18); ctx.lineTo(tagX, cy0 + tagH); ctx.closePath(); ctx.fill();
+
+    // Píldora de categoría
+    ctx.textAlign = 'left';
+    ctx.font = '700 30px ' + SERIF;
+    const pw = ctx.measureText(categoria).width + 52, ph = 58, py = cy0 + 38;
+    ctx.fillStyle = CAT;
+    ctx.beginPath(); ctx.roundRect(headL, py, pw, ph, ph / 2); ctx.fill();
+    ctx.fillStyle = CAT_INK;
+    ctx.fillText(categoria, headL + 26, py + 39);
+
+    // Restaurante y dirección
+    ctx.fillStyle = INK; ctx.font = '700 38px ' + SERIF;
+    ctx.fillText(RESTAURANTE_DISPLAY, headL, cy0 + 150);
+    if(RESTAURANTE_LOC){
+      ctx.fillStyle = GRIS; ctx.font = '600 23px ' + SANS;
+      let loc = RESTAURANTE_LOC;
+      const maxLoc = xs[3] - tagW / 2 - headL - 20;
+      while(ctx.measureText(loc).width > maxLoc && loc.length > 8) loc = loc.slice(0, -2);
+      if(loc !== RESTAURANTE_LOC) loc = loc.trim() + '…';
+      ctx.fillText(loc, headL, cy0 + 190);
+    }
+
+    // Asientos
+    const foto = (img, cx, cy, blur) => {
       ctx.save();
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
-      ctx.fillStyle = fondo; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
-      ctx.fillStyle = color;
-      ctx.beginPath(); ctx.arc(cx, cy - 14, 19, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(cx, cy + 52, 40, 34, 0, 0, Math.PI * 2); ctx.fill();
+      const lado = Math.min(img.width, img.height);
+      const sx = (img.width - lado) / 2, sy = (img.height - lado) / 2;
+      if(blur){
+        // desenfoque: se reduce y se amplía (funciona en todos los navegadores)
+        const t = document.createElement('canvas'); t.width = t.height = 14;
+        t.getContext('2d').drawImage(img, sx, sy, lado, lado, 0, 0, 14, 14);
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(t, cx - R - 8, cy - R - 8, R * 2 + 16, R * 2 + 16);
+      }else{
+        ctx.drawImage(img, sx, sy, lado, lado, cx - R, cy - R, R * 2, R * 2);
+      }
       ctx.restore();
-    }
-    function mas(cx, cy, len, color, grosor){
-      ctx.strokeStyle = color; ctx.lineWidth = grosor; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(cx - len, cy); ctx.lineTo(cx + len, cy); ctx.moveTo(cx, cy - len); ctx.lineTo(cx, cy + len); ctx.stroke();
-    }
-    function libre(cx, cy){
-      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
-      ctx.fillStyle = '#f1fcee'; ctx.fill();
-      ctx.setLineDash([9, 8]); ctx.strokeStyle = '#8fd47e'; ctx.lineWidth = 3.5; ctx.stroke(); ctx.setLineDash([]);
-      mas(cx, cy, 20, '#6a7b99', 3.5);
-    }
-    function corazon(cx, cy, s){
-      ctx.beginPath();
-      ctx.moveTo(cx, cy + s * 0.9);
-      ctx.bezierCurveTo(cx - s * 1.5, cy - s * 0.1, cx - s * 0.7, cy - s * 1.1, cx, cy - s * 0.35);
-      ctx.bezierCurveTo(cx + s * 0.7, cy - s * 1.1, cx + s * 1.5, cy - s * 0.1, cx, cy + s * 0.9);
-      ctx.closePath(); ctx.fill();
-    }
+    };
+    const asiento = (a, cx, cy) => {
+      ctx.textAlign = 'center';
+      if(a.libre){
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = MENTA; ctx.fill();
+        ctx.strokeStyle = NAVY; ctx.lineWidth = 5; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(cx - 20, cy); ctx.lineTo(cx + 20, cy); ctx.moveTo(cx, cy - 20); ctx.lineTo(cx, cy + 20); ctx.stroke();
+      }else if(a.pendiente){
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = '#e11d48'; ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = '800 22px ' + SANS; ctx.fillText('Confirmar', cx, cy + 8);
+      }else if(a.img){
+        foto(a.img, cx, cy, a.blur);
+      }else{
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = NAVY; ctx.fill();
+        if(logoImg){
+          ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip(); ctx.globalAlpha = .45;
+          ctx.drawImage(logoImg, cx - R * 1.1, cy - R * 1.1, R * 2.2, R * 2.2); ctx.restore();
+        }
+      }
+      if(a.usuario){
+        ctx.beginPath(); ctx.arc(cx, cy, R + 3, 0, Math.PI * 2); ctx.lineWidth = 5; ctx.strokeStyle = NAVY; ctx.stroke();
+      }
+      ctx.fillStyle = a.usuario ? INK : GRIS; ctx.font = (a.usuario ? '800 ' : '700 ') + '23px ' + SANS;
+      ctx.fillText(a.etiqueta, cx, cy + R + 36);
+    };
+    const rowTop = cy0 + 300;
+    arriba.forEach((a, i) => asiento(a, xs[i], rowTop));
 
-    // Fila de arriba: Tu sitio · Te invita · dos personas
-    // 1) Tu sitio (resaltado)
-    ctx.beginPath(); ctx.arc(xs[0], rowTop, R + 9, 0, Math.PI * 2); ctx.fillStyle = '#dbe3f5'; ctx.fill();
-    ctx.beginPath(); ctx.arc(xs[0], rowTop, R, 0, Math.PI * 2); ctx.fillStyle = '#aef59c'; ctx.fill();
-    ctx.lineWidth = 6; ctx.strokeStyle = NAVY; ctx.stroke();
-    mas(xs[0], rowTop, 22, NAVY, 4.5);
-    // 2) Te invita
-    persona(xs[1], rowTop, '#dde6f8', '#3b5fc9');
-    const hx = xs[1] + 45, hy = rowTop + 40;
-    ctx.beginPath(); ctx.arc(hx, hy, 24, 0, Math.PI * 2); ctx.fillStyle = '#ee3a5c'; ctx.fill();
-    ctx.lineWidth = 4; ctx.strokeStyle = '#fff'; ctx.stroke();
-    ctx.fillStyle = '#fff'; corazon(hx, hy - 1, 9);
-    // 3) y 4)
-    persona(xs[2], rowTop, '#fce1e8', '#dc4468');
-    persona(xs[3], rowTop, '#fff0d6', '#e5992b');
-
-    // Etiquetas
-    ctx.fillStyle = INK; ctx.font = '700 27px ' + FONT;
-    ctx.fillText('Tu sitio', xs[0], 662);
-    ctx.fillText('Te invita', xs[1], 662);
-    if(tieneNombre){
-      ctx.fillStyle = GRIS; ctx.font = '600 22px ' + FONT;
-      ctx.fillText(primerNombre, xs[1], 692);
-    }
-
-    // Barra de la mesa (con día y hora)
-    const bx = 131, by = 724, bw = 818, bh = 76;
+    // Barra de la mesa (día y hora reales)
+    const bx = cx0 + 20, bw = cw - 40, bh = 96, by = rowTop + R + 80;
     const gb = ctx.createLinearGradient(bx, 0, bx + bw, 0);
-    gb.addColorStop(0, '#14286a'); gb.addColorStop(1, '#2c55a6');
+    gb.addColorStop(0, '#002d74'); gb.addColorStop(1, '#1B5FAE');
     ctx.fillStyle = gb;
     ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, bh / 2); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.font = '700 28px ' + FONT;
-    ctx.fillText((dia || 'Por confirmar') + '  ·  ' + (hora ? (hora + ' h') : 'Por confirmar'), W / 2, by + bh / 2 + 10);
+    ctx.fillStyle = '#fff'; ctx.font = '800 33px ' + SANS; ctx.textAlign = 'center';
+    ctx.fillText((dia || 'Por confirmar') + '  ·  ' + (hora ? (hora + ' h') : 'Por confirmar'), W / 2, by + bh / 2 + 12);
 
-    // Fila de abajo: una persona + 3 libres
-    persona(xs[0], rowBot + 10, '#dcf3ec', '#219c7c');
-    for(let i = 1; i < 4; i++) libre(xs[i], rowBot + 10);
-    ctx.fillStyle = GRIS; ctx.font = '700 26px ' + FONT;
-    for(let i = 1; i < 4; i++) ctx.fillText('Libre', xs[i], 989);
+    const rowBot = by + bh + 50 + R;
+    abajo.forEach((a, i) => asiento(a, xs[i], rowBot));
 
     // Botón "Reserva tu sitio"
-    const bbx = W / 2 - 195, bby = 1152, bbw = 390, bbh = 90;
+    const bbx = W / 2 - 215, bby = 1195, bbw = 430, bbh = 88;
     ctx.save();
-    ctx.shadowColor = 'rgba(19,40,107,.35)'; ctx.shadowBlur = 28; ctx.shadowOffsetY = 12;
+    ctx.shadowColor = 'rgba(0,45,116,.35)'; ctx.shadowBlur = 28; ctx.shadowOffsetY = 12;
     ctx.fillStyle = NAVY;
     ctx.beginPath(); ctx.roundRect(bbx, bby, bbw, bbh, bbh / 2); ctx.fill();
     ctx.restore();
-    ctx.fillStyle = '#fff'; ctx.font = '800 35px ' + FONT;
-    ctx.fillText('Reserva tu sitio', W / 2, bby + bbh / 2 + 12);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff'; ctx.font = '800 36px ' + SANS;
+    ctx.fillText('Reserva tu sitio', W / 2, bby + bbh / 2 + 13);
 
-    ctx.fillStyle = GRIS; ctx.font = '700 26px ' + FONT;
-    ctx.fillText('flambao.com', W / 2, 1288);
+    ctx.fillStyle = GRIS; ctx.font = '700 26px ' + SANS;
+    ctx.fillText('flambao.com', W / 2, 1328);
 
     return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
   }
@@ -1130,60 +1361,59 @@
 
   // Imagen de la invitación: se prepara al cargar para poder compartir al instante
 let inviteAsset = null;
+let invitePromesa = Promise.resolve(null);
+var inviteTimer = null;
+function invalidarImagenInvitacion(){ clearTimeout(inviteTimer); inviteTimer = setTimeout(() => prepararImagenInvitacion(), 700); }
 function prepararImagenInvitacion(){
-  buildInviteImage()
-    .then(blob => { inviteAsset = { blob, file: new File([blob], 'flambao-mesa.png', { type: 'image/png' }) }; })
-    .catch(() => {});
+  clearTimeout(inviteTimer);
+  invitePromesa = buildInviteImage()
+    .then(blob => {
+      inviteAsset = { blob, file: new File([blob], 'flambao-mesa.png', { type: 'image/png' }) };
+      const prev = document.getElementById('invitePreview');   // la misma imagen se ve en el pop-up de compartir
+      if(prev){
+        if(prev.dataset.url) URL.revokeObjectURL(prev.dataset.url);
+        prev.dataset.url = URL.createObjectURL(blob);
+        prev.src = prev.dataset.url;
+        prev.hidden = false;
+      }
+      return inviteAsset;
+    })
+    .catch(() => null);
+  return invitePromesa;
 }
 prepararImagenInvitacion();
 
-function avisoCopiado(el, textoOriginal){
-  el.textContent = '¡Enlace copiado!';
-  setTimeout(() => { el.textContent = textoOriginal; }, 2200);
+function mostrarAviso(texto){
+  const toast = document.getElementById('shareToast');
+  if(!toast) return;
+  toast.textContent = texto;
+  toast.classList.add('visible');
+  setTimeout(() => toast.classList.remove('visible'), 2600);
 }
 
-// Solo el enlace
-document.getElementById('inviteLinkOnly').addEventListener('click', function(){
-  const btn = this;
-  const url = buildInviteUrl();
-  const text = buildShareText(url);
-  try{ navigator.clipboard.writeText(url).catch(() => {}); }catch(e0){}
-  if(navigator.share){
-    navigator.share({ title: 'Flambao · Mesa', text })
-      .then(() => { inviteModal.hidden = true; })
-      .catch(err => { if(!err || err.name !== 'AbortError') avisoCopiado(btn, 'Enviar solo el enlace'); });
-  }else{
-    avisoCopiado(btn, 'Enviar solo el enlace');
-  }
-});
-
-// Compartir con imagen
-document.getElementById('btnShare').addEventListener('click', function(){
-  const toast = document.getElementById('shareToast');
+// Compartir amigos: comparte la imagen de la mesa (con el texto y el enlace de invitación)
+document.getElementById('btnShare').addEventListener('click', async function(){
   const inviteUrl = buildInviteUrl();
   const shareText = buildShareText(inviteUrl);
-  const mostrarToast = () => {
-    toast.classList.add('visible');
-    setTimeout(() => toast.classList.remove('visible'), 2400);
-  };
+  try{ navigator.clipboard.writeText(inviteUrl).catch(() => {}); }catch(e0){}   // por si la app de destino ignora el texto
 
-  try{ navigator.clipboard.writeText(inviteUrl).catch(() => {}); }catch(e0){}
+  // si la imagen aún se está dibujando, espera un momento (máx. 2 s)
+  const asset = inviteAsset || await Promise.race([invitePromesa, new Promise(r => setTimeout(() => r(null), 2000))]);
 
-  const datos = { title: 'Flambao · Mesa', text: shareText, url: inviteUrl };
-  if(inviteAsset && navigator.canShare && navigator.canShare({ files: [inviteAsset.file] })){
-    datos.files = [inviteAsset.file];
-  }
+  const datos = { title: 'Flambao · Mesa', text: shareText };
+  if(asset && navigator.canShare && navigator.canShare({ files: [asset.file] })) datos.files = [asset.file];
 
   if(navigator.share){
-    navigator.share(datos).catch(err => { if(!err || err.name !== 'AbortError') mostrarToast(); });
+    try{ await navigator.share(datos); }
+    catch(err){ if(!err || err.name !== 'AbortError') mostrarAviso('No se ha podido compartir. Enlace copiado.'); }
   }else{
-    if(inviteAsset){
+    if(asset){
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(inviteAsset.blob);
+      a.href = URL.createObjectURL(asset.blob);
       a.download = 'flambao-mesa.png';
       a.click();
     }
-    mostrarToast();
+    mostrarAviso('Imagen descargada y enlace copiado');
   }
 });
 
@@ -1193,6 +1423,54 @@ document.getElementById('btnShare').addEventListener('click', function(){
   // ═══════════════════════════════════════════════════════════════
   const STRIPE_PUBLISHABLE_KEY = 'pk_live_51UQmiLBj1aVDCAhIALYy36M3zCRnMKgAeYSS2faNXT2TogPLzRKsz4bfvMEhqzsWFDsSmu3sbi2ams1ylXTtteg6002rD9FXZY';
   const CREAR_PAGO_URL = 'https://europe-west1-flambao-8f1fd.cloudfunctions.net/crearPago';
+
+  // ── Pago completado: gracias + confeti ──
+  function lanzarConfeti(){
+    if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cv = document.getElementById('confeti');
+    if(!cv) return;
+    const r = cv.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.max(1, Math.round(r.width * dpr));
+    cv.height = Math.max(1, Math.round(r.height * dpr));
+    const ctx = cv.getContext('2d');
+    ctx.scale(dpr, dpr);
+    const W = r.width, H = r.height;
+    const colores = ['#002d74', '#1B5FAE', '#d0b787', '#98FB98', '#F5C518', '#E4572E', '#3FA34D', '#ffffff'];
+    const piezas = [];
+    for(let i = 0; i < 150; i++){
+      piezas.push({
+        x: Math.random() * W, y: -20 - Math.random() * H * 0.5,
+        vx: (Math.random() - 0.5) * 4, vy: 2 + Math.random() * 4,
+        w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
+        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.4,
+        c: colores[Math.floor(Math.random() * colores.length)]
+      });
+    }
+    const ini = performance.now();
+    (function frame(){
+      const dt = performance.now() - ini;
+      ctx.clearRect(0, 0, W, H);
+      piezas.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.rot += p.vr;
+        ctx.save();
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.globalAlpha = dt > 3200 ? Math.max(0, 1 - (dt - 3200) / 800) : 1;
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      if(dt < 4000) requestAnimationFrame(frame); else ctx.clearRect(0, 0, W, H);
+    })();
+  }
+  function mostrarGracias(){
+    document.getElementById('graciasModal').hidden = false;
+    lanzarConfeti();
+  }
+  document.getElementById('graciasFoto').addEventListener('click', () => {
+    document.getElementById('graciasModal').hidden = true;
+    document.getElementById('photoInput').click();
+  });
 
   (function(){
     if(esInvitado) return;                              // el invitado primero rellena el formulario (nombre, apellidos, email)
@@ -1215,7 +1493,7 @@ document.getElementById('btnShare').addEventListener('click', function(){
     function setPagado(){
       seatUser.classList.remove('pago-pendiente');
       badge.hidden = true;
-      if(line2) line2.textContent = 'Asiento confirmado. Te avisaremos por email.';
+      if(line2) line2.textContent = 'Asiento confirmado. Te escribiremos pronto.';
       pintarCabecera();
     }
     function setPendiente(){
@@ -1232,9 +1510,10 @@ document.getElementById('btnShare').addEventListener('click', function(){
       setPagado();
       if(eraNuevo){
         renderOtros();
-        if(datosUsuario) enviarInscripcion(nombreRaw, datosUsuario.email);
+        if(datosUsuario) enviarInscripcion(nombreRaw, datosUsuario.email, datosUsuario.telefono);
         cargarFotos();
         prepararImagenInvitacion();
+        mostrarGracias();
       }
     }
 
@@ -1275,7 +1554,8 @@ document.getElementById('btnShare').addEventListener('click', function(){
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             restaurante: RESTAURANTE, categoria: categoria, dia: dia || '', hora: hora || '',
-            nombre: nombreRaw, email: datosUsuario ? datosUsuario.email : ''
+            nombre: nombreRaw, email: datosUsuario ? datosUsuario.email : '',
+            telefono: datosUsuario ? (datosUsuario.telefono || '') : '', whatsapp: (datosUsuario && datosUsuario.acepto) ? 'si' : 'no'
           })
         });
         const data = await resp.json();
@@ -1378,6 +1658,21 @@ document.getElementById('btnShare').addEventListener('click', function(){
       explora.addEventListener('click', () => { parent.postMessage({ flambao: 'cerrar-mesa' }, location.origin); });
     }
     document.querySelectorAll('a[href^="https://flambao.com/descargas"]').forEach(a => { a.target = '_blank'; });
+  }
+  // Dentro del pop-up del index: avisa de lo que mide la página y recibe qué trozo se está viendo
+  if(EMBED){
+    const avisarAltura = () => {
+      parent.postMessage({ flambao: 'altura', h: Math.ceil(document.body.getBoundingClientRect().height) }, location.origin);
+    };
+    if(window.ResizeObserver) new ResizeObserver(avisarAltura).observe(document.body);
+    window.addEventListener('load', avisarAltura);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(avisarAltura);
+    avisarAltura();
+    window.addEventListener('message', (e) => {
+      if(e.origin !== location.origin || !e.data || e.data.flambao !== 'visible') return;
+      document.documentElement.style.setProperty('--vis-top', e.data.top + 'px');
+      document.documentElement.style.setProperty('--vis-h', e.data.height + 'px');
+    });
   }
 </script>
 
