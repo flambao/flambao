@@ -412,6 +412,68 @@
   </div>
 </div>
 
+<!-- ===== EVENTOS DE META (FLAMBAO) · avisos de la Unit Table ===== -->
+<script>
+(function () {
+  var DENTRO = !!(window.parent && window.parent !== window);   // dentro del pop-up de la landing
+  var P = new URLSearchParams(location.search);
+  var PIXEL_ID = '1641532077166499', PRECIO = 3.99, MONEDA = 'EUR';
+  var REST = (location.pathname.split('/').filter(Boolean)[0] || 'home');
+  var RESERVA = { categoria: P.get('categoria') || '', fecha: P.get('dia') || '', hora: P.get('hora') || '' };
+
+  // Si esta página se abre SOLA (no dentro de la landing), el píxel se carga aquí
+  if (!DENTRO) {
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', PIXEL_ID);
+    fbq('track', 'PageView');
+  }
+
+  var yaEnviado = {};   // "confirmar" y "lead" solo una vez por visita
+  function params(extra) {
+    return Object.assign({ content_name: REST, content_category: RESERVA.categoria, fecha: RESERVA.fecha, hora: RESERVA.hora }, extra || {});
+  }
+
+  window.avisarMeta = function (tipo, datos) {
+    if ((tipo === 'confirmar' || tipo === 'lead') && yaEnviado[tipo]) return;
+    yaEnviado[tipo] = true;
+    // Dentro de la landing: se lo decimos a la landing, que es la que tiene el píxel
+    if (DENTRO) {
+      window.parent.postMessage({ flambao: 'meta', tipo: tipo, datos: datos || null, reserva: RESERVA }, location.origin);
+      return;
+    }
+    // Página sola: lo mandamos directamente a Meta
+    if (typeof fbq !== 'function') return;
+    var id = { eventID: tipo + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8) };
+    var d = datos || {};
+    switch (tipo) {
+      case 'confirmar': fbq('track', 'InitiateCheckout', params({ value: PRECIO, currency: MONEDA }), id); break;
+      case 'lead':
+        fbq('init', PIXEL_ID, {
+          em: (d.email || '').trim().toLowerCase(), ph: (d.telefono || '').replace(/\D/g, ''),
+          fn: (d.nombre || '').trim().toLowerCase(), ln: (d.apellidos || '').trim().toLowerCase()
+        });
+        fbq('track', 'Lead', params(), id); break;
+      case 'compra':    fbq('track', 'Purchase', params({ value: PRECIO, currency: MONEDA }), id); break;
+      case 'compartir': fbq('trackCustom', 'Compartir', params(), id); break;
+      case 'descarga':  fbq('trackCustom', 'Descarga_App', params(), id); break;
+    }
+  };
+
+  // "Descarga Flambao" (todos los enlaces a flambao.com/descargas)
+  document.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('a[href^="https://flambao.com/descargas"]')) window.avisarMeta('descarga');
+  }, true);
+})();
+</script>
+<!-- ===== FIN EVENTOS DE META ===== -->
+
 <script>
   // ═══════════════════════════════════════════════════════════════
   //  DATOS DEL RESTAURANTE  (lo único que cambia entre Pabblo y Brickell)
@@ -421,11 +483,15 @@
   const RESTAURANTE_DISPLAY = 'Brickell Majadahonda';  // como se ve en la página
   const RESTAURANTE_LOC = 'C/ Manuel de Falla, 3, 28222 Majadahonda, Madrid';                          // dirección (si la dejas vacía no se muestra)
   // CSV publicado (Archivo → Compartir → Publicar en la Web) de la pestaña "Publicar" del Google Sheet de respuestas
-  const RESPUESTAS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT4ghv2TDT3F5kOvPEaInY6tcnYFk3fNXClLIEse8igoHd0owHUYVk_yJ61nFCThH5cSWV0NdYxFvwD/pub?gid=2095768316&single=true&output=csv';
+  const RESPUESTAS_CSV_URL = '';   // sin Sheet de reserva: los asientos se leen de Firebase
   // Google Form de este restaurante
   const FORM_ID = '1FAIpQLSe4Ow8OZAicCwjp9HxcS7I4ULNrFpSYqF4OUxdg-wjxOR6i5w';              // lo que va entre /d/e/ y /formResponse
-  const FORM_ENTRY_NOMBRE = 'entry.1353539226';    // ej. 'entry.2016620008'
-  const FORM_ENTRY_TELEFONO = 'entry.2025770590';  // ej. 'entry.1993107579'
+  const FORM_ENTRY_NOMBRE = 'entry.20709573';    // ej. 'entry.2016620008'
+  const FORM_ENTRY_TELEFONO = 'entry.1419066393';  // ej. 'entry.1993107579'
+  const FORM_ENTRY_APELLIDOS = 'entry.960566326';  // Form nuevo: id de "Apellidos". Vacío = se usa el formato antiguo
+  const FORM_ENTRY_CORREO = 'entry.267301830';     // Form nuevo: id de "Correo"
+  const FORM_ENTRY_MESA = 'entry.379418322';       // Opcional: id de una pregunta "Mesa" (categoría, día y hora)
+  const FORM_ENTRY_ORIGEN = 'entry.1821576860';     // UTM: id de la pregunta "Origen" del Google Form (entry.XXXXXXXXX). Vacío = no se envía
 
   // ═══════════════════════════════════════════════════════════════
   //  PERSONAS SENTADAS EN CADA MESA  (una caja por mesa)
@@ -691,6 +757,7 @@
  document.addEventListener('click', (e) => {
   if(e.target.closest('.invite-btn')){
     if(esInvitado){
+      if(window.avisarMeta) avisarMeta('confirmar'); // META
       seatModal.hidden = false;                 // entra por invitación: formulario
       setTimeout(() => document.getElementById('seatNombre').focus(), 50);
     }else{
@@ -892,11 +959,23 @@
   //    El Form no tiene campo de email: va en el campo del teléfono.
   async function enviarInscripcion(nombreCompleto, email, telefono){
     const mesaInfo = categoria + (dia ? (', ' + dia + (hora ? (' ' + hora) : '')) : '');
-    const nombreParaForm = nombreCompleto + ' — ' + RESTAURANTE + ' · ' + mesaInfo;
     if(!FORM_ID || !FORM_ENTRY_NOMBRE || !FORM_ENTRY_TELEFONO) return;
     const body = new URLSearchParams();
-    body.append(FORM_ENTRY_NOMBRE, nombreParaForm);
-    body.append(FORM_ENTRY_TELEFONO, (telefono ? (telefono + ' · ') : '') + email);   // el Form no tiene campo de email: va junto al teléfono
+    if(FORM_ENTRY_APELLIDOS){
+      // Form nuevo: una pregunta por dato (Nombre, Apellidos, Teléfono, Correo, Origen y, si existe, Mesa)
+      body.append(FORM_ENTRY_NOMBRE, (datosUsuario && datosUsuario.nombre) || nombreCompleto);
+      body.append(FORM_ENTRY_APELLIDOS, (datosUsuario && datosUsuario.apellidos) || '');
+      body.append(FORM_ENTRY_TELEFONO, telefono || '');
+      if(FORM_ENTRY_CORREO) body.append(FORM_ENTRY_CORREO, email || '');
+      if(FORM_ENTRY_MESA) body.append(FORM_ENTRY_MESA, mesaInfo);
+    }else{
+      // Form antiguo: nombre + restaurante + mesa en una sola casilla, y email junto al teléfono
+      body.append(FORM_ENTRY_NOMBRE, nombreCompleto + ' — ' + RESTAURANTE + ' · ' + mesaInfo);
+      body.append(FORM_ENTRY_TELEFONO, (telefono ? (telefono + ' · ') : '') + email);
+    }
+    // UTM: de qué campaña / anuncio viene la reserva
+    const origen = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].map(k => params.get(k)).filter(Boolean).join(' / ');
+    if(FORM_ENTRY_ORIGEN) body.append(FORM_ENTRY_ORIGEN, origen || 'directo / sin UTM');
     try{
       await fetch('https://docs.google.com/forms/d/e/' + FORM_ID + '/formResponse', {
         method: 'POST', body: body, mode: 'no-cors', keepalive: true
@@ -1014,6 +1093,7 @@
     aplicarDatos();
     guardarMesa();
     try{ localStorage.setItem('flb_ultimo', JSON.stringify(datosUsuario)); }catch(e2){}
+    if(window.avisarMeta) avisarMeta('lead', { nombre: nom, apellidos: ape, email: email, telefono: '+' + prefijoActual.cod + telLocal }); // META
 
     if(esInvitado){
       // Entra por invitación: pasa a su propia mesa (sin modo invitado) y allí se abre el pago
@@ -1393,6 +1473,7 @@ function mostrarAviso(texto){
 
 // Compartir amigos: comparte la imagen de la mesa (con el texto y el enlace de invitación)
 document.getElementById('btnShare').addEventListener('click', async function(){
+  if(window.avisarMeta) avisarMeta('compartir'); // META
   const inviteUrl = buildInviteUrl();
   const shareText = buildShareText(inviteUrl);
   try{ navigator.clipboard.writeText(inviteUrl).catch(() => {}); }catch(e0){}   // por si la app de destino ignora el texto
@@ -1509,6 +1590,7 @@ document.getElementById('btnShare').addEventListener('click', async function(){
       guardarMesa();
       setPagado();
       if(eraNuevo){
+        if(window.avisarMeta) avisarMeta('compra'); // META: pago confirmado por Stripe
         renderOtros();
         if(datosUsuario) enviarInscripcion(nombreRaw, datosUsuario.email, datosUsuario.telefono);
         cargarFotos();
@@ -1609,10 +1691,11 @@ document.getElementById('btnShare').addEventListener('click', async function(){
       payModal.hidden = false;
       prepararPago();
     };
-    badge.addEventListener('click', (e) => { e.stopPropagation(); abrirPago(); });
+    badge.addEventListener('click', (e) => { e.stopPropagation(); if(window.avisarMeta) avisarMeta('confirmar'); /* META */ abrirPago(); });
     avatarUser.addEventListener('click', (e) => {
       if(!seatUser.classList.contains('pago-pendiente')) return;
       if(e.target.closest('.add-photo-btn')) return;
+      if(window.avisarMeta) avisarMeta('confirmar'); // META
       abrirPago();
     });
     payModal.addEventListener('click', (e) => {

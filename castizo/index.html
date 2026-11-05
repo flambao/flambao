@@ -261,6 +261,96 @@ src="https://www.facebook.com/tr?id=1641532077166499&ev=PageView&noscript=1"/></
 
 </div>
 
+<!-- ===== EVENTOS DE META (FLAMBAO) ===== -->
+<script>
+(function () {
+  var PIXEL_ID = '1641532077166499';
+  var PRECIO = 3.99, MONEDA = 'EUR';
+  // Restaurante sacado de la URL: flambao.com/brickell/ -> "brickell"
+  var REST = (location.pathname.split('/').filter(Boolean)[0] || 'home');
+  var estado = { categoria: null, fecha: null, hora: null };
+
+  function track(evento, datos, estandar) {
+    if (typeof fbq !== 'function') return;
+    var params = Object.assign({ content_name: REST }, datos || {});
+    var opciones = { eventID: evento + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8) };
+    fbq(estandar === false ? 'trackCustom' : 'track', evento, params, opciones);
+    return opciones.eventID;
+  }
+  function reserva(extra) {
+    return Object.assign({ content_category: estado.categoria, fecha: estado.fecha, hora: estado.hora }, extra || {});
+  }
+
+  // 1) Usuario comprometido: 30 s con la página a la vista + 50 % de scroll (una vez por visita)
+  var SEG_MIN = 30, SCROLL_MIN = 50, seg = 0, scrollMax = 0;
+  var enviado = { engaged: false, scroll: false, tiempo: false };
+  function pctScroll() {
+    var d = document.documentElement, alto = Math.max(d.scrollHeight - window.innerHeight, 1);
+    return Math.min(100, Math.round((window.scrollY / alto) * 100));
+  }
+  function revisar() {
+    if (!enviado.scroll && scrollMax >= SCROLL_MIN) { enviado.scroll = true; track('Scroll_50', {}, false); }
+    if (!enviado.tiempo && seg >= SEG_MIN) { enviado.tiempo = true; track('Tiempo_30s', {}, false); }
+    if (!enviado.engaged && seg >= SEG_MIN && scrollMax >= SCROLL_MIN) {
+      enviado.engaged = true; track('EngagedUser', { segundos: seg, scroll: scrollMax }, false);
+    }
+  }
+  window.addEventListener('scroll', function () { scrollMax = Math.max(scrollMax, pctScroll()); revisar(); }, { passive: true });
+  setInterval(function () { if (document.visibilityState === 'visible') { seg++; revisar(); } }, 1000);
+
+  // 2) Vídeo de Samantha (id="samVideo") al 50 %
+  document.addEventListener('DOMContentLoaded', function () {
+    var v = document.getElementById('samVideo'); if (!v) return;
+    var hecho = false;
+    v.addEventListener('timeupdate', function () {
+      if (!hecho && v.duration && v.currentTime / v.duration >= 0.5) { hecho = true; track('Video_50', {}, false); }
+    });
+  });
+
+  // 3) Pasos de la reserva
+  window.flambaoTrack = {
+    categoria: function (cat) { estado.categoria = cat; track('ViewContent', { content_category: cat }); },
+    fecha: function (dia, hora, cat) {
+      if (cat) estado.categoria = cat;
+      estado.fecha = dia; estado.hora = hora;
+      track('AddToCart', reserva({ value: PRECIO, currency: MONEDA }));
+    },
+    confirmarAsiento: function () { track('InitiateCheckout', reserva({ value: PRECIO, currency: MONEDA })); },
+    lead: function (d) {
+      d = d || {};
+      if (typeof fbq === 'function') {
+        fbq('init', PIXEL_ID, {
+          em: (d.email || '').trim().toLowerCase(),
+          ph: (d.telefono || '').replace(/\D/g, ''),
+          fn: (d.nombre || '').trim().toLowerCase(),
+          ln: (d.apellidos || '').trim().toLowerCase()
+        });
+      }
+      track('Lead', reserva());
+    },
+    compra: function () { return track('Purchase', reserva({ value: PRECIO, currency: MONEDA })); },
+    compartir: function () { track('Compartir', reserva(), false); },
+    descargaApp: function () { track('Descarga_App', reserva(), false); }
+  };
+
+  // 4) Avisos que llegan desde la Unit Table (confirmacion.html dentro del iframe)
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || !e.data || e.data.flambao !== 'meta') return;
+    var r = e.data.reserva;   // la mesa nos dice qué categoría, día y hora tiene abiertos
+    if (r) { estado.categoria = r.categoria || estado.categoria; estado.fecha = r.fecha || estado.fecha; estado.hora = r.hora || estado.hora; }
+    var t = window.flambaoTrack;
+    switch (e.data.tipo) {
+      case 'confirmar': t.confirmarAsiento(); break;
+      case 'lead':      t.lead(e.data.datos); break;
+      case 'compra':    t.compra(); break;
+      case 'compartir': t.compartir(); break;
+      case 'descarga':  t.descargaApp(); break;
+    }
+  });
+})();
+</script>
+<!-- ===== FIN EVENTOS DE META ===== -->
+
 <script>
   const RESTAURANTE = 'Castizo';
 
@@ -400,6 +490,7 @@ src="https://www.facebook.com/tr?id=1641532077166499&ev=PageView&noscript=1"/></
     q.set('categoria', selectedCat);
     if(selectedOption){ q.set('dia', selectedOption.day); q.set('hora', selectedOption.time); }
     if(extra) Object.keys(extra).forEach(k => { if(extra[k]) q.set(k, extra[k]); });
+    ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(k => { const v = URL_PARAMS.get(k); if(v) q.set(k, v); });   // UTM: se pasan a la Unit Table
     return 'confirmacion.html?' + q.toString();
   }
   // Debajo de la Unit Table: cambiar de categoría y de día
@@ -412,7 +503,7 @@ src="https://www.facebook.com/tr?id=1641532077166499&ev=PageView&noscript=1"/></
       b.className = 'cat-btn' + (cat === selectedCat ? ' active' : '');
       b.dataset.cat = cat;
       b.innerHTML = orig ? orig.innerHTML : cat;
-      b.addEventListener('click', () => { if(cat !== selectedCat) selectCategory(cat, false, true); });
+      b.addEventListener('click', () => { if(cat !== selectedCat){ if(window.flambaoTrack) flambaoTrack.categoria(cat); /* META */ selectCategory(cat, false, true); } });
       ssCats.appendChild(b);
     });
     ssDays.innerHTML = '';
@@ -482,6 +573,7 @@ src="https://www.facebook.com/tr?id=1641532077166499&ev=PageView&noscript=1"/></
     if(!opts[idx]) return;
     tableOptionsEl.querySelectorAll('.table-option').forEach((o, i) => o.classList.toggle('selected', i === idx));
     selectedOption = opts[idx];
+    if(window.flambaoTrack) flambaoTrack.fecha(selectedOption.day, selectedOption.time, selectedCat); // META
     abrirMesa();   // al elegir día: sale la Unit Table
   }
 
@@ -512,7 +604,7 @@ src="https://www.facebook.com/tr?id=1641532077166499&ev=PageView&noscript=1"/></
   }
 
   catGrid.querySelectorAll('.cat-btn').forEach(btn => {
-    btn.addEventListener('click', () => selectCategory(btn.dataset.cat, true));
+    btn.addEventListener('click', () => { if(window.flambaoTrack) flambaoTrack.categoria(btn.dataset.cat); /* META */ selectCategory(btn.dataset.cat, true); });
   });
 
   // Enlace de invitación antiguo al index: salta a la categoría y abre la mesa en modo invitado
