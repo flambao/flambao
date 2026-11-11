@@ -155,7 +155,7 @@
   .replay-btn{margin-bottom:6px;padding:8px 16px;border:1.5px solid rgba(255,255,255,.85);border-radius:999px;background:rgba(0,0,0,.45);color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px);}
   .replay-btn:hover{background:rgba(0,0,0,.65);}
 </style>
-<link rel="prefetch" href="confirmacion.html">
+<link rel="prefetch" href="unit-table.html">
 <!-- Meta Pixel Code (FLAMBAO) -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -333,7 +333,7 @@ src="https://www.facebook.com/tr?id=1641532077166499&ev=PageView&noscript=1"/></
     descargaApp: function () { track('Descarga_App', reserva(), false); }
   };
 
-  // 4) Avisos que llegan desde la Unit Table (confirmacion.html dentro del iframe)
+  // 4) Avisos que llegan desde la Unit Table (unit-table.html dentro del iframe)
   window.addEventListener('message', function (e) {
     if (e.origin !== location.origin || !e.data || e.data.flambao !== 'meta') return;
     var r = e.data.reserva;   // la mesa nos dice qué categoría, día y hora tiene abiertos
@@ -351,28 +351,23 @@ src="https://www.facebook.com/tr?id=1641532077166499&ev=PageView&noscript=1"/></
 </script>
 <!-- ===== FIN EVENTOS DE META ===== -->
 
+<script src="../mesas.js"></script>
 <script>
   const RESTAURANTE = 'Brickell Majadahonda';
 
   // ── Opciones de mesa ya creadas por categoría ──
-  const TABLE_OPTIONS = {
-    'Nuevos Comienzos': [
-      { day: 'Miércoles, 11 de noviembre', time: '20:00' },
-      { day: 'Viernes, 13 de noviembre', time: '20:00' },
-    ],
-    'Conocer Gente Nueva': [
-      { day: 'Viernes, 13 de noviembre', time: '14:00' },
-      { day: 'Miércoles, 18 de noviembre', time: '20:00' },
-    ],
-    'Abierto al Amor': [
-      { day: 'Jueves, 12 de noviembre', time: '20:00' },
-      { day: 'Viernes, 20 de noviembre', time: '20:00' },
-    ],
-    'Negocios': [
-      { day: 'Miércoles, 11 de noviembre', time: '14:00' },
-      { day: 'Jueves, 19 de noviembre', time: '14:00', note: '(Emprendedores)' },
-    ],
-  };
+  const TABLE_OPTIONS = (function () {
+    // Las opciones salen solas de mesas.js (patrón semanal). Para cambiar días u horas, edita mesas.js.
+    var out = {}, P = window.MESAS_PROXIMAS || {};
+    Object.keys(P).forEach(function (cat) {
+      out[cat] = P[cat].map(function (m) {
+        var o = { day: m.dia, time: m.hora };
+        if (m.nota) o.note = m.nota;
+        return o;
+      });
+    });
+    return out;
+  })();
 
   // ── Vídeo de Samantha: arranca solo CON SONIDO; las categorías salen encima al terminar ──
   const samVideo = document.getElementById('samVideo');
@@ -491,7 +486,7 @@ src="https://www.facebook.com/tr?id=1641532077166499&ev=PageView&noscript=1"/></
     if(selectedOption){ q.set('dia', selectedOption.day); q.set('hora', selectedOption.time); }
     if(extra) Object.keys(extra).forEach(k => { if(extra[k]) q.set(k, extra[k]); });
     ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(k => { const v = URL_PARAMS.get(k); if(v) q.set(k, v); });   // UTM: se pasan a la Unit Table
-    return 'confirmacion.html?' + q.toString();
+    return 'unit-table.html?' + q.toString();
   }
   // Debajo de la Unit Table: cambiar de categoría y de día
   function pintarCambiador(){

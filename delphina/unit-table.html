@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flambao · Tu mesa</title>
+<meta name="description" content="Ya tienes tu sitio en la mesa Flambao." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --cat:#002d74; --cat-ink:#fff; --cat-dark:#002d74; --mint:#98FB98; --mint-hover:#7de07d; --blue-dark:#002d74; --blue-light:#1B5FAE; --orange:#d0b787; --dark:#1d1d1b; --cream:#FFFFFF; --gray:#6B6B6B; --border:#E8E8E8;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{max-width:100%;overflow-x:hidden;}
+  body{font-family:'Montserrat',sans-serif;background:var(--cream);color:var(--dark);line-height:1.5;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;}
+
+  .topbar{display:flex;align-items:center;justify-content:center;padding:8px 24px 0;background:rgba(255,255,255,0.97);}
+  .topbar img{height:36px;width:auto;}
+
+  .page{max-width:460px;width:100%;margin:0 auto;padding:10px 20px 24px;flex:1;display:flex;flex-direction:column;}
+  .page .hello{margin-top:clamp(4px,1.5dvh,16px);margin-bottom:clamp(10px,2.4dvh,24px);}
+  .page .actions-grid{margin-top:clamp(12px,2.2dvh,22px);}
+  .page .table-card{flex:1 1 auto;}
+
+  .hello{text-align:center;margin-bottom:14px;position:relative;}
+  .hello .big{font-family:'Playfair Display',serif;font-size:clamp(22px,6.4vw,28px);font-weight:900;line-height:1.15;margin-bottom:4px;}
+  .hello .big em{font-style:italic;color:var(--blue-dark);}
+  .hello .sub{font-size:14px;color:var(--gray);}
+
+  .share-toast{position:absolute;top:-44px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;font-size:11px;font-weight:600;padding:7px 12px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:2;box-shadow:0 4px 12px rgba(0,0,0,.25);}
+  .share-toast.visible{opacity:1;}
+
+  .actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+  .btn-action{display:flex;align-items:center;justify-content:center;padding:13px 6px;border-radius:12px;background:var(--blue-dark);color:#fff;font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(13px,4vw,17px);letter-spacing:0;white-space:nowrap;cursor:pointer;text-align:center;text-decoration:none;transition:background .2s, border-color .2s, opacity .2s;border:1.5px solid var(--blue-dark);position:relative;}
+  .btn-action:hover{background:var(--blue-light);border-color:var(--blue-light);}
+  .btn-action.loading{opacity:.7;pointer-events:none;}
+  /* Compartir: mismo verde menta que los asientos libres (texto oscuro para que se lea) */
+  .btn-action.mint{background:var(--mint);border-color:var(--mint);color:var(--blue-dark);}
+  .btn-action.mint:hover{background:var(--mint-hover);border-color:var(--mint-hover);}
+
+  /* "Descarga Flambao" + botón "i" de información al lado */
+  .btn-wrap{position:relative;display:flex;}
+  .btn-wrap .btn-action{flex:1;}
+  .info-mini{position:absolute;top:-9px;right:-9px;z-index:2;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--blue-dark);background:#fff;color:var(--blue-dark);font-family:'Playfair Display',serif;font-style:italic;font-weight:700;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;box-shadow:0 2px 6px rgba(0,0,0,.18);transition:background .2s,color .2s;}
+  .info-mini:hover,.info-mini:focus-visible{background:var(--blue-dark);color:#fff;outline:none;}
+  .info-mini.plus-mini{font-family:'Montserrat',sans-serif;font-style:normal;font-weight:600;font-size:20px;padding-bottom:1px;}
+
+  /* Sangría de categoría, restaurante y ubicación: parte de donde empieza el primer círculo
+     ((ancho de columna - 54px del círculo) / 2, con 4 columnas y 3 huecos de 8px) y se le resta --seat-nudge
+     para moverlo hacia la izquierda. Para moverlo más o menos, cambia solo --seat-nudge (0px = justo en el círculo) */
+  .table-card{--seat-nudge:7px;--seat-inset:max(0px, calc(((100% - 24px) / 4 - 54px) / 2 - var(--seat-nudge)));position:relative;border:2px solid var(--blue-dark);border-radius:16px;padding:clamp(14px,2.2dvh,26px) 16px clamp(14px,2.2dvh,26px);background:#fff;display:flex;flex-direction:column;justify-content:space-between;gap:clamp(6px,1.6dvh,22px);box-shadow:0 10px 30px rgba(0,45,116,.1);}
+
+  /* Etiqueta colgante (el color cambia según la categoría) */
+  .cat-tag{position:absolute;top:-2px;right:22px;width:40px;height:86px;pointer-events:none;filter:drop-shadow(0 3px 4px rgba(0,0,0,.2));}
+  .cat-tag::before{content:'';position:absolute;inset:0;background:var(--cat);clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 12px),0 100%);}
+
+  .card-head{display:flex;flex-direction:column;gap:6px;}
+  .cat-row{display:flex;align-items:center;gap:8px;margin-bottom:0;padding-right:80px;padding-left:0;}
+  .cat-pill{display:inline-block;background:var(--cat);color:var(--cat-ink);font-family:'Playfair Display',serif;font-weight:700;font-size:13px;padding:6px 14px 6px 10px;margin-left:-10px;border-radius:999px;}
+  .info-btn{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--cat-dark);background:#fff;color:var(--cat-dark);font-family:'Playfair Display',serif;font-style:italic;font-weight:700;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .2s,color .2s;}
+  .info-btn:hover,.info-btn:focus-visible{background:var(--cat);border-color:var(--cat);color:var(--cat-ink);outline:none;}
+
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;overflow-y:auto;}
+  .modal[hidden]{display:none;}
+  .modal-box{background:#fff;border-radius:16px;max-width:380px;width:100%;padding:26px 22px 22px;border-top:6px solid var(--cat);box-shadow:0 20px 50px rgba(0,0,0,.3);margin:auto;}
+  .modal-box h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--cat-dark);margin-bottom:10px;}
+  .modal-box p{font-size:14px;color:var(--dark);margin-bottom:10px;}
+  .modal-box .modal-note{font-size:12px;color:var(--gray);}
+  .modal-close{margin-top:8px;width:100%;padding:14px;border:none;border-radius:12px;background:var(--cat);color:var(--cat-ink);font-family:'Playfair Display',serif;font-weight:700;font-size:16px;cursor:pointer;}
+  .modal-close:disabled{opacity:.6;cursor:default;}
+
+  a.modal-close{display:block;text-align:center;text-decoration:none;}
+  .modal-alt{margin-top:8px;width:100%;padding:13px;border:1.5px solid var(--cat-dark);border-radius:12px;background:#fff;color:var(--cat-dark);font-family:'Playfair Display',serif;font-weight:700;font-size:15px;cursor:pointer;transition:background .2s;}
+  .modal-alt:hover{background:#f3fff3;}
+  .modal-link{margin-top:6px;width:100%;padding:10px;border:none;background:none;color:var(--gray);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+  /* Pop-ups propios (no usan el color de la categoría) */
+  .modal-box.mint{--cat:var(--mint);--cat-ink:var(--blue-dark);--cat-dark:#1E8E4E;}
+  .modal-box.blue{--cat:var(--blue-dark);--cat-ink:#fff;--cat-dark:var(--blue-dark);}
+
+  /* Formulario para sentarse (nombre, apellidos y teléfono) */
+  .seat-mesa{display:flex;flex-direction:column;gap:2px;background:#f2f6fc;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--dark);}
+  .seat-mesa strong{font-family:'Playfair Display',serif;font-size:16px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .field input{width:100%;padding:13px 14px;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--dark);background:#fff;border:1px solid var(--border);border-radius:2px;outline:none;}
+  .field input:focus{border-color:var(--blue-dark);}
+  .seat-success{display:none;text-align:center;padding:10px 0 4px;}
+  .seat-success.visible{display:block;}
+  .seat-success .title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;color:var(--blue-dark);}
+  .seat-success .msg{font-size:14px;color:var(--gray);}
+
+  .meta-rest{font-size:15px;font-weight:700;font-family:'Playfair Display',serif;color:var(--dark);margin-bottom:0;padding-left:0;}
+  .meta-loc{font-size:12px;color:var(--gray);margin-bottom:0;padding-left:0;}
+  .meta-loc:empty{display:none;}
+
+  .seats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 8px;}
+  .seat{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .seat-avatar{position:relative;width:clamp(54px,8dvh,66px);height:clamp(54px,8dvh,66px);border-radius:50%;background:#dcdcdc;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid transparent;}
+  .seat-avatar.empty{background:var(--mint);transition:background .2s;}
+  .seat-avatar.empty:hover{background:var(--mint-hover);}
+  /* "+" en los asientos libres: abre el formulario para sentarse */
+  .invite-btn{position:absolute;inset:0;width:100%;height:100%;border:none;background:transparent;color:var(--blue-dark);font-family:'Montserrat',sans-serif;font-size:32px;font-weight:300;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+  .seat-avatar.filled{background:var(--blue-dark) url('https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png') center/112% no-repeat;background-origin:border-box;}
+  .seat.user .seat-avatar{border-color:var(--blue-dark);box-shadow:0 0 0 3px rgba(0,45,116,.12), 0 4px 10px rgba(0,0,0,.18);}
+  .seat-label{font-size:10px;font-weight:600;color:var(--gray);text-align:center;max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .seat.user .seat-label{color:var(--dark);font-weight:700;}
+
+  /* Asiento de la persona invitada: late para llamar la atención */
+  .seat.guest .seat-avatar{border-color:var(--blue-dark);animation:seatPulse 1.6s ease-in-out infinite;}
+  .seat.guest .seat-label{color:var(--dark);font-weight:700;}
+  @keyframes seatPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,45,116,.45);}50%{box-shadow:0 0 0 9px rgba(0,45,116,0);}}
+
+  /* Asiento del usuario: logo difuminado de fondo + "+" en el centro para añadir foto */
+  .seat.user .seat-avatar.filled{background:var(--blue-dark);}
+  .seat.user .seat-avatar.filled::before{content:'';position:absolute;inset:0;background:url('https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png') center/122% no-repeat;filter:blur(1.6px);opacity:.45;}
+  .seat.user .seat-avatar.has-photo::before{display:none;}
+  .add-photo-btn{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:none;background:transparent;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:'Montserrat',sans-serif;}
+  .add-photo-btn .plus{font-size:28px;font-weight:300;line-height:.9;}
+  .add-photo-btn .foto-txt{font-size:7px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;opacity:.9;margin-top:1px;line-height:1.1;text-align:center;}
+  .add-photo-btn:hover .plus,.add-photo-btn:focus-visible .plus{transform:scale(1.15);}
+  .seat-avatar.has-photo .add-photo-btn{inset:auto;right:0;bottom:0;width:20px;height:20px;border-radius:50%;background:var(--blue-dark);}
+  .seat-avatar.has-photo .add-photo-btn .plus{font-size:16px;font-weight:700;}
+  .seat-avatar.has-photo .add-photo-btn .foto-txt{display:none;}
+
+  .table-bar{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:6px 14px;flex-wrap:wrap;background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));color:#fff;border-radius:999px;padding:clamp(15px,2.6dvh,24px) 18px;margin:0 -10px;font-size:16.5px;font-weight:800;box-shadow:0 6px 16px rgba(0,45,116,.25);}
+  .table-bar .tb-item{display:flex;align-items:center;gap:6px;white-space:nowrap;}
+  .table-bar{position:relative;padding-left:30px;padding-right:50px;}
+  @media (max-width:400px){.table-bar{font-size:15px;padding-left:26px;}}
+  @media (max-width:370px){.table-bar{font-size:14px;padding-left:16px;gap:4px 8px;}}
+  .chat-mini{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.75);background:rgba(255,255,255,.18);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .2s;}
+  .chat-mini:hover,.chat-mini:focus-visible{background:rgba(255,255,255,.35);outline:none;}
+  .chat-mini svg{width:17px;height:17px;display:block;}
+
+  .confirm-msg{margin-top:0;text-align:center;padding-top:clamp(8px,1.6dvh,18px);border-top:1px solid var(--border);}
+  .confirm-msg[hidden]{display:none;}
+  .confirm-msg .check{font-size:32px;display:block;margin-bottom:8px;}
+  .confirm-msg .line1{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:2px;}
+  .confirm-msg .line2{font-size:13px;color:var(--gray);white-space:nowrap;}
+
+  @media (max-width:380px){ .hello .big{font-size:20px;} .confirm-msg .line1{font-size:15px;} .confirm-msg .line2{font-size:11.5px;} .page{padding:6px 14px 16px;} }
+
+  /* ── Pago Stripe: aro rojo pulsante + badge "Confirmar" en el asiento del usuario ── */
+  .seat.user{position:relative;}
+  .seat.user.pago-pendiente .seat-avatar{background:#e11d48;border-color:#e11d48;animation:flbPulso 1.6s ease-out infinite;cursor:pointer;}
+  .seat.user.pago-pendiente .seat-avatar::before{display:none;}
+  .seat.user.pago-pendiente .add-photo-btn{display:none;}
+  @keyframes flbPulso{0%{box-shadow:0 0 0 0 rgba(225,29,72,.55);}70%{box-shadow:0 0 0 14px rgba(225,29,72,0);}100%{box-shadow:0 0 0 0 rgba(225,29,72,0);}}
+  .pago-badge{position:absolute;inset:0;z-index:5;width:100%;height:100%;border:none;border-radius:50%;background:transparent;color:#fff;font-family:'Montserrat',sans-serif;font-size:9.5px;font-weight:800;letter-spacing:0;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .pago-badge[hidden]{display:none;}
+  .pay-box .pay-precio{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:var(--blue-dark);margin:2px 0 6px;}
+  .pay-box .pay-resumen{font-size:13px;color:var(--gray);margin-bottom:14px;}
+  #payElement{margin:6px 0 10px;min-height:60px;}
+  .pay-error{color:#c0182d;font-size:13px;font-weight:600;margin:6px 0;min-height:0;}
+  .pay-error:empty{display:none;}
+  .pay-estado{font-size:13px;color:var(--gray);text-align:center;padding:14px 0;}
+  .pay-box{max-width:340px;padding:18px 18px 14px;max-height:92dvh;overflow-y:auto;}
+  .pay-box .pay-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px;}
+  .pay-box h2{font-size:19px;margin:0;}
+  .pay-box .pay-precio{font-size:22px;margin:0;}
+  .pay-box .pay-resumen{font-size:12px;margin-bottom:12px;}
+  .pay-sep{display:flex;align-items:center;gap:10px;margin:12px 0 10px;font-size:11.5px;color:var(--gray);}
+  .pay-sep::before,.pay-sep::after{content:'';flex:1;height:1px;background:var(--border);}
+  .pay-sep[hidden]{display:none;}
+  #payExpress:empty{display:none;}
+  .pay-box .modal-close{padding:12px;font-size:16px;margin-top:6px;}
+  .pay-box .modal-note{font-size:11px;}
+
+  /* Botón "Confirmar" de la cabecera */
+  .hello .sub:empty{display:none;}
+
+  /* Fotos de ejemplo con blur (se nota si es chico o chica, pero no quién es). Las fotos reales subidas NO llevan blur */
+  .seat-avatar.filled.foto-blur{background:#dcdcdc;border:0;}
+  .seat-photo{position:absolute;inset:-6px;background-size:cover;background-position:center;background-repeat:no-repeat;filter:blur(3.5px);}
+
+  /* Dentro del pop-up del index (Unit Table embebida) */
+  body.embed .topbar{display:none;}
+  body.embed .page{padding-top:12px;}
+
+  /* ── Teléfono con prefijo ── */
+  .phone-row{display:flex;gap:8px;align-items:stretch;}
+  .phone-row input{flex:1 1 auto;width:auto;min-width:0;}
+  .prefix-wrap{position:relative;flex:0 0 auto;}
+  .prefix-btn{height:100%;min-height:46px;display:flex;align-items:center;gap:6px;padding:0 10px;border:1px solid var(--border);border-radius:2px;background:#fff;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--dark);cursor:pointer;white-space:nowrap;}
+  .prefix-btn:focus-visible,.prefix-btn[aria-expanded="true"]{border-color:var(--blue-dark);outline:none;}
+  .prefix-btn .caret{font-size:11px;color:var(--gray);}
+  #prefixFlag{font-size:20px;line-height:1;}
+  .prefix-list{position:absolute;z-index:60;top:calc(100% + 4px);left:0;width:min(290px,78vw);background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.22);padding:8px;}
+  .prefix-list[hidden]{display:none;}
+  .field .prefix-search{padding:10px 12px;margin-bottom:6px;font-size:16px;}
+  #prefixItems{list-style:none;max-height:210px;overflow-y:auto;overscroll-behavior:contain;}
+  #prefixItems li{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:6px;font-size:14px;cursor:pointer;}
+  #prefixItems li:hover,#prefixItems li[aria-selected="true"]{background:#eef3fb;}
+  #prefixItems .pi-flag{font-size:20px;line-height:1;}
+  #prefixItems .pi-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #prefixItems .pi-code{color:var(--gray);font-weight:600;font-size:13px;}
+  #prefixItems .pi-vacio{color:var(--gray);cursor:default;}
+
+  /* ── Casilla de consentimiento ── */
+  .field .check-label{display:flex;align-items:flex-start;gap:10px;margin:0;font-size:12.5px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--dark);line-height:1.4;cursor:pointer;}
+  .field .check-label input{flex:0 0 auto;width:20px;height:20px;margin-top:1px;padding:0;accent-color:var(--blue-dark);}
+  .form-error{color:#c0182d;font-size:13px;font-weight:600;margin:0 0 10px;}
+  .form-error:empty{display:none;}
+
+  /* ── Vista previa de la imagen que se comparte ── */
+  .invite-preview{display:block;width:100%;max-height:230px;object-fit:contain;border-radius:10px;margin:6px 0 10px;border:1px solid var(--border);background:#f7f9ff;}
+  .invite-preview[hidden]{display:none;}
+
+  /* ── Gracias por confirmar + confeti ── */
+  .gracias-emoji{font-size:44px;line-height:1;text-align:center;margin-bottom:6px;}
+  #graciasModal h2{text-align:center;}
+  #graciasModal p{text-align:center;}
+  .confeti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:200;}
+
+  /* ── Dentro del pop-up del index: la página mide lo que mide su contenido, y las ventanas salen donde mira la persona ── */
+  body.embed{min-height:0;}
+  body.embed .modal{position:absolute;inset:auto;left:0;right:0;top:var(--vis-top,0px);height:var(--vis-h,100vh);}
+  body.embed .confeti{position:absolute;inset:auto;left:0;top:var(--vis-top,0px);width:100%;height:var(--vis-h,100vh);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="https://flambao.com"><img src="https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png" alt="Flambao" /></a>
+</div>
+
+<div class="page">
+
+  <div class="hello">
+    <span class="share-toast" id="shareToast">Enlace copiado</span>
+    <h1 class="big" id="helloTitle">¡Ya tienes tu sitio en la <em>mesa</em>!</h1>
+    <p class="sub" id="helloSub"></p>
+  </div>
+
+  <div class="table-card">
+    <div class="cat-tag" aria-hidden="true"></div>
+
+    <div class="card-head">
+    <div class="cat-row">
+      <span class="cat-pill" id="catPill">Categoría</span>
+      <button class="info-btn" id="infoBtn" type="button" aria-label="¿Qué es esta categoría?">i</button>
+    </div>
+    <div class="meta-rest" id="metaRest"></div>
+    <div class="meta-loc" id="metaLoc"></div>
+    </div>
+
+    <div class="seats-grid" id="seatsGridTop"></div>
+
+    <div class="table-bar">
+      <span class="tb-item">📅 <span id="metaDia">—</span></span>
+      <span class="tb-item">🕗 <span id="metaHora">—</span></span>
+      <button class="chat-mini" id="chatBtn" type="button" aria-label="Chatea con la gente de la mesa" title="Chatea con la gente de la mesa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5c3.6 0 6.5 2.5 6.5 5.6s-2.9 5.6-6.5 5.6c-.9 0-1.7-.2-2.5-.4L4 16.3l.9-2.8C3.8 12.5 3 10.9 3 9.1 3 6 5.9 3.5 9.5 3.5z"/><path d="M17 8.4c2.5.8 4 2.7 4 5 0 1.3-.5 2.4-1.4 3.3l.9 2.7-3-1.2c-.6.2-1.3.3-2 .3-1.5 0-2.9-.5-3.9-1.3"/></svg>
+      </button>
+    </div>
+
+    <div class="seats-grid" id="seatsGridBottom"></div>
+
+    <div class="confirm-msg" id="confirmMsg">
+      
+      <div class="line1" id="confirmLine1">¡Ya casi estás en la mesa!</div>
+      <p class="line2">Mesa confirmada. Recordatorios por tu whatsapp.</p>
+    </div>
+  </div>
+
+  <div class="actions-grid">
+    <button class="btn-action" id="btnRefresh" type="button">Refrescar mesa</button>
+    <div class="btn-wrap">
+      <button class="btn-action mint" id="btnShare" type="button">
+        
+        Compartir amigos 
+      </button>
+      <button class="info-mini plus-mini" id="sharePlusBtn" type="button" aria-label="Invitar a más gente">+</button>
+    </div>
+    <a href="index.html" class="btn-action">Explora mesas</a>
+    <div class="btn-wrap">
+      <a href="https://flambao.com/descargas" class="btn-action">Descarga Flambao</a>
+      <button class="info-mini" id="downloadInfoBtn" type="button" aria-label="¿Por qué descargar Flambao?">i</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal" id="infoModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <h2 id="infoTitle">Categoría</h2>
+    <p id="infoText"></p>
+    <p class="modal-note">En Flambao cada mesa tiene una intención: eliges la que encaja con lo que buscas hoy.</p>
+    <button class="modal-close" id="infoClose" type="button">Entendido</button>
+  </div>
+</div>
+
+<!-- Pop-up de compartir: solo se abre desde el botón "Compartir amigos" (o su "+") -->
+<div class="modal" id="inviteModal" hidden>
+  <div class="modal-box mint" role="dialog" aria-modal="true" aria-labelledby="inviteTitle">
+    <h2 id="inviteTitle">Invita a la gente a unirse a la mesa</h2>
+    <p>Comparte esta mesa con tus amigos o conocidos y ocupad juntos los asientos libres.</p>
+    <p class="modal-note">Al pulsar el enlace, verán la mesa con la gente ya sentada y podrán apuntarse dejando su nombre, apellidos y teléfono.</p>
+    <img id="invitePreview" class="invite-preview" alt="Así verán tu invitación" hidden />
+    <button class="modal-close" id="inviteShare" type="button">Compartir invitación</button>
+
+    <button class="modal-link" type="button" data-close>Ahora no</button>
+  </div>
+</div>
+
+<!-- Pop-up para sentarse: se abre al pulsar el "+" de un asiento libre -->
+<div class="modal" id="seatModal" hidden>
+  <div class="modal-box blue" role="dialog" aria-modal="true" aria-labelledby="seatTitle">
+    <form id="seatForm">
+      <h2 id="seatTitle">Confirma tu plan</h2>
+      <div class="seat-mesa">
+        <strong id="seatMesaCat"></strong>
+        <span id="seatMesaWhen"></span>
+        <span id="seatMesaRest"></span>
+      </div>
+      <div class="field">
+        <label for="seatNombre">Nombre</label>
+        <input type="text" id="seatNombre" autocomplete="given-name" required />
+      </div>
+      <div class="field">
+        <label for="seatApellidos">Apellidos</label>
+        <input type="text" id="seatApellidos" autocomplete="family-name" required />
+      </div>
+      <div class="field">
+        <label for="seatTelefono">Teléfono</label>
+        <div class="phone-row">
+          <div class="prefix-wrap" id="prefixWrap">
+            <button type="button" class="prefix-btn" id="prefixBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Prefijo del país"><span id="prefixFlag">🇪🇸</span><span id="prefixCode">+34</span><span class="caret">▾</span></button>
+            <div class="prefix-list" id="prefixList" hidden>
+              <input type="search" id="prefixSearch" class="prefix-search" placeholder="Buscar país o prefijo" autocomplete="off" />
+              <ul id="prefixItems" role="listbox"></ul>
+            </div>
+          </div>
+          <input type="tel" id="seatTelefono" inputmode="tel" autocomplete="tel-national" placeholder="600 000 000" required />
+        </div>
+      </div>
+      <div class="field">
+        <label for="seatEmail">Email</label>
+        <input type="email" id="seatEmail" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label class="check-label" for="seatAcepto">
+          <input type="checkbox" id="seatAcepto" required />
+          <span>Consiento los términos y condiciones y comunicaciones vía WhatsApp</span>
+        </label>
+      </div>
+      <p class="form-error" id="seatError" role="alert"></p>
+      <p class="modal-note">Te escribiremos con los detalles de tu mesa.</p>
+      <button class="modal-close" id="seatSubmit" type="submit">Siguiente</button>
+      <button class="modal-link" type="button" data-close>Ahora no</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="downloadModal" hidden>
+  <div class="modal-box blue" role="dialog" aria-modal="true" aria-labelledby="downloadTitle">
+    <h2 id="downloadTitle">Descarga Flambao</h2>
+    <p>Llega a tu mesa sabiendo con quién vas a cenar: mira las fotos y los perfiles de los demás comensales, entra en el chat de la mesa y descubre más planes cerca de ti.</p>
+    <p class="modal-note">Es gratis y está disponible en iOS y Android.</p>
+    <a class="modal-close" href="https://flambao.com/descargas">Descargar la app</a>
+    <button class="modal-link" type="button" data-close>Ahora no</button>
+  </div>
+</div>
+<div class="modal" id="chatModal" hidden>
+  <div class="modal-box blue" role="dialog" aria-modal="true" aria-labelledby="chatTitle">
+    <h2 id="chatTitle">Chatea en Flambao</h2>
+    <p>Chatea con la gente de la mesa y con más usuarios en la app.</p>
+    <p class="modal-note">Es gratis y está disponible en iOS y Android.</p>
+    <a class="modal-close" href="https://flambao.com/descargas">Descargar la app</a>
+    <button class="modal-link" type="button" data-close>Ahora no</button>
+  </div>
+</div>
+<div class="modal" id="profileModal" hidden>
+  <div class="modal-box blue" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+    <h2 id="profileTitle">Descárgate Flambao</h2>
+    <p>Para ver los perfiles y chatear con estas personas, descárgate Flambao.</p>
+    <a class="modal-close" href="https://flambao.com/descargas">Descargar la app</a>
+    <button class="modal-link" type="button" data-close>Ahora no</button>
+  </div>
+</div>
+
+<div class="modal" id="graciasModal" hidden>
+  <div class="modal-box blue" role="dialog" aria-modal="true" aria-labelledby="graciasTitle">
+    <div class="gracias-emoji">🎉</div>
+    <h2 id="graciasTitle">¡Gracias por confirmar tu asiento!</h2>
+    <p><strong>Carga 1 foto</strong> para que te vean los demás usuarios.</p>
+    <p>Recuerda descargarte Flambao.</p>
+    <button class="modal-close" id="graciasFoto" type="button">Cargar mi foto</button>
+    <a class="modal-alt" href="https://flambao.com/descargas" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;">Descargar Flambao</a>
+    <button class="modal-link" type="button" data-close>Ahora no</button>
+  </div>
+</div>
+<canvas id="confeti" class="confeti" aria-hidden="true"></canvas>
+
+<input type="file" id="photoInput" accept="image/*" hidden />
+
+
+<div class="modal" id="payModal" hidden>
+  <div class="modal-box blue pay-box" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+    <div class="pay-head"><h2 id="payTitle">Confirma tu mesa</h2><div class="pay-precio">3,99 €</div></div>
+    <p class="pay-resumen" id="payResumen"></p>
+    <div class="pay-estado" id="payEstado">Cargando el pago…</div>
+    <div id="payExpress"></div>
+    <div class="pay-sep" id="paySep" hidden><span>o paga con tarjeta</span></div>
+    <div id="payElement"></div>
+    <div class="pay-error" id="payError" role="alert"></div>
+    <button class="modal-close" id="paySubmit" type="button" disabled>Pagar 3,99 €</button>
+    <button class="modal-link" type="button" data-close>Ahora no</button>
+    <p class="modal-note" style="text-align:center;margin-top:8px;">Pago seguro con Stripe.</p>
+  </div>
+</div>
+
+<script src="../mesas.js"></script>
+
+<!-- ===== EVENTOS DE META (FLAMBAO) · avisos de la Unit Table ===== -->
+<script>
+(function () {
+  var DENTRO = !!(window.parent && window.parent !== window);   // dentro del pop-up de la landing
+  var P = new URLSearchParams(location.search);
+  var PIXEL_ID = '1641532077166499', PRECIO = 3.99, MONEDA = 'EUR';
+  var REST = (location.pathname.split('/').filter(Boolean)[0] || 'home');
+  var PROX = (window.MESAS_PROXIMAS && window.MESAS_PROXIMAS[P.get('categoria') || 'Conocer Gente Nueva']) || [];
+  var RESERVA = { categoria: P.get('categoria') || '', fecha: P.get('dia') || (PROX[0] ? PROX[0].dia : ''), hora: P.get('hora') || (PROX[0] ? PROX[0].hora : '') };
+
+  // Si esta página se abre SOLA (no dentro de la landing), el píxel se carga aquí
+  if (!DENTRO) {
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', PIXEL_ID);
+    fbq('track', 'PageView');
+  }
+
+  var yaEnviado = {};   // "confirmar" y "lead" solo una vez por visita
+  function params(extra) {
+    return Object.assign({ content_name: REST, content_category: RESERVA.categoria, fecha: RESERVA.fecha, hora: RESERVA.hora }, extra || {});
+  }
+
+  window.avisarMeta = function (tipo, datos) {
+    if ((tipo === 'confirmar' || tipo === 'lead') && yaEnviado[tipo]) return;
+    yaEnviado[tipo] = true;
+    // Dentro de la landing: se lo decimos a la landing, que es la que tiene el píxel
+    if (DENTRO) {
+      window.parent.postMessage({ flambao: 'meta', tipo: tipo, datos: datos || null, reserva: RESERVA }, location.origin);
+      return;
+    }
+    // Página sola: lo mandamos directamente a Meta
+    if (typeof fbq !== 'function') return;
+    var id = { eventID: tipo + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8) };
+    var d = datos || {};
+    switch (tipo) {
+      case 'confirmar': fbq('track', 'InitiateCheckout', params({ value: PRECIO, currency: MONEDA }), id); break;
+      case 'lead':
+        fbq('init', PIXEL_ID, {
+          em: (d.email || '').trim().toLowerCase(), ph: (d.telefono || '').replace(/\D/g, ''),
+          fn: (d.nombre || '').trim().toLowerCase(), ln: (d.apellidos || '').trim().toLowerCase()
+        });
+        fbq('track', 'Lead', params(), id); break;
+      case 'compra':    fbq('track', 'Purchase', params({ value: PRECIO, currency: MONEDA }), id); break;
+      case 'compartir': fbq('trackCustom', 'Compartir', params(), id); break;
+      case 'descarga':  fbq('trackCustom', 'Descarga_App', params(), id); break;
+    }
+  };
+
+  // "Descarga Flambao" (todos los enlaces a flambao.com/descargas)
+  document.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('a[href^="https://flambao.com/descargas"]')) window.avisarMeta('descarga');
+  }, true);
+})();
+</script>
+<!-- ===== FIN EVENTOS DE META ===== -->
+
+<script>
+  // ═══════════════════════════════════════════════════════════════
+  //  DATOS DEL RESTAURANTE  (lo único que cambia entre Pabblo y Brickell)
+  //  Cópialos de tu unit-table.html de Brickell.
+  // ═══════════════════════════════════════════════════════════════
+  const RESTAURANTE = 'Delphina';                      // nombre corto, igual que se guarda en el Google Form
+  const RESTAURANTE_DISPLAY = 'Delphina Madrid';  // como se ve en la página
+  const RESTAURANTE_LOC = 'C/ de Serrano, 84, 28006 Madrid';                          // dirección (si la dejas vacía no se muestra)
+  // CSV publicado (Archivo → Compartir → Publicar en la Web) de la pestaña "Publicar" del Google Sheet de respuestas
+  const RESPUESTAS_CSV_URL = '';   // sin Sheet de reserva: los asientos se leen de Firebase
+  // Google Form de este restaurante
+  const FORM_ID = '1FAIpQLSdQCMrb9-01pRfx0vmrMBWmNlhe8Z-I1xJPhytWp0jaS6nLag';              // lo que va entre /d/e/ y /formResponse
+  const FORM_ENTRY_NOMBRE = 'entry.979894507';    // ej. 'entry.2016620008'
+  const FORM_ENTRY_TELEFONO = 'entry.687933132';  // ej. 'entry.1993107579'
+  const FORM_ENTRY_APELLIDOS = 'entry.2134877259';  // Form nuevo: id de "Apellidos". Vacío = se usa el formato antiguo
+  const FORM_ENTRY_CORREO = 'entry.963711139';     // Form nuevo: id de "Correo"
+  const FORM_ENTRY_MESA = 'entry.1777497367';       // Opcional: id de una pregunta "Mesa" (categoría, día y hora)
+  const FORM_ENTRY_ORIGEN = 'entry.369978147';     // UTM: id de la pregunta "Origen" del Google Form (entry.XXXXXXXXX). Vacío = no se envía
+
+  // ═══════════════════════════════════════════════════════════════
+  //  PERSONAS SENTADAS EN CADA MESA  (una caja por mesa)
+  //  · La página elige la caja según la categoría y el día/hora del enlace.
+  //  · dia / hora: ponlos IGUAL que salen en la landing (ej. 'Martes, 13 de octubre' y '20:00').
+  //    Si ninguno coincide, se usa la Mesa 1 de esa categoría.
+  //  · foto: pega la URL de la foto de esa persona. Vacía = sale el logo de Flambao.
+  //  · Cada persona está en 2 mesas distintas; cuando acepte una, quítala de la otra.
+  // ═══════════════════════════════════════════════════════════════
+  // ═══ FOTOS (por nombre, en minúsculas). Se usan en TODAS las mesas donde salga esa persona ═══
+  const FOTOS = {
+    'fran': '../fotos/personas/fran.jpg',
+    'jose luis': '../fotos/personas/jose-luis.jpg',
+    'angeles': '../fotos/personas/angeles.jpg',
+    'julio': '../fotos/personas/julio.jpg',
+    'marta': '../fotos/personas/marta.jpg',
+    'joaquin': '../fotos/personas/joaquin.jpg',
+    'miguel alvaro': '../fotos/personas/miguel-alvaro.jpg',
+    'anina': '../fotos/personas/anina.jpg',
+    'manuel': '../fotos/personas/manuel.jpg',
+    'maria': '../fotos/personas/maria.jpg',
+    'olga': '../fotos/personas/olga.jpg',
+    'guillermo': '../fotos/personas/guillermo.jpg',
+    'ale': '../fotos/personas/ale.jpg',
+    'ana': '../fotos/personas/ana.jpg',
+    'carlos272': '../fotos/personas/carlos272.jpg',
+    'jacobo': '../fotos/personas/jacobo.jpg',
+    'benja': '../fotos/personas/benja.jpg',
+    'david': '../fotos/personas/david.jpg',
+    'francesca': '../fotos/personas/francesca.jpg',
+    'natalia': '../fotos/personas/natalia.jpg',
+    'bea': '../fotos/personas/bea.jpg',
+    'magali': '../fotos/personas/magali.jpg',
+    'oscar': '../fotos/personas/oscar.jpg',
+    'adriana': '../fotos/personas/adriana.jpg',
+  };
+
+  const MESAS = [
+
+    // ┌──────────────────────────────────────────────────────────┐
+    // │ CONOCER GENTE NUEVA · MESA 1                             │
+    // └──────────────────────────────────────────────────────────┘
+    { categoria: 'Conocer Gente Nueva', dia: 'Viernes, 13 de noviembre', hora: '14:00', sentados: [
+        { nombre: 'Fran', foto: '' },
+        { nombre: 'Anina', foto: '' },
+        { nombre: 'José Luis', foto: '' },
+        { nombre: 'Ana', foto: '' },
+    ]},
+
+    // ┌──────────────────────────────────────────────────────────┐
+    // │ CONOCER GENTE NUEVA · MESA 2                             │
+    // └──────────────────────────────────────────────────────────┘
+    { categoria: 'Conocer Gente Nueva', dia: 'Miércoles, 18 de noviembre', hora: '20:00', sentados: [
+        { nombre: 'Olga', foto: '' },
+        { nombre: 'Joaquín', foto: '' },
+        { nombre: 'Bea', foto: '' },
+        { nombre: 'Carlos272', foto: '' },
+    ]},
+
+    // ┌──────────────────────────────────────────────────────────┐
+    // │ NEGOCIOS · MESA 1                                        │
+    // └──────────────────────────────────────────────────────────┘
+    { categoria: 'Negocios', dia: 'Miércoles, 11 de noviembre', hora: '14:00', sentados: [
+        { nombre: 'Fran', foto: '' },
+        { nombre: 'Olga', foto: '' },
+        { nombre: 'Oscar', foto: '' },
+        { nombre: 'María', foto: '' },
+    ]},
+
+    // ┌──────────────────────────────────────────────────────────┐
+    // │ NEGOCIOS · MESA 2                                        │
+    // └──────────────────────────────────────────────────────────┘
+    { categoria: 'Negocios', dia: 'Jueves, 19 de noviembre', hora: '14:00', sentados: [
+        { nombre: 'Anina', foto: '' },
+        { nombre: 'Joaquín', foto: '' },
+        { nombre: 'Magali', foto: '' },
+        { nombre: 'Julio', foto: '' },
+    ]},
+
+    // ┌──────────────────────────────────────────────────────────┐
+    // │ ABIERTO AL AMOR · MESA 1                                 │
+    // └──────────────────────────────────────────────────────────┘
+    { categoria: 'Abierto al Amor', dia: 'Jueves, 12 de noviembre', hora: '20:00', sentados: [
+        { nombre: 'José Luis', foto: '' },
+        { nombre: 'Bea', foto: '' },
+        { nombre: 'Benja', foto: '' },
+        { nombre: 'Angeles', foto: '' },
+    ]},
+
+    // ┌──────────────────────────────────────────────────────────┐
+    // │ ABIERTO AL AMOR · MESA 2                                 │
+    // └──────────────────────────────────────────────────────────┘
+    { categoria: 'Abierto al Amor', dia: 'Viernes, 20 de noviembre', hora: '20:00', sentados: [
+        { nombre: 'Ana', foto: '' },
+        { nombre: 'Carlos272', foto: '' },
+        { nombre: 'Adriana', foto: '' },
+        { nombre: 'Jacobo', foto: '' },
+    ]},
+
+    // ┌──────────────────────────────────────────────────────────┐
+    // │ NUEVOS COMIENZOS · MESA 1                                │
+    // └──────────────────────────────────────────────────────────┘
+    { categoria: 'Nuevos Comienzos', dia: 'Miércoles, 11 de noviembre', hora: '20:00', sentados: [
+        { nombre: 'Oscar', foto: '' },
+        { nombre: 'Magali', foto: '' },
+        { nombre: 'Benja', foto: '' },
+        { nombre: 'Adriana', foto: '' },
+    ]},
+
+    // ┌──────────────────────────────────────────────────────────┐
+    // │ NUEVOS COMIENZOS · MESA 2                                │
+    // └──────────────────────────────────────────────────────────┘
+    { categoria: 'Nuevos Comienzos', dia: 'Viernes, 13 de noviembre', hora: '20:00', sentados: [
+        { nombre: 'María', foto: '' },
+        { nombre: 'Julio', foto: '' },
+        { nombre: 'Angeles', foto: '' },
+        { nombre: 'Jacobo', foto: '' },
+    ]},
+
+  ];
+
+  const params = new URLSearchParams(window.location.search);
+  let nombreRaw = (params.get('nombre') || '').trim();
+  const categoria = params.get('categoria') || 'Conocer Gente Nueva';
+  const proximas = (window.MESAS_PROXIMAS && window.MESAS_PROXIMAS[categoria]) || [];
+  const dia = params.get('dia') || (proximas[0] ? proximas[0].dia : '');
+  const hora = params.get('hora') || (proximas[0] ? proximas[0].hora : '');
+
+  // ── Mesa que toca: la caja de MESAS que coincide con categoría + día/hora ──
+  const normaliza = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  const mesasDeCategoria = MESAS.filter(m => normaliza(m.categoria) === normaliza(categoria));
+  const mesaActual = mesasDeCategoria.find(m => m.dia && m.dia === dia && (!m.hora || m.hora === hora)) || mesasDeCategoria[0] || { sentados: [] };
+  const SENTADOS = mesaActual.sentados.filter(p => p.nombre).map(p => ({ nombre: p.nombre, foto: p.foto || FOTOS[normaliza(p.nombre)] || '' })); // las casillas sin nombre quedan como asiento libre
+
+  let primerNombre = nombreRaw ? nombreRaw.split(' ')[0] : '';
+  let tieneNombre = !!primerNombre;
+
+  // ── Datos de quien se sienta (se guardan en este navegador, por mesa). Sin pago no hay asiento. ──
+  //    Para empezar de cero al probar: añade &reset=1 a la dirección.
+  const EMBED = params.get('embed') === '1';           // dentro del pop-up del index
+  if(EMBED) document.body.classList.add('embed');
+  const claveMesa = 'flb_mesa|' + [RESTAURANTE, categoria, dia, hora].join('|');
+  let datosUsuario = null;                              // { nombre, apellidos, email }
+  let usuarioPagado = false;
+  function guardarMesa(){ try{ localStorage.setItem(claveMesa, JSON.stringify({ datos: datosUsuario, pagado: usuarioPagado })); }catch(e){} }
+  function aplicarDatos(){
+    if(!datosUsuario) return;
+    nombreRaw = (datosUsuario.nombre + ' ' + datosUsuario.apellidos).trim();
+    primerNombre = nombreRaw.split(' ')[0] || '';
+    tieneNombre = !!primerNombre;
+  }
+  if(params.get('reset') === '1'){
+    try{ localStorage.removeItem(claveMesa); }catch(e){}
+  }else{
+    try{
+      const g = JSON.parse(localStorage.getItem(claveMesa) || 'null');
+      if(g && g.datos && g.datos.email){ datosUsuario = g.datos; usuarioPagado = !!g.pagado; aplicarDatos(); }
+    }catch(e){}
+  }
+
+  // Modo invitado: la persona llega desde un enlace de invitación, aún no está sentada
+  const esInvitado = !tieneNombre && params.get('invitado') === '1';
+  const quienInvita = (params.get('invita') || '').trim();
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function pintarCabecera(){
+    const titulo = document.getElementById('helloTitle');
+    const sub = document.getElementById('helloSub');
+    if(esInvitado){
+      titulo.innerHTML = '¡Mira quién está sentado, <em>apúntate</em>!';
+      sub.textContent = (quienInvita ? (quienInvita + ' te ha invitado') : 'Te han invitado') + ' a esta mesa en ' + RESTAURANTE_DISPLAY;
+      document.getElementById('confirmMsg').hidden = true;
+      return;
+    }
+    if(usuarioPagado){
+      titulo.innerHTML = '¡Ya estás en la <em>mesa</em>' + (primerNombre ? (', ' + esc(primerNombre)) : '') + '!';
+      sub.textContent = '';
+    }else{
+      titulo.innerHTML = 'Confirma ya tu <em>plan</em>';
+      sub.textContent = 'Asegura tu asiento en esta mesa';
+    }
+  }
+  pintarCabecera();
+  document.getElementById('catPill').textContent = categoria;
+  document.getElementById('metaRest').textContent = RESTAURANTE_DISPLAY;
+  document.getElementById('metaLoc').textContent = RESTAURANTE_LOC;
+  document.getElementById('seatMesaRest').textContent = '📍 ' + RESTAURANTE_DISPLAY;
+
+  // ── Color e info de cada categoría (para cambiar un color, toca solo el "color" de aquí) ──
+  const CATEGORIAS = {
+    'conocer gente nueva': { color:'#2E9E5B', texto:'Sin expectativas concretas: personas que no se conocen de antes se sientan juntas y la conversación fluye de forma natural. Es la categoría más popular y la mejor para empezar.' },
+    'abierto al amor':     { color:'#D62828', texto:'Para quienes quieren abrirse al amor. Una mesa con la intención de conocer a alguien especial alrededor de una buena cena.' },
+    'negocios':            { color:'#2563C9', texto:'Para hacer contactos profesionales. Networking cara a cara y alrededor de una mesa, mucho más natural que un evento de negocios.' },
+    'nuevos comienzos':    { color:'#F2B705', ink:'#1d1d1b', dark:'#A67C00', texto:'Para empezar de cero: una nueva ciudad, una nueva etapa. Una mesa para encontrar gente con la que arrancar con buen pie.' },
+    'mi agenda':           { color:'#6B6B6B', texto:'Tu espacio personal para compartir planes con tus propios contactos.' }
+  };
+  const catKey = categoria.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  const catInfo = CATEGORIAS[catKey] || { color:'#002d74', texto:'Cada mesa de Flambao tiene una intención. Esta es la que has elegido.' };
+  document.documentElement.style.setProperty('--cat', catInfo.color);
+  document.documentElement.style.setProperty('--cat-ink', catInfo.ink || '#fff');     // color del texto sobre el color de la categoría
+  document.documentElement.style.setProperty('--cat-dark', catInfo.dark || catInfo.color); // versión más oscura para texto/bordes sobre blanco
+
+  // La etiqueta cuelga hasta la línea del nombre del restaurante y queda centrada con el asiento de debajo (el 4º de la fila de arriba)
+  function ajustarEtiqueta(){
+    const tag = document.querySelector('.cat-tag');
+    const ref = document.querySelector('.meta-rest');
+    if(!tag || !ref) return;
+    const card = tag.parentElement;
+    const cardRect = card.getBoundingClientRect();
+    tag.style.height = Math.round(ref.getBoundingClientRect().bottom - cardRect.top) + 'px';
+
+    // Categoría, restaurante y ubicación arrancan justo en el borde izquierdo del primer círculo
+    const primero = document.querySelector('#seatsGridTop .seat-avatar');
+    const head = document.querySelector('.card-head');
+    if(primero && head){
+      const col = primero.closest('.seat').getBoundingClientRect();
+      const izq = col.left + col.width / 2 - primero.offsetWidth / 2;
+      head.style.paddingLeft = Math.max(0, Math.round(izq - head.getBoundingClientRect().left)) + 'px';
+    }
+
+    const seat = document.querySelectorAll('#seatsGridTop .seat-avatar')[3];
+    if(seat){
+      const r = seat.getBoundingClientRect();
+      const centro = r.left + r.width / 2;
+      tag.style.right = 'auto';
+      tag.style.left = Math.round(centro - cardRect.left - card.clientLeft - tag.offsetWidth / 2) + 'px';
+    }
+  }
+  ajustarEtiqueta();
+  window.addEventListener('load', ajustarEtiqueta);
+  window.addEventListener('resize', ajustarEtiqueta);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarEtiqueta);
+
+  const infoModal = document.getElementById('infoModal');
+  document.getElementById('infoTitle').textContent = categoria;
+  document.getElementById('infoText').textContent = catInfo.texto;
+  document.getElementById('infoBtn').addEventListener('click', () => { infoModal.hidden = false; });
+  document.getElementById('infoClose').addEventListener('click', () => { infoModal.hidden = true; });
+  infoModal.addEventListener('click', (e) => { if(e.target === infoModal) infoModal.hidden = true; });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') document.querySelectorAll('.modal').forEach(m => m.hidden = true); });
+
+  // ── Pop-ups: compartir (solo desde el botón Compartir amigos), sentarse y "Descarga Flambao" ──
+  const inviteModal = document.getElementById('inviteModal');
+  const downloadModal = document.getElementById('downloadModal');
+  const seatModal = document.getElementById('seatModal');
+  document.getElementById('downloadInfoBtn').addEventListener('click', () => { downloadModal.hidden = false; });
+  document.getElementById('sharePlusBtn').addEventListener('click', () => { inviteModal.hidden = false; });
+  // "Compartir invitación" lanza el mismo flujo que el botón Compartir
+  document.getElementById('inviteShare').addEventListener('click', () => {
+    inviteModal.hidden = true;
+    document.getElementById('btnShare').click();
+  });
+  const profileModal = document.getElementById('profileModal');
+  const chatModal = document.getElementById('chatModal');
+  document.getElementById('chatBtn').addEventListener('click', () => { chatModal.hidden = false; });
+  [inviteModal, downloadModal, seatModal, profileModal, chatModal, document.getElementById('graciasModal')].forEach(m => m.addEventListener('click', (e) => {
+    if(e.target === m || e.target.closest('[data-close]')) m.hidden = true;
+  }));
+
+  // El "+" de un asiento libre abre el formulario para sentarse
+  document.getElementById('seatMesaCat').textContent = categoria;
+  document.getElementById('seatMesaWhen').textContent = '📅 ' + (dia || 'Por confirmar') + ' · 🕗 ' + (hora ? (hora + ' h') : 'Por confirmar');
+ document.addEventListener('click', (e) => {
+  if(e.target.closest('.invite-btn')){
+    if(esInvitado){
+      if(window.avisarMeta) avisarMeta('confirmar'); // META
+      seatModal.hidden = false;                 // entra por invitación: formulario
+      setTimeout(() => document.getElementById('seatNombre').focus(), 50);
+    }else{
+      inviteModal.hidden = false;               // ya está sentado: compartir invitación
+    }
+  }
+});
+
+  document.getElementById('metaDia').textContent = dia || 'Por confirmar';
+  document.getElementById('metaHora').textContent = hora ? (hora + ' h') : 'Por confirmar';
+  document.getElementById('confirmLine1').textContent = '¡Nos vemos ' + (dia ? ('el ' + dia) : 'pronto') + '!';
+
+  // ── 8 asientos: 4 arriba, 4 abajo. El primero de arriba es de quien mira la página ──
+  const gridTop = document.getElementById('seatsGridTop');
+  const gridBottom = document.getElementById('seatsGridBottom');
+  const otrosSeatEls = []; // los 7 asientos restantes (los primeros se llenan con SENTADOS, el resto con gente real del CSV)
+
+  // tipo: 'user' (ya sentado), 'guest' (invitado, asiento libre y destacado) o 'other'
+  function buildSeat(tipo){
+    const seat = document.createElement('div');
+    seat.className = 'seat' + (tipo === 'user' ? ' user' : (tipo === 'guest' ? ' guest' : ''));
+
+    const avatar = document.createElement('div');
+    avatar.className = 'seat-avatar ' + (tipo === 'user' ? 'filled' : 'empty');
+
+    const label = document.createElement('span');
+    label.className = 'seat-label';
+
+    if(tipo === 'user'){
+      label.textContent = 'Tu asiento';
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'add-photo-btn';
+      addBtn.innerHTML = '<span class="plus">+</span><span class="foto-txt">agrega<br>tu foto</span>';
+      addBtn.title = 'Agrega tu foto (opcional)';
+      addBtn.addEventListener('click', () => document.getElementById('photoInput').click());
+      avatar.appendChild(addBtn);
+      avatar.dataset.userSeat = '1';
+    }else{
+      label.textContent = tipo === 'guest' ? 'Apúntate' : 'Libre';
+      const inviteBtn = document.createElement('button');
+      inviteBtn.type = 'button';
+      inviteBtn.className = 'invite-btn';
+      inviteBtn.textContent = '+';
+      const txtBtn = esInvitado ? 'Apúntate a esta mesa' : 'Compartir invitación';
+      inviteBtn.title = txtBtn;
+      inviteBtn.setAttribute('aria-label', txtBtn);
+      avatar.appendChild(inviteBtn);
+    }
+
+    seat.appendChild(avatar);
+    seat.appendChild(label);
+    return seat;
+  }
+
+  gridTop.appendChild(buildSeat(esInvitado ? 'guest' : 'user'));
+  for(let i = 0; i < 3; i++){ const s = buildSeat('other'); gridTop.appendChild(s); otrosSeatEls.push(s); }
+  for(let i = 0; i < 4; i++){ const s = buildSeat('other'); gridBottom.appendChild(s); otrosSeatEls.push(s); }
+  ajustarEtiqueta(); // ya existen los asientos: recolocamos la etiqueta sobre el 4º
+
+  // Sienta a una persona en un asiento (con foto si la hay)
+  const seatNombres = new Map(); // asiento -> nombre completo (para buscarle la foto)
+  function ocuparAsiento(seatEl, nombre, foto, esFalso){
+    seatNombres.set(seatEl, nombre);
+    if(esFalso) seatEl.dataset.falso = '1';
+    const avatar = seatEl.querySelector('.seat-avatar');
+    const label = seatEl.querySelector('.seat-label');
+    avatar.classList.remove('empty');
+    const invBtn = avatar.querySelector('.invite-btn');
+    if(invBtn) invBtn.remove(); // un asiento ocupado ya no muestra el "+"
+    avatar.classList.add('filled');
+    avatar.style.cursor = 'pointer';
+    avatar.addEventListener('click', () => { profileModal.hidden = false; });
+    if(foto){
+      if(esFalso){
+        // foto de ejemplo: con blur (capa aparte para que el borde del círculo no se difumine)
+        const ph = document.createElement('span');
+        ph.className = 'seat-photo';
+        ph.style.backgroundImage = "url('" + foto + "')";
+        avatar.classList.add('foto-blur');
+        avatar.appendChild(ph);
+      }else{
+        avatar.style.backgroundImage = "url('" + foto + "')";
+        avatar.style.backgroundSize = 'cover';
+        avatar.style.backgroundPosition = 'center';
+        avatar.style.backgroundRepeat = 'no-repeat';
+      }
+    }
+    label.textContent = (nombre.split(' ')[0] || 'Invitado');
+  }
+
+  // Las personas ya sentadas aparecen desde el primer momento
+  // Se pintan los 7 asientos de los demás. Cada persona REAL que se sienta (las del Google Sheet y tú al pagar)
+  // quita una de las fotos de ejemplo, para que la mesa no parezca llenarse de golpe.
+  let realesCSV = [];
+  function renderOtros(){
+    seatNombres.clear();
+    otrosSeatEls.forEach((viejo, i) => {
+      const nuevo = buildSeat('other');
+      viejo.replaceWith(nuevo);
+      otrosSeatEls[i] = nuevo;
+    });
+    const nFalsos = Math.max(0, SENTADOS.length - realesCSV.length - (usuarioPagado ? 1 : 0));
+    let i = 0;
+    SENTADOS.slice(0, nFalsos).forEach(p => { ocuparAsiento(otrosSeatEls[i++], p.nombre, p.foto, true); });
+    realesCSV.forEach(r => {
+      if(i >= otrosSeatEls.length) return;
+      const seat = otrosSeatEls[i++];
+      ocuparAsiento(seat, r.nombre, r.foto || null, false);
+      if(r.buscar) seat.dataset.buscar = '1';
+    });
+    if(typeof invalidarImagenInvitacion === 'function') invalidarImagenInvitacion();
+  }
+  renderOtros();
+
+  // ── Fotos de los asientos: se guardan en Firebase y las ven todos los de la mesa ──
+  const FOTOS_API = 'https://europe-west1-flambao-8f1fd.cloudfunctions.net';
+
+  function ponerFoto(avatar, src){
+    if(!avatar || !src) return;
+    avatar.classList.add('has-photo');
+    avatar.style.backgroundImage = "url('" + src + "')";
+    avatar.style.backgroundSize = 'cover';
+    avatar.style.backgroundPosition = 'center';
+    avatar.style.backgroundRepeat = 'no-repeat';
+    if(typeof invalidarImagenInvitacion === 'function') invalidarImagenInvitacion();
+  }
+
+  // Recorta al centro y reduce a 256 px para que pese poco
+  function reducirFoto(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const S = 256, lado = Math.min(img.width, img.height);
+          const c = document.createElement('canvas');
+          c.width = S; c.height = S;
+          c.getContext('2d').drawImage(img, (img.width - lado) / 2, (img.height - lado) / 2, lado, lado, 0, 0, S, S);
+          resolve(c.toDataURL('image/jpeg', 0.82));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('photoInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if(!file) return;
+    let dataUrl;
+    try{ dataUrl = await reducirFoto(file); }
+    catch(err){ alert('No se ha podido leer esa foto. Prueba con otra.'); return; }
+    ponerFoto(document.querySelector('.seat-avatar[data-user-seat="1"]'), dataUrl); // la ves al instante
+    if(!tieneNombre) return;
+    try{
+      const resp = await fetch(FOTOS_API + '/subirFoto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ restaurante: RESTAURANTE, nombre: nombreRaw, imagen: dataUrl })
+      });
+      if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    }catch(err){
+      console.log('[Flambao] No se pudo guardar la foto:', err);
+      alert('Tu foto se ve aquí, pero no hemos podido guardarla para los demás. Inténtalo de nuevo en un momento.');
+    }
+  });
+
+  // Busca en Firebase las fotos de la gente sentada y se las pone
+  async function cargarFotos(){
+    const nombres = [];
+    if(tieneNombre) nombres.push(nombreRaw);
+    seatNombres.forEach((nombre, seatEl) => {
+      const av = seatEl.querySelector('.seat-avatar');
+      if(seatEl.dataset.falso !== '1' && seatEl.dataset.buscar === '1' && av && !av.style.backgroundImage) nombres.push(nombre);
+    });
+    if(!nombres.length) return;
+    try{
+      const resp = await fetch(FOTOS_API + '/obtenerFotos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ restaurante: RESTAURANTE, nombres: nombres })
+      });
+      if(!resp.ok) return;
+      const data = await resp.json();
+      const fotos = data.fotos || {};
+      if(tieneNombre && fotos[nombreRaw]) ponerFoto(document.querySelector('.seat-avatar[data-user-seat="1"]'), fotos[nombreRaw]);
+      seatNombres.forEach((nombre, seatEl) => {
+        const av = seatEl.querySelector('.seat-avatar');
+        if(seatEl.dataset.falso !== '1' && seatEl.dataset.buscar === '1' && av && !av.style.backgroundImage && fotos[nombre]) ponerFoto(av, fotos[nombre]);
+      });
+    }catch(err){ console.log('[Flambao] No se pudieron cargar las fotos:', err); }
+  }
+
+  // ── Google Form (solo cuando ya ha pagado: sin pago no hay asiento) ──
+  //    El Form no tiene campo de email: va en el campo del teléfono.
+  async function enviarInscripcion(nombreCompleto, email, telefono){
+    const mesaInfo = categoria + (dia ? (', ' + dia + (hora ? (' ' + hora) : '')) : '');
+    if(!FORM_ID || !FORM_ENTRY_NOMBRE || !FORM_ENTRY_TELEFONO) return;
+    const body = new URLSearchParams();
+    if(FORM_ENTRY_APELLIDOS){
+      // Form nuevo: una pregunta por dato (Nombre, Apellidos, Teléfono, Correo, Origen y, si existe, Mesa)
+      body.append(FORM_ENTRY_NOMBRE, (datosUsuario && datosUsuario.nombre) || nombreCompleto);
+      body.append(FORM_ENTRY_APELLIDOS, (datosUsuario && datosUsuario.apellidos) || '');
+      body.append(FORM_ENTRY_TELEFONO, telefono || '');
+      if(FORM_ENTRY_CORREO) body.append(FORM_ENTRY_CORREO, email || '');
+      if(FORM_ENTRY_MESA) body.append(FORM_ENTRY_MESA, mesaInfo);
+    }else{
+      // Form antiguo: nombre + restaurante + mesa en una sola casilla, y email junto al teléfono
+      body.append(FORM_ENTRY_NOMBRE, nombreCompleto + ' — ' + RESTAURANTE + ' · ' + mesaInfo);
+      body.append(FORM_ENTRY_TELEFONO, (telefono ? (telefono + ' · ') : '') + email);
+    }
+    // UTM: de qué campaña / anuncio viene la reserva
+    const origen = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].map(k => params.get(k)).filter(Boolean).join(' / ');
+    if(FORM_ENTRY_ORIGEN) body.append(FORM_ENTRY_ORIGEN, origen || 'directo / sin UTM');
+    try{
+      await fetch('https://docs.google.com/forms/d/e/' + FORM_ID + '/formResponse', {
+        method: 'POST', body: body, mode: 'no-cors', keepalive: true
+      });
+    }catch(err){
+      console.log('[Flambao] Error enviando al Google Form:', err);
+    }
+  }
+
+  var abrirPago = function(){};   // lo define el bloque de Stripe, más abajo
+
+  // ── Teléfono con prefijo (por defecto +34, y se puede elegir cualquier otro) ──
+  const PAISES_TXT = 'ES:34,PT:351,FR:33,IT:39,DE:49,GB:44,US:1,MX:52,AR:54,CO:57,CL:56,PE:51,VE:58,EC:593,UY:598,MA:212,' +
+    'AD:376,AL:355,AM:374,AO:244,AT:43,AU:61,AZ:994,BA:387,BD:880,BE:32,BG:359,BO:591,BR:55,BS:1,BY:375,BZ:501,CA:1,CD:243,CH:41,CI:225,CM:237,CN:86,CR:506,CU:53,CY:357,CZ:420,' +
+    'DK:45,DO:1,DZ:213,EE:372,EG:20,ET:251,FI:358,GE:995,GH:233,GQ:240,GR:30,GT:502,GY:592,HK:852,HN:504,HR:385,HT:509,HU:36,ID:62,IE:353,IL:972,IN:91,IQ:964,IR:98,IS:354,' +
+    'JM:1,JO:962,JP:81,KE:254,KH:855,KR:82,KW:965,KZ:7,LB:961,LK:94,LT:370,LU:352,LV:371,LY:218,MC:377,MD:373,ME:382,MK:389,MT:356,MU:230,MY:60,MZ:258,NG:234,NI:505,NL:31,NO:47,NP:977,NZ:64,' +
+    'OM:968,PA:507,PH:63,PK:92,PL:48,PR:1,PS:970,PY:595,QA:974,RO:40,RS:381,RU:7,SA:966,SE:46,SG:65,SI:386,SK:421,SN:221,SV:503,SY:963,TH:66,TN:216,TR:90,TT:1,TW:886,TZ:255,UA:380,UG:256,UZ:998,VN:84,ZA:27,ZM:260,ZW:263';
+  const PAISES_PRIMEROS = ['ES','PT','FR','IT','DE','GB','US','MX','AR','CO','CL','PE','VE','EC','UY','MA'];
+  let _nombresPais = null;
+  try{ _nombresPais = new Intl.DisplayNames(['es'], { type: 'region' }); }catch(e){}
+  const banderaDe = iso => String.fromCodePoint.apply(null, iso.toUpperCase().split('').map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+  const PAISES = PAISES_TXT.split(',').map(x => {
+    const par = x.split(':'); let nombre = par[0];
+    try{ nombre = (_nombresPais && _nombresPais.of(par[0])) || par[0]; }catch(e){}
+    return { iso: par[0], cod: par[1], nombre: nombre, bandera: banderaDe(par[0]) };
+  }).sort((a, b) => {
+    const ia = PAISES_PRIMEROS.indexOf(a.iso), ib = PAISES_PRIMEROS.indexOf(b.iso);
+    if(ia !== -1 || ib !== -1) return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    return a.nombre.localeCompare(b.nombre, 'es');
+  });
+  let prefijoActual = PAISES.find(p => p.iso === 'ES');
+
+  const prefixBtn = document.getElementById('prefixBtn');
+  const prefixList = document.getElementById('prefixList');
+  const prefixSearch = document.getElementById('prefixSearch');
+  const prefixItems = document.getElementById('prefixItems');
+  function elegirPrefijo(iso){
+    prefijoActual = PAISES.find(p => p.iso === iso) || PAISES[0];
+    document.getElementById('prefixFlag').textContent = prefijoActual.bandera;
+    document.getElementById('prefixCode').textContent = '+' + prefijoActual.cod;
+  }
+  function pintarPrefijos(filtro){
+    const f = normaliza(filtro || '').replace(/^\+/, '');
+    prefixItems.innerHTML = '';
+    const lista = PAISES.filter(p => !f || normaliza(p.nombre).includes(f) || p.cod.startsWith(f));
+    if(!lista.length){ const li = document.createElement('li'); li.className = 'pi-vacio'; li.textContent = 'Sin resultados'; prefixItems.appendChild(li); return; }
+    lista.forEach(p => {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.setAttribute('aria-selected', p.iso === prefijoActual.iso ? 'true' : 'false');
+      li.dataset.iso = p.iso;
+      li.innerHTML = '<span class="pi-flag">' + p.bandera + '</span><span class="pi-name">' + esc(p.nombre) + '</span><span class="pi-code">+' + p.cod + '</span>';
+      prefixItems.appendChild(li);
+    });
+  }
+  function cerrarPrefijos(){ prefixList.hidden = true; prefixBtn.setAttribute('aria-expanded', 'false'); }
+  prefixBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if(!prefixList.hidden){ cerrarPrefijos(); return; }
+    prefixSearch.value = '';
+    pintarPrefijos('');
+    prefixList.hidden = false;
+    prefixBtn.setAttribute('aria-expanded', 'true');
+    const sel = prefixItems.querySelector('[aria-selected="true"]');
+    if(sel) prefixItems.scrollTop = Math.max(0, sel.offsetTop - 60);
+    if(window.matchMedia && matchMedia('(hover:hover)').matches) prefixSearch.focus();   // en el móvil no, para que no tape la lista el teclado
+  });
+  prefixSearch.addEventListener('input', () => pintarPrefijos(prefixSearch.value));
+  prefixList.addEventListener('click', (e) => e.stopPropagation());
+  prefixItems.addEventListener('click', (e) => {
+    const li = e.target.closest('li[data-iso]');
+    if(!li) return;
+    elegirPrefijo(li.dataset.iso);
+    cerrarPrefijos();
+    document.getElementById('seatTelefono').focus();
+  });
+  document.addEventListener('click', cerrarPrefijos);
+
+  function abrirFormulario(){
+    const partes = nombreRaw.split(' ');
+    let ultimo = null;
+    try{ ultimo = JSON.parse(localStorage.getItem('flb_ultimo') || 'null'); }catch(e){}
+    const d = datosUsuario || ultimo || { nombre: partes[0] || '', apellidos: partes.slice(1).join(' '), email: '' };
+    document.getElementById('seatNombre').value = d.nombre || '';
+    document.getElementById('seatApellidos').value = d.apellidos || '';
+    document.getElementById('seatEmail').value = d.email || '';
+    document.getElementById('seatTelefono').value = d.telefonoLocal || '';
+    document.getElementById('seatAcepto').checked = !!d.acepto;
+    document.getElementById('seatError').textContent = '';
+    elegirPrefijo(d.prefijoIso || 'ES');
+    cerrarPrefijos();
+    seatModal.hidden = false;
+    setTimeout(() => document.getElementById('seatNombre').focus(), 50);
+  }
+
+  document.getElementById('seatForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const err = document.getElementById('seatError');
+    const nom = document.getElementById('seatNombre').value.trim();
+    const ape = document.getElementById('seatApellidos').value.trim();
+    const email = document.getElementById('seatEmail').value.trim();
+    const telLocal = document.getElementById('seatTelefono').value.replace(/\D/g, '').replace(/^0+/, '');
+    const acepto = document.getElementById('seatAcepto').checked;
+    err.textContent = '';
+    if(!nom || !ape || !email){ err.textContent = 'Rellena nombre, apellidos y email.'; return; }
+    const telOk = prefijoActual.cod === '34' ? /^[6-9]\d{8}$/.test(telLocal) : (telLocal.length >= 6 && telLocal.length <= 14);
+    if(!telOk){ err.textContent = 'Revisa el teléfono: ' + (prefijoActual.cod === '34' ? 'en España tiene 9 cifras.' : 'no parece válido.'); return; }
+    if(!acepto){ err.textContent = 'Para continuar tienes que consentir los términos y condiciones.'; return; }
+    datosUsuario = {
+      nombre: nom, apellidos: ape, email: email,
+      prefijoIso: prefijoActual.iso, telefonoLocal: telLocal, telefono: '+' + prefijoActual.cod + telLocal,
+      acepto: true
+    };
+    usuarioPagado = false;
+    aplicarDatos();
+    guardarMesa();
+    try{ localStorage.setItem('flb_ultimo', JSON.stringify(datosUsuario)); }catch(e2){}
+    if(window.avisarMeta) avisarMeta('lead', { nombre: nom, apellidos: ape, email: email, telefono: '+' + prefijoActual.cod + telLocal }); // META
+
+    if(esInvitado){
+      // Entra por invitación: pasa a su propia mesa (sin modo invitado) y allí se abre el pago
+      const q = new URLSearchParams(location.search);
+      q.delete('invitado'); q.delete('invita'); q.set('pagar', '1');
+      location.href = location.pathname + '?' + q.toString();
+      return;
+    }
+    seatModal.hidden = true;
+    pintarCabecera();
+    abrirPago();   // al pulsar "Siguiente" se abre el pago; sus datos se guardan como "pendiente de pago"
+  });
+
+  // ── Parsea el CSV (una sola columna "nombre_mesa" con cada inscripción) ──
+  function parseCsv(text){
+    return text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(line => {
+      let v = line;
+      if(v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1).replace(/""/g, '"');
+      return v;
+    });
+  }
+
+  // ── Extrae {nombre, restaurante, categoria, dia, hora} de una línea tipo:
+  //    "Nombre Apellidos — Restaurante · Categoria, Dia 20:00" ──
+  function parseEntry(line){
+    const dashIdx = line.indexOf(' — ');
+    if(dashIdx === -1) return null;
+    const nombre = line.slice(0, dashIdx).trim();
+    const resto = line.slice(dashIdx + 3);
+    const dotIdx = resto.indexOf(' · ');
+    if(dotIdx === -1) return null;
+    const restaurante = resto.slice(0, dotIdx).trim();
+    const mesaInfo = resto.slice(dotIdx + 3).trim();
+    const firstComma = mesaInfo.indexOf(',');
+    if(firstComma === -1) return { nombre, restaurante, categoria: mesaInfo, dia: '', hora: '' };
+    const cat = mesaInfo.slice(0, firstComma).trim();
+    const diaHora = mesaInfo.slice(firstComma + 1).trim();
+    const timeMatch = diaHora.match(/(\d{1,2}:\d{2})\s*$/);
+    let h = '', d = diaHora;
+    if(timeMatch){ h = timeMatch[1]; d = diaHora.slice(0, timeMatch.index).trim().replace(/,\s*$/, ''); }
+    return { nombre, restaurante, categoria: cat, dia: d, hora: h };
+  }
+
+  // ── Rellena los asientos "Libre" que quedan con la gente real que ya se ha apuntado a esta mesa ──
+  function pintarAsientos(entries){
+    const nuevos = [];
+    for(const entry of entries){
+      if(entry.restaurante !== RESTAURANTE) continue;
+      if(entry.categoria !== categoria) continue;
+      if(dia && entry.dia !== dia) continue;
+      if(hora && entry.hora !== hora) continue;
+      if(tieneNombre && entry.nombre === nombreRaw) continue;   // tú ya tienes tu propio asiento
+      nuevos.push({ nombre: entry.nombre, foto: '', buscar: true });
+    }
+    realesCSV = nuevos;
+    renderOtros();
+  }
+
+  // ── Refrescar: vuelve a comprobar si hay más gente apuntada a esta mesa ──
+  function cargarAsistentesCSV(){
+    if(!RESPUESTAS_CSV_URL) return Promise.resolve();
+    return fetch(RESPUESTAS_CSV_URL + (RESPUESTAS_CSV_URL.includes('?') ? '&' : '?') + '_=' + Date.now())
+      .then(res => res.ok ? res.text() : Promise.reject(res.status))
+      .then(text => {
+        const lines = parseCsv(text);
+        lines.shift(); // quita la cabecera "nombre_mesa"
+        const entries = lines.map(parseEntry).filter(Boolean);
+        pintarAsientos(entries);
+      })
+      .catch(err => console.log('[Flambao] No se pudieron cargar los asistentes:', err));
+  }
+
+  // Gente REAL sentada en esta mesa (ya ha pagado) con su foto: se lee de Firebase, no del Google Sheet
+  let firmaReales = '';
+  async function cargarMesaServidor(){
+    const resp = await fetch(FOTOS_API + '/obtenerMesa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurante: RESTAURANTE, categoria: categoria, dia: dia || '', hora: hora || '', excluir: tieneNombre ? nombreRaw : '' })
+    });
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const lista = (data.personas || []).map(p => ({ nombre: p.nombre, foto: p.foto || '' }));
+    const firma = JSON.stringify(lista.map(p => [p.nombre, (p.foto || '').length]));
+    if(firma !== firmaReales){ firmaReales = firma; realesCSV = lista; renderOtros(); }
+  }
+  function cargarAsistentes(){
+    return cargarMesaServidor()
+      .catch(err => { console.log('[Flambao] No se pudo leer la mesa de Firebase, uso el Sheet:', err); return cargarAsistentesCSV(); })
+      .then(() => cargarFotos());
+  }
+
+  cargarAsistentes();
+  // Cada 20 s mira si se ha sentado alguien más (y si ha subido su foto)
+  setInterval(() => { const pm = document.getElementById('payModal'); if(!document.hidden && !(pm && !pm.hidden)) cargarAsistentes(); }, 20000);
+
+  document.getElementById('btnRefresh').addEventListener('click', function(){
+    const btn = this;
+    btn.classList.add('loading');
+    btn.textContent = 'Actualizando…';
+    cargarAsistentes().finally(() => {
+      setTimeout(() => { btn.classList.remove('loading'); btn.textContent = 'Refrescar mesa'; }, 500);
+    });
+  });
+
+  // ── Genera una imagen (tarjeta de invitación) con el nombre, categoría, día y hora ──
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+    const words = text.split(' ');
+    let line = '';
+    const lines = [];
+    for(const w of words){
+      const test = line ? (line + ' ' + w) : w;
+      if(ctx.measureText(test).width > maxWidth && line){
+        lines.push(line);
+        line = w;
+      }else{
+        line = test;
+      }
+    }
+    if(line) lines.push(line);
+    const startY = y - ((lines.length - 1) * lineHeight) / 2;
+    lines.forEach((l, i) => ctx.fillText(l, x, startY + i * lineHeight));
+    return lines.length;
+  }
+
+  // ── Logo de Flambao para la tarjeta de invitación ──
+  const LOGO_URL = 'https://i.ibb.co/zV4PnK1j/imagen-2026-06-04-175151913.png';
+  function cargarImagen(src, cors){
+    return new Promise((resolve) => {
+      const img = new Image();
+      if(cors) img.crossOrigin = 'anonymous';
+      const t = setTimeout(() => resolve(null), 5000);
+      img.onload = () => { clearTimeout(t); resolve(img); };
+      img.onerror = () => { clearTimeout(t); resolve(null); };
+      img.src = src;
+    });
+  }
+
+  async function buildInviteImage(){
+    // La imagen es una "captura" de la mesa REAL: mismos asientos, nombres, fotos, categoría, restaurante y día/hora que se ven en pantalla
+    if(document.fonts){
+      await Promise.all([
+        document.fonts.load('800 58px Montserrat'),
+        document.fonts.load('700 26px Montserrat'),
+        document.fonts.load('600 24px Montserrat'),
+        document.fonts.load('700 34px "Playfair Display"'),
+        document.fonts.load('700 30px "Playfair Display"')
+      ]).catch(() => {});
+      await document.fonts.ready;
+    }
+    const logoImg = await cargarImagen(LOGO_URL, true);
+
+    // Lee los asientos tal y como están ahora en la página
+    const leerAsientos = (gridId) => Array.from(document.querySelectorAll('#' + gridId + ' .seat')).map(seat => {
+      const av = seat.querySelector('.seat-avatar');
+      const fotoEl = av.querySelector('.seat-photo');
+      const bg = (fotoEl ? fotoEl.style.backgroundImage : av.style.backgroundImage) || '';
+      const m = bg.match(/url\(["']?(.*?)["']?\)$/);
+      return {
+        etiqueta: (seat.querySelector('.seat-label') || {}).textContent || '',
+        libre: av.classList.contains('empty'),
+        usuario: seat.classList.contains('user') || seat.classList.contains('guest'),
+        pendiente: seat.classList.contains('pago-pendiente'),
+        blur: !!fotoEl,
+        src: m ? m[1] : ''
+      };
+    });
+    const arriba = leerAsientos('seatsGridTop'), abajo = leerAsientos('seatsGridBottom');
+    const todos = arriba.concat(abajo);
+    await Promise.all(todos.map(async a => { a.img = a.src ? await cargarImagen(a.src, false) : null; }));
+
+    const W = 1080, H = 1350;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const css = getComputedStyle(document.documentElement);
+    const CAT = (css.getPropertyValue('--cat') || '#002d74').trim() || '#002d74';
+    const CAT_INK = (css.getPropertyValue('--cat-ink') || '#fff').trim() || '#fff';
+    const NAVY = '#002d74', INK = '#0f1a3a', GRIS = '#6B6B6B', MENTA = '#98FB98';
+    const SANS = 'Montserrat, sans-serif', SERIF = '"Playfair Display", serif';
+
+    // Fondo
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#f7f9ff'); bg.addColorStop(0.35, '#ffffff'); bg.addColorStop(1, '#f1f4fb');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    // Logo de Flambao
+    const logoS = 100, logoX = W / 2 - logoS / 2, logoY = 56;
+    ctx.save();
+    ctx.shadowColor = 'rgba(19,40,107,.25)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
+    ctx.fillStyle = '#1c3366';
+    ctx.beginPath(); ctx.roundRect(logoX, logoY, logoS, logoS, 24); ctx.fill();
+    ctx.restore();
+    if(logoImg){
+      ctx.save();
+      ctx.beginPath(); ctx.roundRect(logoX, logoY, logoS, logoS, 24); ctx.clip();
+      const esc = Math.max(logoS / logoImg.width, logoS / logoImg.height);
+      const lw = logoImg.width * esc, lh = logoImg.height * esc;
+      ctx.drawImage(logoImg, logoX + (logoS - lw) / 2, logoY + (logoS - lh) / 2, lw, lh);
+      ctx.restore();
+    }
+
+    // Titular
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = INK;
+    ctx.font = '800 56px ' + SANS;
+    ctx.fillText(tieneNombre ? (primerNombre + ' te invita a su mesa') : 'Te han invitado a su mesa', W / 2, 255);
+    ctx.fillStyle = GRIS; ctx.font = '600 28px ' + SANS;
+    ctx.fillText('Mira quién está sentado y apúntate', W / 2, 308);
+
+    // Tarjeta de la mesa
+    const cx0 = 60, cy0 = 345, cw = W - 120, ch = 812;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,45,116,.16)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 20;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.roundRect(cx0, cy0, cw, ch, 44); ctx.fill();
+    ctx.restore();
+    ctx.lineWidth = 5; ctx.strokeStyle = NAVY;
+    ctx.beginPath(); ctx.roundRect(cx0, cy0, cw, ch, 44); ctx.stroke();
+
+    const R = 66;
+    const innerL = cx0 + 30, colW = (cw - 60) / 4;
+    const xs = [0, 1, 2, 3].map(i => innerL + colW * (i + 0.5));
+    const headL = xs[0] - R;   // la cabecera arranca justo en el borde del primer círculo
+
+    // Etiqueta colgante (color de la categoría) sobre el 4º asiento
+    const tagW = 62, tagX = xs[3] - tagW / 2, tagH = 175;
+    ctx.fillStyle = CAT;
+    ctx.beginPath();
+    ctx.moveTo(tagX, cy0); ctx.lineTo(tagX + tagW, cy0); ctx.lineTo(tagX + tagW, cy0 + tagH);
+    ctx.lineTo(tagX + tagW / 2, cy0 + tagH - 18); ctx.lineTo(tagX, cy0 + tagH); ctx.closePath(); ctx.fill();
+
+    // Píldora de categoría
+    ctx.textAlign = 'left';
+    ctx.font = '700 30px ' + SERIF;
+    const pw = ctx.measureText(categoria).width + 52, ph = 58, py = cy0 + 38;
+    ctx.fillStyle = CAT;
+    ctx.beginPath(); ctx.roundRect(headL, py, pw, ph, ph / 2); ctx.fill();
+    ctx.fillStyle = CAT_INK;
+    ctx.fillText(categoria, headL + 26, py + 39);
+
+    // Restaurante y dirección
+    ctx.fillStyle = INK; ctx.font = '700 38px ' + SERIF;
+    ctx.fillText(RESTAURANTE_DISPLAY, headL, cy0 + 150);
+    if(RESTAURANTE_LOC){
+      ctx.fillStyle = GRIS; ctx.font = '600 23px ' + SANS;
+      let loc = RESTAURANTE_LOC;
+      const maxLoc = xs[3] - tagW / 2 - headL - 20;
+      while(ctx.measureText(loc).width > maxLoc && loc.length > 8) loc = loc.slice(0, -2);
+      if(loc !== RESTAURANTE_LOC) loc = loc.trim() + '…';
+      ctx.fillText(loc, headL, cy0 + 190);
+    }
+
+    // Asientos
+    const foto = (img, cx, cy, blur) => {
+      ctx.save();
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
+      const lado = Math.min(img.width, img.height);
+      const sx = (img.width - lado) / 2, sy = (img.height - lado) / 2;
+      if(blur){
+        // desenfoque: se reduce y se amplía (funciona en todos los navegadores)
+        const t = document.createElement('canvas'); t.width = t.height = 14;
+        t.getContext('2d').drawImage(img, sx, sy, lado, lado, 0, 0, 14, 14);
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(t, cx - R - 8, cy - R - 8, R * 2 + 16, R * 2 + 16);
+      }else{
+        ctx.drawImage(img, sx, sy, lado, lado, cx - R, cy - R, R * 2, R * 2);
+      }
+      ctx.restore();
+    };
+    const asiento = (a, cx, cy) => {
+      ctx.textAlign = 'center';
+      if(a.libre){
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = MENTA; ctx.fill();
+        ctx.strokeStyle = NAVY; ctx.lineWidth = 5; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(cx - 20, cy); ctx.lineTo(cx + 20, cy); ctx.moveTo(cx, cy - 20); ctx.lineTo(cx, cy + 20); ctx.stroke();
+      }else if(a.pendiente){
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = '#e11d48'; ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = '800 22px ' + SANS; ctx.fillText('Confirmar', cx, cy + 8);
+      }else if(a.img){
+        foto(a.img, cx, cy, a.blur);
+      }else{
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = NAVY; ctx.fill();
+        if(logoImg){
+          ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip(); ctx.globalAlpha = .45;
+          ctx.drawImage(logoImg, cx - R * 1.1, cy - R * 1.1, R * 2.2, R * 2.2); ctx.restore();
+        }
+      }
+      if(a.usuario){
+        ctx.beginPath(); ctx.arc(cx, cy, R + 3, 0, Math.PI * 2); ctx.lineWidth = 5; ctx.strokeStyle = NAVY; ctx.stroke();
+      }
+      ctx.fillStyle = a.usuario ? INK : GRIS; ctx.font = (a.usuario ? '800 ' : '700 ') + '23px ' + SANS;
+      ctx.fillText(a.etiqueta, cx, cy + R + 36);
+    };
+    const rowTop = cy0 + 300;
+    arriba.forEach((a, i) => asiento(a, xs[i], rowTop));
+
+    // Barra de la mesa (día y hora reales)
+    const bx = cx0 + 20, bw = cw - 40, bh = 96, by = rowTop + R + 80;
+    const gb = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+    gb.addColorStop(0, '#002d74'); gb.addColorStop(1, '#1B5FAE');
+    ctx.fillStyle = gb;
+    ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, bh / 2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '800 33px ' + SANS; ctx.textAlign = 'center';
+    ctx.fillText((dia || 'Por confirmar') + '  ·  ' + (hora ? (hora + ' h') : 'Por confirmar'), W / 2, by + bh / 2 + 12);
+
+    const rowBot = by + bh + 50 + R;
+    abajo.forEach((a, i) => asiento(a, xs[i], rowBot));
+
+    // Botón "Reserva tu sitio"
+    const bbx = W / 2 - 215, bby = 1195, bbw = 430, bbh = 88;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,45,116,.35)'; ctx.shadowBlur = 28; ctx.shadowOffsetY = 12;
+    ctx.fillStyle = NAVY;
+    ctx.beginPath(); ctx.roundRect(bbx, bby, bbw, bbh, bbh / 2); ctx.fill();
+    ctx.restore();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff'; ctx.font = '800 36px ' + SANS;
+    ctx.fillText('Reserva tu sitio', W / 2, bby + bbh / 2 + 13);
+
+    ctx.fillStyle = GRIS; ctx.font = '700 26px ' + SANS;
+    ctx.fillText('flambao.com', W / 2, 1328);
+
+    return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+  }
+
+  // ── Compartir: genera la tarjeta de invitación y la comparte (o la descarga + copia el enlace) ──
+  // Enlace de invitación: lleva directo a ESTA página de la mesa (con la gente ya sentada),
+  // en modo invitado: "¡Mira quién está sentado, apúntate!" y el "+" abre el formulario
+  function buildInviteUrl(){
+    const base = new URL(window.location.href);
+    base.search = '';
+    base.hash = '';
+    const inviteParams = new URLSearchParams();
+    inviteParams.set('invitado', '1');
+    inviteParams.set('categoria', categoria);
+    if(dia) inviteParams.set('dia', dia);
+    if(hora) inviteParams.set('hora', hora);
+    if(tieneNombre) inviteParams.set('invita', primerNombre);
+    return base.toString() + '?' + inviteParams.toString();
+  }
+  function buildShareText(url){
+    return (tieneNombre ? primerNombre : 'Alguien') + ' te ha invitado a su mesa en ' + RESTAURANTE_DISPLAY + '. Mira quién está sentado y apúntate 👇\n' + url;
+  }
+
+  // Imagen de la invitación: se prepara al cargar para poder compartir al instante
+let inviteAsset = null;
+let invitePromesa = Promise.resolve(null);
+var inviteTimer = null;
+function invalidarImagenInvitacion(){ clearTimeout(inviteTimer); inviteTimer = setTimeout(() => prepararImagenInvitacion(), 700); }
+function prepararImagenInvitacion(){
+  clearTimeout(inviteTimer);
+  invitePromesa = buildInviteImage()
+    .then(blob => {
+      inviteAsset = { blob, file: new File([blob], 'flambao-mesa.png', { type: 'image/png' }) };
+      const prev = document.getElementById('invitePreview');   // la misma imagen se ve en el pop-up de compartir
+      if(prev){
+        if(prev.dataset.url) URL.revokeObjectURL(prev.dataset.url);
+        prev.dataset.url = URL.createObjectURL(blob);
+        prev.src = prev.dataset.url;
+        prev.hidden = false;
+      }
+      return inviteAsset;
+    })
+    .catch(() => null);
+  return invitePromesa;
+}
+prepararImagenInvitacion();
+
+function mostrarAviso(texto){
+  const toast = document.getElementById('shareToast');
+  if(!toast) return;
+  toast.textContent = texto;
+  toast.classList.add('visible');
+  setTimeout(() => toast.classList.remove('visible'), 2600);
+}
+
+// Compartir amigos: comparte la imagen de la mesa (con el texto y el enlace de invitación)
+document.getElementById('btnShare').addEventListener('click', async function(){
+  if(window.avisarMeta) avisarMeta('compartir'); // META
+  const inviteUrl = buildInviteUrl();
+  const shareText = buildShareText(inviteUrl);
+  try{ navigator.clipboard.writeText(inviteUrl).catch(() => {}); }catch(e0){}   // por si la app de destino ignora el texto
+
+  // si la imagen aún se está dibujando, espera un momento (máx. 2 s)
+  const asset = inviteAsset || await Promise.race([invitePromesa, new Promise(r => setTimeout(() => r(null), 2000))]);
+
+  const datos = { title: 'Flambao · Mesa', text: shareText };
+  if(asset && navigator.canShare && navigator.canShare({ files: [asset.file] })) datos.files = [asset.file];
+
+  if(navigator.share){
+    try{ await navigator.share(datos); }
+    catch(err){ if(!err || err.name !== 'AbortError') mostrarAviso('No se ha podido compartir. Enlace copiado.'); }
+  }else{
+    if(asset){
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(asset.blob);
+      a.download = 'flambao-mesa.png';
+      a.click();
+    }
+    mostrarAviso('Imagen descargada y enlace copiado');
+  }
+});
+
+  // ═══════════════════════════════════════════════════════════════
+  //  PAGO CON STRIPE (3,99 €) — aro rojo + "Confirmar" en tu asiento
+  //  Pega aquí tu clave PÚBLICA (pk_test_… para pruebas, pk_live_… en producción)
+  // ═══════════════════════════════════════════════════════════════
+  const STRIPE_PUBLISHABLE_KEY = 'pk_live_51UQmiLBj1aVDCAhIALYy36M3zCRnMKgAeYSS2faNXT2TogPLzRKsz4bfvMEhqzsWFDsSmu3sbi2ams1ylXTtteg6002rD9FXZY';
+  const CREAR_PAGO_URL = 'https://europe-west1-flambao-8f1fd.cloudfunctions.net/crearPago';
+
+  // ── Pago completado: gracias + confeti ──
+  function lanzarConfeti(){
+    if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cv = document.getElementById('confeti');
+    if(!cv) return;
+    const r = cv.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.max(1, Math.round(r.width * dpr));
+    cv.height = Math.max(1, Math.round(r.height * dpr));
+    const ctx = cv.getContext('2d');
+    ctx.scale(dpr, dpr);
+    const W = r.width, H = r.height;
+    const colores = ['#002d74', '#1B5FAE', '#d0b787', '#98FB98', '#F5C518', '#E4572E', '#3FA34D', '#ffffff'];
+    const piezas = [];
+    for(let i = 0; i < 150; i++){
+      piezas.push({
+        x: Math.random() * W, y: -20 - Math.random() * H * 0.5,
+        vx: (Math.random() - 0.5) * 4, vy: 2 + Math.random() * 4,
+        w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
+        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.4,
+        c: colores[Math.floor(Math.random() * colores.length)]
+      });
+    }
+    const ini = performance.now();
+    (function frame(){
+      const dt = performance.now() - ini;
+      ctx.clearRect(0, 0, W, H);
+      piezas.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.rot += p.vr;
+        ctx.save();
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.globalAlpha = dt > 3200 ? Math.max(0, 1 - (dt - 3200) / 800) : 1;
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      if(dt < 4000) requestAnimationFrame(frame); else ctx.clearRect(0, 0, W, H);
+    })();
+  }
+  function mostrarGracias(){
+    document.getElementById('graciasModal').hidden = false;
+    lanzarConfeti();
+  }
+  document.getElementById('graciasFoto').addEventListener('click', () => {
+    document.getElementById('graciasModal').hidden = true;
+    document.getElementById('photoInput').click();
+  });
+
+  (function(){
+    if(esInvitado) return;                              // el invitado primero rellena el formulario (nombre, apellidos, email)
+    const seatUser = document.querySelector('.seat.user');
+    const avatarUser = document.querySelector('[data-user-seat]');
+    if(!seatUser || !avatarUser) return;
+    const line2 = document.querySelector('.confirm-msg .line2');
+    const payModal = document.getElementById('payModal');
+    const payEstado = document.getElementById('payEstado');
+    const payError = document.getElementById('payError');
+    const paySubmit = document.getElementById('paySubmit');
+
+    // Círculo rojo entero con "Confirmar" dentro
+    const badge = document.createElement('button');
+    badge.type = 'button';
+    badge.className = 'pago-badge';
+    badge.textContent = 'Confirmar';
+    avatarUser.appendChild(badge);
+
+    function setPagado(){
+      seatUser.classList.remove('pago-pendiente');
+      badge.hidden = true;
+      if(line2) line2.textContent = 'Asiento confirmado. Te escribiremos pronto.';
+      pintarCabecera();
+    }
+    function setPendiente(){
+      seatUser.classList.add('pago-pendiente');
+      badge.hidden = false;
+      if(line2) line2.textContent = 'Confirma tu asiento por 3,99 €';
+      pintarCabecera();
+    }
+    // Pago completado: ahora sí hay asiento (y se quita una foto de ejemplo)
+    function marcarPagado(){
+      const eraNuevo = !usuarioPagado;
+      usuarioPagado = true;
+      guardarMesa();
+      setPagado();
+      if(eraNuevo){
+        if(window.avisarMeta) avisarMeta('compra'); // META: pago confirmado por Stripe
+        renderOtros();
+        if(datosUsuario) enviarInscripcion(nombreRaw, datosUsuario.email, datosUsuario.telefono);
+        cargarFotos();
+        prepararImagenInvitacion();
+        mostrarGracias();
+      }
+    }
+
+    // Vuelta de un pago con redirección (p. ej. 3D Secure)
+    const qp = new URLSearchParams(location.search);
+    if(qp.get('redirect_status') === 'succeeded' && datosUsuario && !usuarioPagado) marcarPagado();
+
+    if(usuarioPagado) setPagado(); else setPendiente();
+
+    let stripe = null, elements = null, cargando = false;
+
+    function cargarStripeJs(){
+      return new Promise((resolve, reject) => {
+        if(window.Stripe) return resolve();
+        const s = document.createElement('script');
+        s.src = 'https://js.stripe.com/v3/';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('No se pudo cargar Stripe'));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function prepararPago(){
+      if(elements || cargando) return;
+      payError.textContent = '';
+      if(!STRIPE_PUBLISHABLE_KEY){
+        payEstado.textContent = 'Pago en preparación: falta configurar la clave pública de Stripe.';
+        return;
+      }
+      cargando = true;
+      payEstado.hidden = false;
+      payEstado.textContent = 'Cargando el pago…';
+      try{
+        await cargarStripeJs();
+        // crearPago crea el pago Y deja sus datos guardados como "pendiente" en Firestore
+        const resp = await fetch(CREAR_PAGO_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            restaurante: RESTAURANTE, categoria: categoria, dia: dia || '', hora: hora || '',
+            nombre: nombreRaw, email: datosUsuario ? datosUsuario.email : '',
+            telefono: datosUsuario ? (datosUsuario.telefono || '') : '', whatsapp: (datosUsuario && datosUsuario.acepto) ? 'si' : 'no'
+          })
+        });
+        const data = await resp.json();
+        if(!resp.ok || !data.clientSecret) throw new Error(data.error || 'No se pudo iniciar el pago');
+        stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+        elements = stripe.elements({
+          clientSecret: data.clientSecret,
+          locale: 'es',
+          appearance: { theme: 'stripe', variables: { colorPrimary: '#002d74', fontFamily: 'Montserrat, sans-serif', borderRadius: '6px' } }
+        });
+        const exp = elements.create('expressCheckout', {
+          buttonHeight: 44,
+          buttonTheme: { applePay: 'black', googlePay: 'black' },
+          paymentMethods: { applePay: 'auto', googlePay: 'auto', link: 'never', amazonPay: 'never', paypal: 'never', klarna: 'never' }
+        });
+        exp.on('ready', (ev) => {
+          const m = ev.availablePaymentMethods;
+          const hay = !!m && Object.values(m).some(Boolean);
+          document.getElementById('payExpress').hidden = !hay;
+          document.getElementById('paySep').hidden = !hay;
+        });
+        exp.on('confirm', async () => {
+          const r = await stripe.confirmPayment({ elements, redirect: 'if_required', confirmParams: { return_url: location.href } });
+          if(r.error){ payError.textContent = r.error.message || 'El pago no se ha podido completar.'; return; }
+          if(r.paymentIntent && (r.paymentIntent.status === 'succeeded' || r.paymentIntent.status === 'processing')){
+            marcarPagado(); payModal.hidden = true;
+          }
+        });
+        exp.mount('#payExpress');
+        elements.create('payment', {
+          layout: { type: 'tabs' },
+          wallets: { applePay: 'never', googlePay: 'never' },
+          fields: { billingDetails: { address: { country: 'never' } } },
+          terms: { card: 'never' }
+        }).mount('#payElement');
+        payEstado.hidden = true;
+        paySubmit.disabled = false;
+      }catch(err){
+        payEstado.textContent = 'No hemos podido cargar el pago. Inténtalo de nuevo en un momento.';
+        payError.textContent = '';
+        elements = null;
+      }finally{
+        cargando = false;
+      }
+    }
+
+    abrirPago = function(){
+      if(usuarioPagado) return;
+      if(!datosUsuario){ abrirFormulario(); return; }   // primero nombre, apellidos y email
+      document.getElementById('payResumen').textContent = RESTAURANTE_DISPLAY + ' · ' + categoria + ' · ' + (dia || 'Por confirmar') + (hora ? (' · ' + hora + ' h') : '');
+      payModal.hidden = false;
+      prepararPago();
+    };
+    badge.addEventListener('click', (e) => { e.stopPropagation(); if(window.avisarMeta) avisarMeta('confirmar'); /* META */ abrirPago(); });
+    avatarUser.addEventListener('click', (e) => {
+      if(!seatUser.classList.contains('pago-pendiente')) return;
+      if(e.target.closest('.add-photo-btn')) return;
+      if(window.avisarMeta) avisarMeta('confirmar'); // META
+      abrirPago();
+    });
+    payModal.addEventListener('click', (e) => {
+      if(e.target === payModal || e.target.closest('[data-close]')) payModal.hidden = true;
+    });
+
+    paySubmit.addEventListener('click', async () => {
+      if(!stripe || !elements) return;
+      paySubmit.disabled = true;
+      paySubmit.textContent = 'Procesando…';
+      payError.textContent = '';
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        redirect: 'if_required',
+        confirmParams: { return_url: location.href, payment_method_data: { billing_details: { address: { country: 'ES' } } } }
+      });
+      if(error){
+        payError.textContent = error.message || 'El pago no se ha podido completar.';
+        paySubmit.disabled = false;
+        paySubmit.textContent = 'Pagar 3,99 €';
+        return;
+      }
+      if(paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')){
+        marcarPagado();
+        payModal.hidden = true;
+      }else{
+        payError.textContent = 'El pago no se ha completado. Inténtalo de nuevo.';
+        paySubmit.disabled = false;
+        paySubmit.textContent = 'Pagar 3,99 €';
+      }
+    });
+
+    // Llega desde un enlace de invitación y ya ha rellenado el formulario: se abre el pago directamente
+    if(qp.get('pagar') === '1' && datosUsuario && !usuarioPagado) abrirPago();
+  })();
+
+  // Dentro del pop-up del index: "Explora mesas" cierra el pop-up y los enlaces externos se abren aparte
+  if(EMBED){
+    const explora = document.querySelector('a.btn-action[href="index.html"]');
+    if(explora){
+      explora.removeAttribute('href');
+      explora.setAttribute('role', 'button');
+      explora.addEventListener('click', () => { parent.postMessage({ flambao: 'cerrar-mesa' }, location.origin); });
+    }
+    document.querySelectorAll('a[href^="https://flambao.com/descargas"]').forEach(a => { a.target = '_blank'; });
+  }
+  // Dentro del pop-up del index: avisa de lo que mide la página y recibe qué trozo se está viendo
+  if(EMBED){
+    const avisarAltura = () => {
+      parent.postMessage({ flambao: 'altura', h: Math.ceil(document.body.getBoundingClientRect().height) }, location.origin);
+    };
+    if(window.ResizeObserver) new ResizeObserver(avisarAltura).observe(document.body);
+    window.addEventListener('load', avisarAltura);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(avisarAltura);
+    avisarAltura();
+    window.addEventListener('message', (e) => {
+      if(e.origin !== location.origin || !e.data || e.data.flambao !== 'visible') return;
+      document.documentElement.style.setProperty('--vis-top', e.data.top + 'px');
+      document.documentElement.style.setProperty('--vis-h', e.data.height + 'px');
+    });
+  }
+</script>
+
+</body>
+</html>
