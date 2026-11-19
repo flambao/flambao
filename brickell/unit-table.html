@@ -960,8 +960,8 @@ const FOTOS = {
 
   // ── Google Form (solo cuando ya ha pagado: sin pago no hay asiento) ──
   //    El Form no tiene campo de email: va en el campo del teléfono.
-  async function enviarInscripcion(nombreCompleto, email, telefono){
-    const mesaInfo = categoria + (dia ? (', ' + dia + (hora ? (' ' + hora) : '')) : '');
+  async function enviarInscripcion(nombreCompleto, email, telefono, estado){   // estado: 'pendiente' (al pulsar Siguiente) o 'pagado' (cuando Stripe confirma)
+    const mesaInfo = categoria + (dia ? (', ' + dia + (hora ? (' ' + hora) : '')) : '') + ' · ' + (estado === 'pagado' ? 'PAGADO' : 'PENDIENTE DE PAGO');
     if(!FORM_ID || !FORM_ENTRY_NOMBRE || !FORM_ENTRY_TELEFONO) return;
     const body = new URLSearchParams();
     if(FORM_ENTRY_APELLIDOS){
@@ -1097,6 +1097,12 @@ const FOTOS = {
     guardarMesa();
     try{ localStorage.setItem('flb_ultimo', JSON.stringify(datosUsuario)); }catch(e2){}
     if(window.avisarMeta) avisarMeta('lead', { nombre: nom, apellidos: ape, email: email, telefono: '+' + prefijoActual.cod + telLocal }); // META
+
+    // También al Google Form, marcado como PENDIENTE DE PAGO: así tenemos sus datos aunque no pague. Una sola vez por persona y mesa.
+    try{
+      const kForm = 'flb_form_pend|' + claveMesa + '|' + email.toLowerCase();
+      if(!localStorage.getItem(kForm)){ localStorage.setItem(kForm, '1'); enviarInscripcion(nom + ' ' + ape, email, '+' + prefijoActual.cod + telLocal, 'pendiente'); }
+    }catch(e3){ enviarInscripcion(nom + ' ' + ape, email, '+' + prefijoActual.cod + telLocal, 'pendiente'); }
 
     if(esInvitado){
       // Entra por invitación: pasa a su propia mesa (sin modo invitado) y allí se abre el pago
@@ -1595,7 +1601,7 @@ document.getElementById('btnShare').addEventListener('click', async function(){
       if(eraNuevo){
         if(window.avisarMeta) avisarMeta('compra'); // META: pago confirmado por Stripe
         renderOtros();
-        if(datosUsuario) enviarInscripcion(nombreRaw, datosUsuario.email, datosUsuario.telefono);
+        if(datosUsuario) enviarInscripcion(nombreRaw, datosUsuario.email, datosUsuario.telefono, 'pagado');
         cargarFotos();
         prepararImagenInvitacion();
         mostrarGracias();
